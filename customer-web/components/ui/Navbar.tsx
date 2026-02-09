@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag, Search, User } from "lucide-react";
+import { ShoppingBag, Search, User, Heart } from "lucide-react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useCartStore } from "@/stores/useCartStore";
 import { useI18nStore } from "@/stores/useI18nStore";
@@ -64,6 +64,15 @@ export function Navbar() {
         >
           <Search className="size-5" />
         </Link>
+        {isAuthenticated && (
+          <Link
+            href="/wishlist"
+            className="flex items-center justify-center rounded-full size-10 bg-transparent text-[#181511] hover:bg-black/5"
+            aria-label={t("wishlist")}
+          >
+            <Heart className="size-5" />
+          </Link>
+        )}
         <Link
           href="/cart"
           className="relative flex items-center justify-center rounded-full size-10 bg-transparent text-[#181511] hover:bg-black/5"

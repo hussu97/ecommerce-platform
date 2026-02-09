@@ -16,8 +16,9 @@ from app.models import (
     taxonomy_attribute, product_attribute_value, language, product_translation,
     taxonomy_translation, brand_translation, taxonomy_attribute_translation,
     ui_string, visitor_preference, product_review, customer_address, audit_log,
+    wishlist,
 )
-from app.api.endpoints import auth, users, products, orders, cart as cart_endpoints, taxonomy as taxonomy_endpoints, brands as brands_endpoints, taxonomy_attributes as taxonomy_attributes_endpoints, i18n as i18n_endpoints, addresses as addresses_endpoints
+from app.api.endpoints import auth, users, products, orders, cart as cart_endpoints, taxonomy as taxonomy_endpoints, brands as brands_endpoints, taxonomy_attributes as taxonomy_attributes_endpoints, i18n as i18n_endpoints, addresses as addresses_endpoints, wishlist as wishlist_endpoints
 
 OPENAPI_TAGS = [
     {"name": "Authentication", "description": "Sign up, login, and token management."},
@@ -26,6 +27,7 @@ OPENAPI_TAGS = [
     {"name": "Products", "description": "Product catalog. Public read only."},
     {"name": "Orders", "description": "Order creation, payment intents, and user order history."},
     {"name": "Cart", "description": "Shopping cart. Works for guests (via X-Visitor-ID) and logged-in users (via Bearer token)."},
+    {"name": "Wishlist", "description": "Saved products (parent only). Logged-in users. Move to cart removes from wishlist."},
 ]
 
 app = FastAPI(
@@ -69,6 +71,7 @@ app.include_router(i18n_endpoints.router, prefix=f"{v1_prefix}/i18n", tags=["i18
 app.include_router(addresses_endpoints.router, prefix=f"{v1_prefix}/addresses", tags=["Addresses"])
 app.include_router(orders.router, prefix=f"{v1_prefix}/orders", tags=["Orders"])
 app.include_router(cart_endpoints.router, prefix=f"{v1_prefix}/cart", tags=["Cart"])
+app.include_router(wishlist_endpoints.router, prefix=f"{v1_prefix}/wishlist", tags=["Wishlist"])
 
 
 @app.on_event("startup")

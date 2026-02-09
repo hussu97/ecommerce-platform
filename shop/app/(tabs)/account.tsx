@@ -95,6 +95,15 @@ export default function AccountScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.menuBtn, { borderColor: colors.sandDivider, backgroundColor: colors.surface }]}
+          onPress={() => router.push("/wishlist")}
+          activeOpacity={0.85}
+        >
+          <FontAwesome name="heart" size={20} color={colors.primary} />
+          <Text style={[styles.menuBtnText, { color: colors.text }]}>{t("wishlist")}</Text>
+          <FontAwesome name="chevron-right" size={14} color={colors.textMuted} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.menuBtn, { borderColor: colors.sandDivider, backgroundColor: colors.surface }]}
           onPress={() => router.push("/addresses")}
           activeOpacity={0.85}
         >

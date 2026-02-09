@@ -9,7 +9,7 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
-| ⬜ | **Wishlist / Saved Items** | Let users save products for later; sync across devices when logged in. New model `WishlistItem`, API endpoints, UI in customer-web and shop. | Medium |
+| ✅ | **Wishlist / Saved Items** | Let users save products for later; sync across devices when logged in. New model `WishlistItem`, API endpoints, UI in customer-web and shop. | Medium |
 | 🔶 | **Product Search** | Full-text search (name, description, brand). *Current:* simple name ILIKE in `/products`. Add FTS5 or Elasticsearch/Meilisearch for scale. | Medium |
 | 🔶 | **Order Tracking** | Real-time status updates. *Current:* admin can set order/item status (shipped, delivered); customer sees status. Missing: tracking number field, carrier API, customer notifications. | Medium |
 | ⬜ | **Promotions / Discounts** | Coupon codes, percentage/fixed discounts, BOGO. New models: `Promotion`, `Coupon`. Apply at checkout. | Medium–High |

@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Product, useCartStore } from "@/stores/useCartStore";
+import { useWishlistStore } from "@/stores/useWishlistStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { PdpSkeleton } from "@/components/PdpSkeleton";
-import { Loader2, Plus, Minus, Star, ArrowLeft, Truck } from "lucide-react";
+import { Loader2, Plus, Minus, Star, ArrowLeft, Truck, Heart } from "lucide-react";
 
 interface Review {
   id: number;
@@ -29,6 +31,11 @@ export default function ProductDetailPage() {
   const addToCart = useCartStore((state) => state.addToCart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getQuantityForProductAndChild = useCartStore((state) => state.getQuantityForProductAndChild);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const inWishlist = useWishlistStore((s) => s.inWishlist);
+  const addToWishlist = useWishlistStore((s) => s.addToWishlist);
+  const removeFromWishlist = useWishlistStore((s) => s.removeFromWishlist);
+  const [wishlistUpdating, setWishlistUpdating] = useState(false);
 
   type Child = { id: number; code: string; size_value: string; stock_net: number };
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
@@ -108,6 +115,25 @@ export default function ProductDetailPage() {
     document.getElementById("pdp-sizes")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleWishlistClick = async () => {
+    if (!slug) return;
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    if (wishlistUpdating) return;
+    setWishlistUpdating(true);
+    try {
+      if (inWishlist(slug)) {
+        await removeFromWishlist(slug);
+      } else {
+        await addToWishlist(slug);
+      }
+    } finally {
+      setWishlistUpdating(false);
+    }
+  };
+
   if (isLoading) {
     return <PdpSkeleton />;
   }
@@ -131,8 +157,14 @@ export default function ProductDetailPage() {
           <ArrowLeft className="size-5" />
         </button>
         <div className="flex gap-2">
-          <button className="flex items-center justify-center rounded-full size-10 bg-white/80 backdrop-blur-md text-[#181511] shadow-sm">
-            <Star className="size-5" />
+          <button
+            type="button"
+            onClick={handleWishlistClick}
+            disabled={wishlistUpdating}
+            className="flex items-center justify-center rounded-full size-10 bg-white/80 backdrop-blur-md text-[#181511] shadow-sm disabled:opacity-50"
+            aria-label={inWishlist(slug) ? t("remove_from_wishlist") : t("add_to_wishlist")}
+          >
+            <Heart className={`size-5 ${inWishlist(slug) ? "fill-[#ec9213] text-[#ec9213]" : ""}`} />
           </button>
         </div>
       </div>
@@ -181,9 +213,20 @@ export default function ProductDetailPage() {
           <h1 className="serif-font text-3xl font-bold leading-tight text-[#181511] mt-1">
             {product.name}
           </h1>
-          <p className="text-2xl font-semibold text-[#ec9213]">
-            AED {product.price.toFixed(2)}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-2xl font-semibold text-[#ec9213]">
+              AED {product.price.toFixed(2)}
+            </p>
+            <button
+              type="button"
+              onClick={handleWishlistClick}
+              disabled={wishlistUpdating}
+              className="flex items-center justify-center rounded-full size-10 bg-[#e5e1da]/50 text-[#181511] hover:bg-[#e5e1da] disabled:opacity-50"
+              aria-label={inWishlist(slug) ? t("remove_from_wishlist") : t("add_to_wishlist")}
+            >
+              <Heart className={`size-5 ${inWishlist(slug) ? "fill-[#ec9213] text-[#ec9213]" : ""}`} />
+            </button>
+          </div>
         </div>
 
         {/* Description */}

@@ -39,6 +39,7 @@ Both `customer-api` and `admin-api` use the same SQLite database. Set `admin-api
 - **CustomerAddress** – Saved delivery addresses (address_code, user_id)
 - **ProductReview** – Reviews linked to order items
 - **CartItem** – Guest (X-Visitor-ID) or logged-in; required product_child_id (cart always references a child)
+- **WishlistItem** – Logged-in only; one row per user and product (parent-product level). Used for wishlist; move-to-cart adds to cart and removes from wishlist in one transaction.
 - **StockReservation** – Required product_child_id; reservations target a child
 - **IdempotencyKey** – (idempotency_key, user_id) → order_id for idempotent order creation (optional header `Idempotency-Key` on POST `/orders/`)
 
@@ -52,6 +53,7 @@ Both `customer-api` and `admin-api` use the same SQLite database. Set `admin-api
 | `/products` | Catalog (public read), product detail, reviews |
 | `/orders` | Create order, payment intent, my orders, order detail |
 | `/cart` | Cart (Bearer or X-Visitor-ID) |
+| `/wishlist` | Wishlist (logged-in only): list, add by product_slug, remove, move-to-cart |
 | `/i18n` | Languages, UI strings, language preference |
 
 ## Multi-language (i18n)

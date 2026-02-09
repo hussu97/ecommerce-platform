@@ -332,6 +332,10 @@ UI_STRINGS = {
         "edit_review": "Edit review", "rate": "Rate",
         "rate_product": "Rate this product", "optional_comment": "Optional comment", "submit": "Submit",
         "size": "Size", "select_size": "Select size", "view_variants": "View variants",
+        "wishlist": "Wishlist", "my_wishlist": "My Wishlist", "add_to_wishlist": "Add to wishlist",
+        "remove_from_wishlist": "Remove from wishlist", "move_to_bag": "Move to Bag",
+        "sign_in_to_save": "Sign in to save items", "wishlist_empty": "Your wishlist is empty",
+        "wishlist_empty_hint": "Save items you love and move them to your bag when you're ready.",
     },
     "ar": {
         "add_to_cart": "أضف إلى السلة", "add_to_sanctuary": "أضف إلى الملاذ", "in_cart": "في السلة",
@@ -446,6 +450,10 @@ UI_STRINGS = {
         "edit_review": "تعديل التقييم", "rate": "قيّم",
         "rate_product": "قيّم هذا المنتج", "optional_comment": "تعليق اختياري", "submit": "إرسال",
         "size": "المقاس", "select_size": "اختر المقاس", "view_variants": "عرض المقاسات",
+        "wishlist": "قائمة الأمنيات", "my_wishlist": "قائمتي", "add_to_wishlist": "أضف إلى القائمة",
+        "remove_from_wishlist": "إزالة من القائمة", "move_to_bag": "انقل إلى الحقيبة",
+        "sign_in_to_save": "سجّل الدخول لحفظ المنتجات", "wishlist_empty": "قائمتك فارغة",
+        "wishlist_empty_hint": "احفظ ما يعجبك وانقله إلى حقيبتك عندما تكون جاهزاً.",
     },
 }
 

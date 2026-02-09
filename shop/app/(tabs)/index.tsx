@@ -18,6 +18,8 @@ import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import api from "@/lib/api";
 import { useCartStore, Product } from "@/stores/useCartStore";
+import { useWishlistStore } from "@/stores/useWishlistStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import { useColorScheme } from "@/components/useColorScheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -82,10 +84,15 @@ export default function ShopScreen() {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [addingSlug, setAddingSlug] = useState<string | null>(null);
+  const [wishlistSlug, setWishlistSlug] = useState<string | null>(null);
   const router = useRouter();
   const addToCart = useCartStore((s) => s.addToCart);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const getQuantityForProductAndChild = useCartStore((s) => s.getQuantityForProductAndChild);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const inWishlist = useWishlistStore((s) => s.inWishlist);
+  const addToWishlist = useWishlistStore((s) => s.addToWishlist);
+  const removeFromWishlist = useWishlistStore((s) => s.removeFromWishlist);
   const t = useI18nStore((s) => s.t);
   const currentLanguage = useI18nStore((s) => s.currentLanguage);
   const colorScheme = useColorScheme();
@@ -183,6 +190,25 @@ export default function ShopScreen() {
     }
   };
 
+  const handleWishlistPress = async (item: Product) => {
+    const slug = (item.slug ?? item.id).toString();
+    if (!isAuthenticated) {
+      Alert.alert(t("sign_in_to_save"), "", [
+        { text: t("sign_in"), onPress: () => router.push("/login") },
+        { text: t("cancel") ?? "Cancel", style: "cancel" },
+      ]);
+      return;
+    }
+    if (wishlistSlug) return;
+    setWishlistSlug(slug);
+    try {
+      if (inWishlist(slug)) await removeFromWishlist(slug);
+      else await addToWishlist(slug);
+    } finally {
+      setWishlistSlug(null);
+    }
+  };
+
   const renderItem = ({ item }: { item: Product }) => {
     const slug = (item.slug ?? item.id).toString();
     const isSingleSized =
@@ -217,6 +243,13 @@ export default function ShopScreen() {
                   <Text style={[styles.noImageText, { color: colors.textMuted }]}>{t("no_image")}</Text>
                 </View>
               )}
+              <TouchableOpacity
+                style={[styles.heartBtn, { backgroundColor: "rgba(255,255,255,0.9)" }]}
+                onPress={() => handleWishlistPress(item)}
+                disabled={wishlistSlug === slug}
+              >
+                <FontAwesome name={inWishlist(slug) ? "heart" : "heart-o"} size={18} color={colors.primary} />
+              </TouchableOpacity>
             </View>
             <View style={styles.cardTextBlock}>
               <Text style={[styles.cardHeader, { fontFamily: FontFamily.serif, color: colors.text }]} numberOfLines={1}>
@@ -301,6 +334,13 @@ export default function ShopScreen() {
                 <Text style={[styles.noImageText, { color: colors.textMuted }]}>{t("no_image")}</Text>
               </View>
             )}
+            <TouchableOpacity
+              style={[styles.heartBtn, { backgroundColor: "rgba(255,255,255,0.9)" }]}
+              onPress={() => handleWishlistPress(item)}
+              disabled={wishlistSlug === slug}
+            >
+              <FontAwesome name={inWishlist(slug) ? "heart" : "heart-o"} size={18} color={colors.primary} />
+            </TouchableOpacity>
           </View>
           <View style={styles.cardTextBlock}>
             <Text style={[styles.cardHeader, { fontFamily: FontFamily.serif, color: colors.text }]} numberOfLines={1}>
@@ -588,6 +628,7 @@ const styles = StyleSheet.create({
     aspectRatio: 4 / 5,
     borderRadius: 12,
     overflow: "hidden",
+    position: "relative",
     ...Platform.select({
       ios: {
         shadowColor: "#181511",
@@ -601,6 +642,16 @@ const styles = StyleSheet.create({
   image: { width: "100%", height: "100%" },
   imagePlaceholder: { justifyContent: "center", alignItems: "center" },
   noImageText: { fontSize: 12 },
+  heartBtn: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   cardTextBlock: { marginTop: 8 },
   cardHeader: { fontSize: 14, fontWeight: "700" },
   cardSubheader: { fontSize: 12, marginTop: 2, marginBottom: 4 },

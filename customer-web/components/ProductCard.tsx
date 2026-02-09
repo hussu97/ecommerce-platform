@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Product, useCartStore } from "@/stores/useCartStore";
+import { useWishlistStore } from "@/stores/useWishlistStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import { Button } from "@/components/ui/Button";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Heart } from "lucide-react";
 import { useState } from "react";
 
 interface ProductCardProps {
@@ -12,11 +15,18 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const addToCart = useCartStore((state) => state.addToCart);
   const t = useI18nStore((s) => s.t);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getQuantityForProductAndChild = useCartStore((state) => state.getQuantityForProductAndChild);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const inWishlist = useWishlistStore((s) => s.inWishlist);
+  const addToWishlist = useWishlistStore((s) => s.addToWishlist);
+  const removeFromWishlist = useWishlistStore((s) => s.removeFromWishlist);
   const productSlug = product.slug ?? product.id;
+  const inWishlistSlug = inWishlist(productSlug);
+  const [wishlistUpdating, setWishlistUpdating] = useState(false);
   const isSingleSized =
     product.single_sized ??
     (product.children?.length === 1 && product.children[0]?.size_value === "single_size");
@@ -56,6 +66,26 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
+  const handleWishlistClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    if (wishlistUpdating) return;
+    setWishlistUpdating(true);
+    try {
+      if (inWishlistSlug) {
+        await removeFromWishlist(productSlug);
+      } else {
+        await addToWishlist(productSlug);
+      }
+    } finally {
+      setWishlistUpdating(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <div className="aspect-[4/5] rounded-xl overflow-hidden bg-white shadow-sm relative group">
@@ -72,6 +102,17 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
         </Link>
+        <button
+          type="button"
+          onClick={handleWishlistClick}
+          disabled={wishlistUpdating}
+          className="absolute top-2 right-2 size-9 rounded-full bg-white/90 shadow-sm flex items-center justify-center text-[#181511] hover:bg-white disabled:opacity-50"
+          aria-label={inWishlistSlug ? t("remove_from_wishlist") : t("add_to_wishlist")}
+        >
+          <Heart
+            className={`size-5 ${inWishlistSlug ? "fill-[#ec9213] text-[#ec9213]" : ""}`}
+          />
+        </button>
       </div>
       <div>
         <Link href={`/products/${productSlug}`} className="block">

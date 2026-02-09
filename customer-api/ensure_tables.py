@@ -7,7 +7,7 @@ from app.models import (
     user, order, cart, stock_reservation, customer_address,
     language, product_translation, taxonomy_translation, brand_translation,
     taxonomy_attribute_translation, ui_string, visitor_preference,
-    idempotency_key,
+    idempotency_key, wishlist,
 )
 
 async def main():

@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import { I18nInitializer } from '@/components/I18nInitializer';
 import { AuthInitializer } from '@/components/AuthInitializer';
+import { WishlistInitializer } from '@/components/WishlistInitializer';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,12 +49,14 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <I18nInitializer />
       <AuthInitializer />
+      <WishlistInitializer />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ title: "Sign In" }} />
         <Stack.Screen name="signup" options={{ title: "Sign Up" }} />
         <Stack.Screen name="profile" options={{ title: "Profile" }} />
         <Stack.Screen name="orders" options={{ title: "Orders" }} />
+        <Stack.Screen name="wishlist" options={{ title: "Wishlist" }} />
         <Stack.Screen name="checkout" options={{ title: "Checkout" }} />
         <Stack.Screen
           name="product/[id]"

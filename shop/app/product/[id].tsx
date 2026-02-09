@@ -14,6 +14,8 @@ import { Text, View } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import api from "@/lib/api";
 import { useCartStore, Product } from "@/stores/useCartStore";
+import { useWishlistStore } from "@/stores/useWishlistStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
@@ -41,6 +43,11 @@ export default function ProductDetailScreen() {
   const addToCart = useCartStore((s) => s.addToCart);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const getQuantityForProductAndChild = useCartStore((s) => s.getQuantityForProductAndChild);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const inWishlist = useWishlistStore((s) => s.inWishlist);
+  const addToWishlist = useWishlistStore((s) => s.addToWishlist);
+  const removeFromWishlist = useWishlistStore((s) => s.removeFromWishlist);
+  const [wishlistUpdating, setWishlistUpdating] = useState(false);
   const t = useI18nStore((s) => s.t);
   const currentLanguage = useI18nStore((s) => s.currentLanguage);
   const colorScheme = useColorScheme();
@@ -116,6 +123,22 @@ export default function ProductDetailScreen() {
 
   const stockNet = selectedChild?.stock_net ?? product?.stock_net ?? product?.stock_quantity ?? 0;
 
+  const handleWishlistPress = async () => {
+    if (!slug) return;
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    if (wishlistUpdating) return;
+    setWishlistUpdating(true);
+    try {
+      if (inWishlist(slug)) await removeFromWishlist(slug);
+      else await addToWishlist(slug);
+    } finally {
+      setWishlistUpdating(false);
+    }
+  };
+
   const imageTranslateY = scrollY.interpolate({
     inputRange: [0, IMAGE_HEIGHT],
     outputRange: [0, IMAGE_HEIGHT * 0.35],
@@ -164,6 +187,13 @@ export default function ProductDetailScreen() {
             activeOpacity={0.9}
           >
             <FontAwesome name="chevron-left" size={22} color={colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.heartBtn, { backgroundColor: colors.surface }]}
+            onPress={handleWishlistPress}
+            disabled={wishlistUpdating}
+          >
+            <FontAwesome name={inWishlist(slug) ? "heart" : "heart-o"} size={22} color={colors.primary} />
           </TouchableOpacity>
           <Animated.View style={[styles.imageWrap, { transform: [{ translateY: imageTranslateY }] }]}>
             {product.image_url ? (
@@ -392,6 +422,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: Platform.OS === "ios" ? 54 : 16,
     left: 16,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    opacity: 0.95,
+  },
+  heartBtn: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 54 : 16,
+    right: 16,
     zIndex: 10,
     width: 44,
     height: 44,

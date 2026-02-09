@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/Footer";
 import { CartInitializer } from "@/components/CartInitializer";
+import { WishlistInitializer } from "@/components/WishlistInitializer";
 import { I18nInitializer } from "@/components/I18nInitializer";
 import { I18nLayoutEffect } from "@/components/I18nLayoutEffect";
 
@@ -28,6 +29,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-[#f8f7f6] text-[#181511]">
         <CartInitializer />
+        <WishlistInitializer />
         <I18nInitializer />
         <I18nLayoutEffect />
         <Navbar />
