@@ -1,0 +1,2907 @@
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand-divider": "#e5e1da",
+                        "text-muted": "#897961"
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden max-w-[430px] mx-auto shadow-2xl">
+<header class="flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pt-6 justify-between border-b border-sand-divider dark:border-[#3d3123] sticky top-0 z-50">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="serif-font text-xl font-semibold">Filters</h1>
+<button class="text-primary text-sm font-semibold px-2">Reset</button>
+</header>
+<div class="flex-1 overflow-y-auto px-4 pb-32">
+<section class="py-6 border-b border-sand-divider dark:border-[#3d3123]">
+<h2 class="serif-font text-lg font-semibold mb-4">Sort By</h2>
+<div class="flex flex-wrap gap-2">
+<button class="px-5 py-2 rounded-full bg-primary text-white text-sm font-medium shadow-md shadow-primary/20">Featured</button>
+<button class="px-5 py-2 rounded-full border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-sm font-medium">Newest</button>
+<button class="px-5 py-2 rounded-full border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-sm font-medium">Price: Low to High</button>
+<button class="px-5 py-2 rounded-full border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-sm font-medium">Price: High to Low</button>
+</div>
+</section>
+<section class="py-6 border-b border-sand-divider dark:border-[#3d3123]">
+<div class="flex items-center justify-between mb-4">
+<h2 class="serif-font text-lg font-semibold">Category</h2>
+<span class="material-symbols-outlined text-text-muted">expand_more</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex items-center p-3 rounded-xl border border-primary bg-primary/5">
+<span class="text-sm font-medium">All Categories</span>
+<span class="material-symbols-outlined text-primary ml-auto text-lg">check_circle</span>
+</div>
+<div class="flex items-center p-3 rounded-xl border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419]">
+<span class="text-sm font-medium">Electronics</span>
+</div>
+<div class="flex items-center p-3 rounded-xl border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419]">
+<span class="text-sm font-medium">Living Room</span>
+</div>
+<div class="flex items-center p-3 rounded-xl border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419]">
+<span class="text-sm font-medium">Wellness</span>
+</div>
+</div>
+</section>
+<section class="py-6 border-b border-sand-divider dark:border-[#3d3123]">
+<h2 class="serif-font text-lg font-semibold mb-6">Price Range</h2>
+<div class="px-2">
+<div class="relative h-1 w-full bg-sand-divider dark:bg-[#3d3123] rounded-full">
+<div class="absolute h-full bg-primary left-[20%] right-[30%] rounded-full"></div>
+<div class="absolute -top-2 left-[20%] size-5 bg-white border-2 border-primary rounded-full shadow-sm"></div>
+<div class="absolute -top-2 right-[30%] size-5 bg-white border-2 border-primary rounded-full shadow-sm"></div>
+</div>
+<div class="flex justify-between mt-6">
+<div class="bg-white dark:bg-[#2d2419] border border-sand-divider dark:border-[#3d3123] rounded-lg px-4 py-2 w-[45%]">
+<p class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Min (AED)</p>
+<p class="text-sm font-semibold">500</p>
+</div>
+<div class="bg-white dark:bg-[#2d2419] border border-sand-divider dark:border-[#3d3123] rounded-lg px-4 py-2 w-[45%]">
+<p class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Max (AED)</p>
+<p class="text-sm font-semibold">5,000</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-6 border-b border-sand-divider dark:border-[#3d3123]">
+<div class="flex items-center justify-between mb-4">
+<h2 class="serif-font text-lg font-semibold">Brand</h2>
+<p class="text-primary text-sm font-medium">See All</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-5 py-2 rounded-full border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-sm font-medium">Al Maha</button>
+<button class="px-5 py-2 rounded-full bg-primary text-white text-sm font-medium shadow-md shadow-primary/20">Oasis Tech</button>
+<button class="px-5 py-2 rounded-full border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-sm font-medium">Dune Designs</button>
+<button class="px-5 py-2 rounded-full border border-sand-divider dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-sm font-medium">Sandscape</button>
+</div>
+</section>
+<section class="py-6 border-b border-sand-divider dark:border-[#3d3123]">
+<div class="flex items-center justify-between mb-4">
+<h2 class="serif-font text-lg font-semibold">Material</h2>
+<span class="material-symbols-outlined text-text-muted">expand_more</span>
+</div>
+<div class="flex gap-4 overflow-x-auto no-scrollbar py-1">
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full border-2 border-primary p-0.5">
+<div class="w-full h-full rounded-full bg-[#E5D5C5]"></div>
+</div>
+<span class="text-xs font-medium">Sand</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full border border-sand-divider dark:border-[#3d3123] p-0.5">
+<div class="w-full h-full rounded-full bg-[#7C6E5A]"></div>
+</div>
+<span class="text-xs font-medium">Walnut</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full border border-sand-divider dark:border-[#3d3123] p-0.5">
+<div class="w-full h-full rounded-full bg-[#D1D1D1]"></div>
+</div>
+<span class="text-xs font-medium">Marble</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full border border-sand-divider dark:border-[#3d3123] p-0.5">
+<div class="w-full h-full rounded-full bg-[#B8860B]"></div>
+</div>
+<span class="text-xs font-medium">Gold</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-14 rounded-full border border-sand-divider dark:border-[#3d3123] p-0.5">
+<div class="w-full h-full rounded-full bg-[#F5F5DC]"></div>
+</div>
+<span class="text-xs font-medium">Ceramic</span>
+</div>
+</div>
+</section>
+</div>
+<footer class="absolute bottom-0 left-0 right-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl p-4 pb-10 border-t border-sand-divider dark:border-[#3d3123] flex items-center justify-between gap-4">
+<div class="flex flex-col">
+<p class="text-text-muted text-xs font-medium uppercase tracking-wider">Results</p>
+<p class="text-lg font-bold">142 Items</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-4 px-10 rounded-xl shadow-lg shadow-primary/30 flex-1">
+                Show Products
+            </button>
+</footer>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand-text": "#897961",
+                        "cream-border": "#e5e1da",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .input-focus:focus {
+            border-color: #ec9213;
+            box-shadow: 0 0 0 1px #ec9213;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<div class="px-4 pt-6">
+<button class="flex items-center justify-center rounded-full size-10 bg-white/50 dark:bg-white/5 backdrop-blur-sm border border-cream-border dark:border-[#3d3123]">
+<span class="material-symbols-outlined text-xl">arrow_back_ios_new</span>
+</button>
+</div>
+<div class="flex flex-col items-center justify-center pt-8 pb-10">
+<div class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary mb-6 shadow-sm">
+<span class="material-symbols-outlined text-3xl">spa</span>
+</div>
+<h1 class="serif-font text-3xl font-bold tracking-tight text-center">Assalamu Alaikum</h1>
+<p class="text-sand-text dark:text-[#c4b5a0] text-sm mt-2 text-center">Enter your sanctuary of refined living</p>
+</div>
+<div class="px-8 flex-1">
+<div class="space-y-6">
+<div class="flex border-b border-cream-border dark:border-[#3d3123] mb-8">
+<button class="flex-1 pb-3 text-sm font-bold border-b-2 border-primary text-[#181511] dark:text-white">Login</button>
+<button class="flex-1 pb-3 text-sm font-medium text-sand-text dark:text-[#c4b5a0] border-b-2 border-transparent">Sign Up</button>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-semibold uppercase tracking-wider text-sand-text dark:text-[#c4b5a0] px-1">Email Address</label>
+<input class="w-full h-14 px-4 rounded-xl border-cream-border dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-[#181511] dark:text-white placeholder:text-sand-text/40 focus:ring-primary focus:border-primary transition-all duration-200 outline-none" placeholder="ahmad@example.ae" type="email"/>
+</div>
+<div class="flex flex-col gap-2 relative">
+<label class="text-xs font-semibold uppercase tracking-wider text-sand-text dark:text-[#c4b5a0] px-1">Password</label>
+<div class="relative">
+<input class="w-full h-14 px-4 rounded-xl border-cream-border dark:border-[#3d3123] bg-white dark:bg-[#2d2419] text-[#181511] dark:text-white placeholder:text-sand-text/40 focus:ring-primary focus:border-primary transition-all duration-200 outline-none" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-sand-text">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex justify-end">
+<button class="text-xs font-bold text-primary uppercase tracking-widest">Forgot Password?</button>
+</div>
+<button class="w-full h-14 bg-primary text-white rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform">
+                    Continue to Oasis
+                </button>
+<div class="pt-6">
+<div class="relative flex py-5 items-center">
+<div class="flex-grow border-t border-cream-border dark:border-[#3d3123]"></div>
+<span class="flex-shrink mx-4 text-xs text-sand-text uppercase tracking-widest">Or continue with</span>
+<div class="flex-grow border-t border-cream-border dark:border-[#3d3123]"></div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-4">
+<button class="flex items-center justify-center gap-2 h-12 rounded-xl border border-cream-border dark:border-[#3d3123] bg-white dark:bg-[#2d2419] hover:bg-gray-50 transition-colors">
+<img alt="Google" class="size-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPHABbPLXDn9gUjChqdilmb4gbRUEEDUl5opkYM4qVCEqOhdxBZg5s9eA3mu6w56qeXWrgWIr_TLRlbURHy9scXB0SC2mQeNvfnqIHFz1a9NTgnC2we_h8ryJok4XiFr9UMoUKV79gI3nJZ4jzwXDNKu8SrA6Xks4odfmKtFkb1d9xQ7sDPz6wgmrivcUUyYz87-jurykH2Pvt3S4zlzCk_mNvenXgr6xZZaw44cV9VmLmtCreAPi3rGVVEBmC7pz0HIynPm84yG0"/>
+<span class="text-sm font-medium">Google</span>
+</button>
+<button class="flex items-center justify-center gap-2 h-12 rounded-xl border border-cream-border dark:border-[#3d3123] bg-white dark:bg-[#2d2419] hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-xl">ios</span>
+<span class="text-sm font-medium">Apple</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<footer class="p-8 text-center">
+<p class="text-xs text-sand-text leading-relaxed">
+                By continuing, you agree to our <br/>
+<span class="font-semibold text-[#181511] dark:text-white">Terms of Service</span> and <span class="font-semibold text-[#181511] dark:text-white">Privacy Policy</span>
+</p>
+</footer>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<!-- Top Bar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<h2 class="serif-font text-lg font-bold leading-tight tracking-[-0.015em]">Assalamu Alaikum</h2>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0]">Welcome to your sanctuary</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center rounded-full size-10 bg-transparent text-[#181511] dark:text-[#f8f7f6]">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-full size-10 bg-transparent text-[#181511] dark:text-[#f8f7f6]">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+</div>
+</header>
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-[#897961] flex border-none bg-white dark:bg-[#2d2419] items-center justify-center pl-4 rounded-l-xl border-r-0">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-xl text-[#181511] dark:text-white focus:outline-0 focus:ring-0 border-none bg-white dark:bg-[#2d2419] h-full placeholder:text-[#897961] px-4 pl-2 text-base font-normal leading-normal" placeholder="Search for your home..." value=""/>
+</div>
+</label>
+</div>
+<!-- Category Filters -->
+<div class="flex gap-3 px-4 py-2 overflow-x-auto no-scrollbar">
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-5 shadow-md shadow-primary/20">
+<p class="text-white text-sm font-medium">All</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2d2419] px-5 border border-[#e5e1da] dark:border-[#3d3123]">
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium">Electronics</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2d2419] px-5 border border-[#e5e1da] dark:border-[#3d3123]">
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium">Living</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2d2419] px-5 border border-[#e5e1da] dark:border-[#3d3123]">
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium">Wellness</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2d2419] px-5 border border-[#e5e1da] dark:border-[#3d3123]">
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium">Kitchen</p>
+</div>
+</div>
+<!-- Hero Section -->
+<div class="px-4 py-4">
+<div class="bg-cover bg-center flex flex-col justify-end overflow-hidden rounded-xl min-h-64 relative shadow-lg group" data-alt="Minimalist modern living room in soft sand tones" style='background-image: linear-gradient(0deg, rgba(24, 21, 17, 0.7) 0%, rgba(24, 21, 17, 0) 50%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuD1ID___pJ2eFBHDdzcOQrhSuCcmlFq54ZJHuTPLaOGK8ATY3bmFgEXuwGJPRaGFXsoZw8AYfZyxdRZmck7eGZPLR8OhKmtyX4I50vv3pRPYtTyDBrgCaQBlhe6ZpwtXpOUvj2yyx29N2XHCYHZFxSI1LB2lsD1LJoqS0364XNyb6EeT5RGGUZYfh30gBsEUPRxUTKcmQY-xa7ype0k46ycWNjAVLOHZJ3ub_vv_AdJGw_MwQHt2-0z_pdxYmiw4AjzpHlXZ6H_-W4");'>
+<div class="p-6 relative z-10">
+<span class="text-primary text-xs font-bold tracking-widest uppercase mb-1 block">New Arrival</span>
+<h1 class="text-white serif-font text-3xl font-bold leading-tight">The Desert Collection</h1>
+<p class="text-white/80 text-sm mt-1">Elegance inspired by the dunes.</p>
+<button class="mt-4 bg-white text-[#181511] px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-primary hover:text-white transition-colors">Shop Now</button>
+</div>
+</div>
+</div>
+<!-- Curated Section -->
+<div class="flex items-center justify-between px-4 pt-4 pb-2">
+<h2 class="serif-font text-xl font-bold leading-tight tracking-[-0.015em]">Curated for You</h2>
+<button class="text-primary text-sm font-semibold">View All</button>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-2 gap-4 px-4 pb-24">
+<!-- Product Card 1 -->
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" data-alt="Luxury ceramic table lamp with warm glow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKl5DxbQXC4oebYrMtCtUTk0KQ00zsJgeFHl-YfldYqOv-fPra-uSu27DyV78EAlXbTsWeRNNcSe3vgpgSKFOWmT-ChyY2bPJ_sZuFECrh5dXN0ZOXvHyxrCX8Kfp80dqZp4l8qHnPgkHG4yTBa3hvOngJI6-7pBhNXqtw-RPYOZKw7bokffv82T226phvMviJOLqSqcWrR1gJYnfauSctcjlkyl6i9-DnCBclNxokGzjH3UlD4eq9x5ORIQsxGK227eJAX9XZOVo"/>
+<button class="absolute top-2 right-2 size-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#181511]">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Al Maha Table Lamp</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Living Room</p>
+<p class="text-sm font-semibold text-primary">AED 1,250</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" data-alt="Premium minimalist air purifier for office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfhUAdluxYwuMIoPc-vh_-gqMY-whMvU2K0mPlSE85UUaui38lzNcqlDk-VexlWpq0kP8ZF9SjFmrQUIbcm34HBhXszMhL7sFyu_YYowDkTIIZhfCKcoasapUF22btQX62wFRoOqxJ9EASao4HsGyc_PKsCPkObnOBvCczpdp8k8rITrRv1nvhhWU012sYPMzedi9e5v0x7VGnd1KbjFgQ6_wxEHMo65nil8jtCSSHrOw5AnS-ygQbv_faKj609hc-kH_1rZkYJrE"/>
+<button class="absolute top-2 right-2 size-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#181511]">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Oasis Air Purifier</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Electronics</p>
+<p class="text-sm font-semibold text-primary">AED 2,890</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" data-alt="Artisanal glass carafe and tumblers set" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHsRXatdB4D0yzV5qw3c19GmTiUFIBIprZ1bfpszVtDlGWyLGiJLHY9WftxEsFlJlnvco3rcCojZbI-eSB1GyNpiILLw6piUX2GSwUpWESWHikw7K84v2wL73LyIdsAwCSTwv0DbhgcCOTXAkyoLoz05JYWEx5aYlqsKzg943TTjyFFmcneVtX7LZDq3HgCUsvOnmNhibllsxIxtNoFHd5zIBHy_fej0I0K9LhC7vUDqXNbx-cHHkzvBjEhi-56tbB0L_srJKGTUk"/>
+<button class="absolute top-2 right-2 size-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#181511]">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Sandscape Carafe Set</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Kitchen</p>
+<p class="text-sm font-semibold text-primary">AED 420</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" data-alt="Luxury golden minimalist headphones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-5Pd4BEuTEyX_sgmxLlHkAEoQmNBwgyQDke0TgXc7bJw-a3ff0f-DPXjoD5qoqBHSqipspLQtKD9FSVGzOCv6P1ZVF-MKmW-g_Rmh7vngb1RY5KN4KFsD-MK3ABgtq-9WaZPMQgXpF3oPyRIgP8xlFrw9ayYqph7X7MIgDccDguRBEnF6fTEr9phTyW8zWJoscaE_Po_icJoVVL3cqqoUc82dqmzlgRD8NjqhVF7CaoVp3QMhdiUANn8D-_A-Db7acjUMs37ojuA"/>
+<button class="absolute top-2 right-2 size-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#181511]">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Dune H1 Headphones</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Electronics</p>
+<p class="text-sm font-semibold text-primary">AED 1,800</p>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/80 dark:bg-[#1a140d]/80 backdrop-blur-xl border-t border-[#e5e1da] dark:border-[#3d3123] px-6 py-3 flex justify-between items-center z-50">
+<div class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-medium mt-1">Discover</span>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<div class="size-12 bg-primary flex items-center justify-center rounded-full -mt-10 shadow-lg shadow-primary/30 border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-white">add</span>
+</div>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-medium mt-1">Saved</span>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium mt-1">Account</span>
+</div>
+</nav>
+</div>
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<button class="flex size-10 items-center justify-center rounded-full bg-white dark:bg-[#2d2419] border border-[#e5e1da] dark:border-[#3d3123]">
+<span class="material-symbols-outlined text-xl">arrow_back</span>
+</button>
+<h1 class="serif-font text-xl font-bold leading-tight tracking-[-0.015em]">My Orders</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center rounded-full size-10 bg-transparent text-[#181511] dark:text-[#f8f7f6]">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</header>
+<div class="flex flex-col gap-6 p-4 pb-24">
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between border-b border-[#e5e1da] dark:border-[#3d3123] pb-2">
+<span class="serif-font text-sm font-bold text-primary italic">In Transit</span>
+<span class="text-[11px] text-[#897961] dark:text-[#c4b5a0] uppercase tracking-wider font-medium">Order #DXB-8821</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKl5DxbQXC4oebYrMtCtUTk0KQ00zsJgeFHl-YfldYqOv-fPra-uSu27DyV78EAlXbTsWeRNNcSe3vgpgSKFOWmT-ChyY2bPJ_sZuFECrh5dXN0ZOXvHyxrCX8Kfp80dqZp4l8qHnPgkHG4yTBa3hvOngJI6-7pBhNXqtw-RPYOZKw7bokffv82T226phvMviJOLqSqcWrR1gJYnfauSctcjlkyl6i9-DnCBclNxokGzjH3UlD4eq9x5ORIQsxGK227eJAX9XZOVo"/>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Al Maha Table Lamp</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Delivering to Jumeirah</p>
+<p class="text-sm font-semibold text-primary uppercase">AED 1,250</p>
+</div>
+</div>
+<div class="flex flex-col justify-center gap-4">
+<div class="space-y-1">
+<p class="text-[10px] text-[#897961] uppercase tracking-widest font-bold">Timeline</p>
+<p class="serif-font text-xs">Arriving by Thursday</p>
+</div>
+<button class="w-full py-2.5 rounded-full border border-primary text-primary text-xs font-bold uppercase tracking-wider">Track Order</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between border-b border-[#e5e1da] dark:border-[#3d3123] pb-2">
+<span class="serif-font text-sm font-bold text-primary italic">Delivered</span>
+<span class="text-[11px] text-[#897961] dark:text-[#c4b5a0] uppercase tracking-wider font-medium">Order #DXB-7402</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-5Pd4BEuTEyX_sgmxLlHkAEoQmNBwgyQDke0TgXc7bJw-a3ff0f-DPXjoD5qoqBHSqipspLQtKD9FSVGzOCv6P1ZVF-MKmW-g_Rmh7vngb1RY5KN4KFsD-MK3ABgtq-9WaZPMQgXpF3oPyRIgP8xlFrw9ayYqph7X7MIgDccDguRBEnF6fTEr9phTyW8zWJoscaE_Po_icJoVVL3cqqoUc82dqmzlgRD8NjqhVF7CaoVp3QMhdiUANn8D-_A-Db7acjUMs37ojuA"/>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Dune H1 Headphones</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Received Oct 12, 2023</p>
+<p class="text-sm font-semibold text-primary uppercase">AED 1,800</p>
+</div>
+</div>
+<div class="flex flex-col justify-center gap-4">
+<div class="space-y-1">
+<p class="text-[10px] text-[#897961] uppercase tracking-widest font-bold">Support</p>
+<p class="serif-font text-xs">Warranty active for 2 yrs</p>
+</div>
+<button class="w-full py-2.5 rounded-full bg-[#181511] text-white dark:bg-white dark:text-[#181511] text-xs font-bold uppercase tracking-wider">Order Again</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between border-b border-[#e5e1da] dark:border-[#3d3123] pb-2">
+<span class="serif-font text-sm font-bold text-primary italic">Processing</span>
+<span class="text-[11px] text-[#897961] dark:text-[#c4b5a0] uppercase tracking-wider font-medium">Order #DXB-9104</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfhUAdluxYwuMIoPc-vh_-gqMY-whMvU2K0mPlSE85UUaui38lzNcqlDk-VexlWpq0kP8ZF9SjFmrQUIbcm34HBhXszMhL7sFyu_YYowDkTIIZhfCKcoasapUF22btQX62wFRoOqxJ9EASao4HsGyc_PKsCPkObnOBvCczpdp8k8rITrRv1nvhhWU012sYPMzedi9e5v0x7VGnd1KbjFgQ6_wxEHMo65nil8jtCSSHrOw5AnS-ygQbv_faKj609hc-kH_1rZkYJrE"/>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Oasis Air Purifier</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Awaiting dispatch</p>
+<p class="text-sm font-semibold text-primary uppercase">AED 2,890</p>
+</div>
+</div>
+<div class="flex flex-col justify-center gap-4">
+<div class="space-y-1">
+<p class="text-[10px] text-[#897961] uppercase tracking-widest font-bold">Status</p>
+<p class="serif-font text-xs">Preparing for courier</p>
+</div>
+<button class="w-full py-2.5 rounded-full border border-[#e5e1da] dark:border-[#3d3123] text-[#181511] dark:text-white text-xs font-bold uppercase tracking-wider">Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/80 dark:bg-[#1a140d]/80 backdrop-blur-xl border-t border-[#e5e1da] dark:border-[#3d3123] px-6 py-3 flex justify-between items-center z-50">
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-medium mt-1">Discover</span>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<div class="size-12 bg-primary flex items-center justify-center rounded-full -mt-10 shadow-lg shadow-primary/30 border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-white">add</span>
+</div>
+</div>
+<div class="flex flex-col items-center text-[#897961] dark:text-[#c4b5a0]">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-medium mt-1">Saved</span>
+</div>
+<div class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">person</span>
+<span class="text-[10px] font-bold mt-1">Account</span>
+</div>
+</nav>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "gold": "#d4af37",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<header class="flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center rounded-full size-10 bg-white dark:bg-[#2d2419] text-[#181511] dark:text-[#f8f7f6] shadow-sm">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div>
+<h1 class="serif-font text-lg font-bold leading-tight">Order #DU-8829</h1>
+<p class="text-[10px] uppercase tracking-widest text-[#897961] dark:text-[#c4b5a0]">Placed Dec 12, 2023</p>
+</div>
+</div>
+<button class="flex items-center justify-center rounded-full size-10 bg-white dark:bg-[#2d2419] text-[#181511] dark:text-[#f8f7f6] shadow-sm">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</header>
+<main class="flex-1 pb-24">
+<section class="px-6 py-8">
+<h2 class="serif-font text-xl font-bold mb-8">Delivery Status</h2>
+<div class="relative flex flex-col gap-8">
+<div class="absolute left-[11px] top-2 bottom-2 w-[2px] bg-[#e5e1da] dark:bg-[#3d3123]"></div>
+<div class="relative flex gap-4">
+<div class="relative z-10 size-6 rounded-full bg-primary flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-white text-sm font-bold">check</span>
+</div>
+<div>
+<p class="font-bold text-sm">Delivered</p>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0]">Dec 15, 2023 • 2:30 PM</p>
+<p class="text-xs mt-1 italic text-[#897961]">Signed by Ahmed K.</p>
+</div>
+</div>
+<div class="relative flex gap-4">
+<div class="relative z-10 size-6 rounded-full bg-primary flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-white text-sm font-bold">local_shipping</span>
+</div>
+<div>
+<p class="font-bold text-sm">Out for Delivery</p>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0]">Dec 15, 2023 • 8:00 AM</p>
+</div>
+</div>
+<div class="relative flex gap-4">
+<div class="relative z-10 size-6 rounded-full bg-primary flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-white text-sm font-bold">package_2</span>
+</div>
+<div>
+<p class="font-bold text-sm">Shipped from Dubai Hub</p>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0]">Dec 14, 2023 • 4:15 PM</p>
+</div>
+</div>
+<div class="relative flex gap-4">
+<div class="relative z-10 size-6 rounded-full bg-primary flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-white text-sm font-bold">inventory</span>
+</div>
+<div>
+<p class="font-bold text-sm">Order Processed</p>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0]">Dec 12, 2023 • 11:45 AM</p>
+</div>
+</div>
+</div>
+</section>
+<section class="px-4 py-4 bg-white/40 dark:bg-[#1a140d]/40">
+<h2 class="serif-font text-xl font-bold mb-4 px-2">Order Items</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="Oasis Air Purifier" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfhUAdluxYwuMIoPc-vh_-gqMY-whMvU2K0mPlSE85UUaui38lzNcqlDk-VexlWpq0kP8ZF9SjFmrQUIbcm34HBhXszMhL7sFyu_YYowDkTIIZhfCKcoasapUF22btQX62wFRoOqxJ9EASao4HsGyc_PKsCPkObnOBvCczpdp8k8rITrRv1nvhhWU012sYPMzedi9e5v0x7VGnd1KbjFgQ6_wxEHMo65nil8jtCSSHrOw5AnS-ygQbv_faKj609hc-kH_1rZkYJrE"/>
+<div class="absolute bottom-2 left-2 px-2 py-1 rounded bg-white/90 backdrop-blur-md text-[10px] font-bold text-[#181511]">
+                            QTY: 1
+                        </div>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Oasis Air Purifier</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Electronics</p>
+<p class="text-sm font-semibold text-primary">AED 2,890</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-white dark:bg-[#2d2419] shadow-sm relative">
+<img alt="Dune H1 Headphones" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-5Pd4BEuTEyX_sgmxLlHkAEoQmNBwgyQDke0TgXc7bJw-a3ff0f-DPXjoD5qoqBHSqipspLQtKD9FSVGzOCv6P1ZVF-MKmW-g_Rmh7vngb1RY5KN4KFsD-MK3ABgtq-9WaZPMQgXpF3oPyRIgP8xlFrw9ayYqph7X7MIgDccDguRBEnF6fTEr9phTyW8zWJoscaE_Po_icJoVVL3cqqoUc82dqmzlgRD8NjqhVF7CaoVp3QMhdiUANn8D-_A-Db7acjUMs37ojuA"/>
+<div class="absolute bottom-2 left-2 px-2 py-1 rounded bg-white/90 backdrop-blur-md text-[10px] font-bold text-[#181511]">
+                            QTY: 1
+                        </div>
+</div>
+<div>
+<h3 class="serif-font text-sm font-bold text-[#181511] dark:text-white">Dune H1 Headphones</h3>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mb-1">Electronics</p>
+<p class="text-sm font-semibold text-primary">AED 1,800</p>
+</div>
+</div>
+</div>
+</section>
+<section class="px-6 py-8">
+<h2 class="serif-font text-xl font-bold mb-4">Summary</h2>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-[#897961] dark:text-[#c4b5a0]">Subtotal</span>
+<span class="font-medium">AED 4,690.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-[#897961] dark:text-[#c4b5a0]">Shipping</span>
+<span class="font-medium">AED 50.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-[#897961] dark:text-[#c4b5a0]">Tax (VAT 5%)</span>
+<span class="font-medium">AED 237.00</span>
+</div>
+<div class="pt-3 mt-3 border-t border-[#e5e1da] dark:border-[#3d3123] flex justify-between items-baseline">
+<span class="serif-font text-lg font-bold">Total</span>
+<span class="text-xl font-bold text-gold">AED 4,977.00</span>
+</div>
+</div>
+</section>
+<section class="px-6 py-4">
+<h2 class="serif-font text-xl font-bold mb-4">Shipping Details</h2>
+<div class="p-4 rounded-xl bg-white dark:bg-[#2d2419] border border-[#e5e1da] dark:border-[#3d3123]">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#897961] mt-0.5">location_on</span>
+<div>
+<p class="font-bold text-sm">Fatima Al Mansouri</p>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] leading-relaxed mt-1">
+                            Villa 45, Al Barsha 2<br/>
+                            Street 23B, Dubai<br/>
+                            United Arab Emirates
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-[#e5e1da] dark:border-[#3d3123] z-50">
+<button class="w-full bg-[#181511] dark:bg-primary text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg active:scale-[0.98] transition-transform">
+            Download Invoice
+        </button>
+</div>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand-muted": "#897961",
+                        "cream-soft": "#e5e1da",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.25rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        input::placeholder {
+            color: #897961;
+            opacity: 0.6;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<header class="flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center rounded-full size-10 bg-white dark:bg-[#2d2419] shadow-sm">
+<span class="material-symbols-outlined text-xl">arrow_back_ios_new</span>
+</button>
+<h2 class="serif-font text-xl font-bold leading-tight tracking-tight">Checkout</h2>
+</div>
+<div class="flex items-center">
+<span class="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-full">Step 2 of 3</span>
+</div>
+</header>
+<div class="flex flex-col gap-8 px-4 py-6 pb-40">
+<section class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="serif-font text-lg font-bold">Delivery Address</h3>
+<button class="text-primary text-xs font-semibold">Change</button>
+</div>
+<div class="space-y-3">
+<div class="relative">
+<input class="w-full bg-white dark:bg-[#2d2419] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-primary shadow-sm" placeholder="Full Name" type="text" value="Zayed bin Sultan"/>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<input class="w-full bg-white dark:bg-[#2d2419] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-primary shadow-sm" placeholder="Dubai" type="text" value="Dubai"/>
+<input class="w-full bg-white dark:bg-[#2d2419] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-primary shadow-sm" placeholder="Emirate" type="text" value="Dubai"/>
+</div>
+<div class="relative">
+<input class="w-full bg-white dark:bg-[#2d2419] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-primary shadow-sm" placeholder="Street Address / Villa Number" type="text" value="Jumeirah Street, Villa 24A"/>
+</div>
+<div class="relative">
+<input class="w-full bg-white dark:bg-[#2d2419] border-none rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-primary shadow-sm" placeholder="Mobile Number" type="tel" value="+971 50 123 4567"/>
+</div>
+</div>
+</section>
+<section class="flex flex-col gap-4">
+<h3 class="serif-font text-lg font-bold">Shipping Method</h3>
+<div class="bg-white dark:bg-[#2d2419] rounded-2xl p-4 flex items-center justify-between border border-primary shadow-sm">
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<div>
+<p class="text-sm font-bold">Express Delivery</p>
+<p class="text-xs text-sand-muted">Tomorrow, by 10:00 PM</p>
+</div>
+</div>
+<p class="text-sm font-bold text-primary">AED 25</p>
+</div>
+</section>
+<section class="bg-white dark:bg-[#2d2419] rounded-2xl p-6 shadow-sm border border-cream-soft dark:border-[#3d3123]">
+<h3 class="serif-font text-lg font-bold mb-6">Order Summary</h3>
+<div class="space-y-4 mb-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-lg overflow-hidden bg-background-light">
+<img alt="Lamp" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKl5DxbQXC4oebYrMtCtUTk0KQ00zsJgeFHl-YfldYqOv-fPra-uSu27DyV78EAlXbTsWeRNNcSe3vgpgSKFOWmT-ChyY2bPJ_sZuFECrh5dXN0ZOXvHyxrCX8Kfp80dqZp4l8qHnPgkHG4yTBa3hvOngJI6-7pBhNXqtw-RPYOZKw7bokffv82T226phvMviJOLqSqcWrR1gJYnfauSctcjlkyl6i9-DnCBclNxokGzjH3UlD4eq9x5ORIQsxGK227eJAX9XZOVo"/>
+</div>
+<div>
+<p class="text-xs font-medium">Al Maha Table Lamp</p>
+<p class="text-[10px] text-sand-muted">Qty: 1</p>
+</div>
+</div>
+<p class="text-sm font-bold text-primary">AED 1,250</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-lg overflow-hidden bg-background-light">
+<img alt="Headphones" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-5Pd4BEuTEyX_sgmxLlHkAEoQmNBwgyQDke0TgXc7bJw-a3ff0f-DPXjoD5qoqBHSqipspLQtKD9FSVGzOCv6P1ZVF-MKmW-g_Rmh7vngb1RY5KN4KFsD-MK3ABgtq-9WaZPMQgXpF3oPyRIgP8xlFrw9ayYqph7X7MIgDccDguRBEnF6fTEr9phTyW8zWJoscaE_Po_icJoVVL3cqqoUc82dqmzlgRD8NjqhVF7CaoVp3QMhdiUANn8D-_A-Db7acjUMs37ojuA"/>
+</div>
+<div>
+<p class="text-xs font-medium">Dune H1 Headphones</p>
+<p class="text-[10px] text-sand-muted">Qty: 1</p>
+</div>
+</div>
+<p class="text-sm font-bold text-primary">AED 1,800</p>
+</div>
+</div>
+<div class="space-y-3 pt-4 border-t border-background-light dark:border-[#3d3123]">
+<div class="flex justify-between items-center text-sm">
+<span class="text-sand-muted">Subtotal</span>
+<span class="font-medium">AED 3,050</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-sand-muted">Shipping</span>
+<span class="font-medium">AED 25</span>
+</div>
+<div class="flex justify-between items-center pt-3 mt-1 border-t border-dashed border-cream-soft dark:border-[#3d3123]">
+<span class="serif-font text-lg font-bold">Total</span>
+<span class="serif-font text-xl font-bold text-primary">AED 3,075</span>
+</div>
+</div>
+</section>
+<section class="flex flex-col gap-4">
+<h3 class="serif-font text-lg font-bold">Payment</h3>
+<div class="flex items-center justify-between p-4 bg-white dark:bg-[#2d2419] rounded-2xl shadow-sm">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-[#f3f3f3] flex items-center justify-center p-1">
+<img alt="Apple Pay" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDURfLijxbmkoOBwIpIMKvdm8WnPicBXXg4q_tz84VklV8m4Mk_D8ydpmgU3ZwBMrCBd8BDACetGYYoZ2-o8ITSsJavLrjsEXiHsR8XQB0WOc0gRUcLaJ1sUV_AZEPX3wbPnDm41DhRQMJDfGhyyByvykF1Fzmxm5JlokBxAxMQad4xieUKTNjfKTGyNBr3MvCmdVxwMj4I6a0dN5cdeb1ZJONZLaFjlz35PGdsJlWS2Lto5ufrAnSd7hasgMRBPrK13eCOr5glJIA"/>
+</div>
+<p class="text-sm font-medium">Apple Pay</p>
+</div>
+<span class="material-symbols-outlined text-sand-muted">chevron_right</span>
+</div>
+</section>
+</div>
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-cream-soft dark:border-[#3d3123] px-6 pt-4 pb-8 z-50">
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[10px] text-sand-muted">verified_user</span>
+<span class="text-[10px] uppercase tracking-widest text-sand-muted font-bold">Secure Checkout</span>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                    Place Order
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-4 justify-between sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center rounded-full size-10 bg-white dark:bg-[#2d2419] shadow-sm text-[#181511] dark:text-[#f8f7f6]">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h2 class="serif-font text-xl font-bold leading-tight tracking-[-0.015em]">Shopping Bag</h2>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center rounded-full size-10 bg-transparent text-[#181511] dark:text-[#f8f7f6]">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</header>
+<div class="flex flex-col gap-4 px-4 py-2 mb-40">
+<div class="flex gap-4 bg-white dark:bg-[#2d2419] p-3 rounded-xl shadow-sm">
+<div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-background-light">
+<img alt="Al Maha Table Lamp" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKl5DxbQXC4oebYrMtCtUTk0KQ00zsJgeFHl-YfldYqOv-fPra-uSu27DyV78EAlXbTsWeRNNcSe3vgpgSKFOWmT-ChyY2bPJ_sZuFECrh5dXN0ZOXvHyxrCX8Kfp80dqZp4l8qHnPgkHG4yTBa3hvOngJI6-7pBhNXqtw-RPYOZKw7bokffv82T226phvMviJOLqSqcWrR1gJYnfauSctcjlkyl6i9-DnCBclNxokGzjH3UlD4eq9x5ORIQsxGK227eJAX9XZOVo"/>
+</div>
+<div class="flex flex-col flex-1 justify-between py-0.5">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="serif-font text-base font-bold text-[#181511] dark:text-white leading-tight">Al Maha Table Lamp</h3>
+<button class="text-[#897961]"><span class="material-symbols-outlined text-xl">close</span></button>
+</div>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mt-0.5">Living Room • Sand Ceramic</p>
+</div>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-semibold text-primary">AED 1,250</p>
+<div class="flex items-center gap-3 bg-background-light dark:bg-[#1a140d] px-2 py-1 rounded-full">
+<button class="size-6 flex items-center justify-center rounded-full bg-white dark:bg-[#2d2419] shadow-sm text-xs font-bold">-</button>
+<span class="text-xs font-bold">1</span>
+<button class="size-6 flex items-center justify-center rounded-full bg-white dark:bg-[#2d2419] shadow-sm text-xs font-bold">+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 bg-white dark:bg-[#2d2419] p-3 rounded-xl shadow-sm">
+<div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-background-light">
+<img alt="Dune H1 Headphones" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-5Pd4BEuTEyX_sgmxLlHkAEoQmNBwgyQDke0TgXc7bJw-a3ff0f-DPXjoD5qoqBHSqipspLQtKD9FSVGzOCv6P1ZVF-MKmW-g_Rmh7vngb1RY5KN4KFsD-MK3ABgtq-9WaZPMQgXpF3oPyRIgP8xlFrw9ayYqph7X7MIgDccDguRBEnF6fTEr9phTyW8zWJoscaE_Po_icJoVVL3cqqoUc82dqmzlgRD8NjqhVF7CaoVp3QMhdiUANn8D-_A-Db7acjUMs37ojuA"/>
+</div>
+<div class="flex flex-col flex-1 justify-between py-0.5">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="serif-font text-base font-bold text-[#181511] dark:text-white leading-tight">Dune H1 Headphones</h3>
+<button class="text-[#897961]"><span class="material-symbols-outlined text-xl">close</span></button>
+</div>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] mt-0.5">Electronics • Gold Finish</p>
+</div>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-semibold text-primary">AED 1,800</p>
+<div class="flex items-center gap-3 bg-background-light dark:bg-[#1a140d] px-2 py-1 rounded-full">
+<button class="size-6 flex items-center justify-center rounded-full bg-white dark:bg-[#2d2419] shadow-sm text-xs font-bold">-</button>
+<span class="text-xs font-bold">1</span>
+<button class="size-6 flex items-center justify-center rounded-full bg-white dark:bg-[#2d2419] shadow-sm text-xs font-bold">+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 p-5 bg-white dark:bg-[#2d2419] rounded-xl shadow-sm border border-[#e5e1da] dark:border-[#3d3123]">
+<h4 class="serif-font font-bold text-lg mb-4">Order Summary</h4>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-[#897961] dark:text-[#c4b5a0]">Subtotal</span>
+<span class="font-medium">AED 3,050</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-[#897961] dark:text-[#c4b5a0]">Shipping</span>
+<span class="text-emerald-600 font-medium">Free</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-[#897961] dark:text-[#c4b5a0]">Tax (5% VAT)</span>
+<span class="font-medium">AED 152.50</span>
+</div>
+<div class="pt-3 border-t border-[#e5e1da] dark:border-[#3d3123] flex justify-between items-center">
+<span class="serif-font font-bold text-lg">Total</span>
+<span class="text-xl font-bold text-primary">AED 3,202.50</span>
+</div>
+</div>
+</div>
+<div class="px-1 py-2">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-[#897961] flex border-none bg-white dark:bg-[#2d2419] items-center justify-center pl-4 rounded-l-xl border-r-0">
+<span class="material-symbols-outlined text-xl">confirmation_number</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-xl text-[#181511] dark:text-white focus:outline-0 focus:ring-0 border-none bg-white dark:bg-[#2d2419] h-full placeholder:text-[#897961] px-4 pl-2 text-sm font-normal" placeholder="Promo code or gift card" value=""/>
+</div>
+</label>
+</div>
+</div>
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 dark:bg-[#1a140d]/90 backdrop-blur-xl border-t border-[#e5e1da] dark:border-[#3d3123] px-6 py-8 z-50">
+<button class="w-full bg-primary text-white py-4 rounded-full text-sm font-bold uppercase tracking-widest shadow-lg shadow-primary/30 flex items-center justify-center gap-3 active:scale-[0.98] transition-transform">
+<span>Proceed to Checkout</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+<p class="text-center text-[10px] text-[#897961] dark:text-[#c4b5a0] mt-3 font-medium uppercase tracking-tighter">Secure checkout with UAE-based gateways</p>
+</div>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand": "#f1eee9",
+                        "cream": "#faf9f7",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">body {
+    font-family: "Noto Sans", sans-serif;
+    -webkit-tap-highlight-color: transparent
+    }
+.serif-font {
+    font-family: "Noto Serif", serif
+    }
+.textured-bg {
+    background-color: #f8f7f6;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAofOafP5moJ8s1sb-n_u4o-zVZa_esDbp1VUEiS1ZZKk4vplJwe94UECdJ6QbWBammksCMKp2dge6fLo2AnzIOhfj7lUwQK8ztUvuRueg9InRelQ1uPdPo9s4aNPUqEOSsxaSu7wnQ62Cc-_txUZHXErDcxvU05OjMSOddPBtasTu9eLa2CEWPE4FTHtwttVsmQ1O-qgjh5jwxHohY4uiyC8HeSFBJaYUJa0WmHBlvnGZ-IcqcxfPpxEhM-Ov5_t-hH8V8hqBDN1g)
+    }
+.dark .textured-bg {
+    background-color: #221a10;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAnSgcBFA_9cRyeiZHq7SsVTlWI3kJThBTqKQAIylAZW26JyE2minYWHeqW8zoKYPAzoycgROK9BhpHOVhRgM0qy2PjSWWzC1W4oL35aQQ9uoFuaJzjo3vwNaJWjiA4o1gnidcuAdNaBOEPEBV6_sCovlXdauqCnJ_aIyDOdwKyOpukBqQBq8UPXvIexuidG8-yiBBcBUzbH0E1p9CBL5ea8shitfKmiM19wEc04_tvpaBfD82_pxCU5nrMnRVdznvWBtzxf1tDyxI);
+    background-opacity: 0.05
+    }
+.no-scrollbar::-webkit-scrollbar {
+    display: none
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="textured-bg text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden max-w-[430px] mx-auto shadow-2xl bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+<header class="flex items-center justify-between px-6 pt-12 pb-4">
+<button class="size-10 flex items-center justify-start">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+<div class="flex-1 text-center">
+<span class="serif-font text-sm tracking-widest uppercase opacity-60">Order Status</span>
+</div>
+<button class="size-10 flex items-center justify-end">
+<span class="material-symbols-outlined text-2xl">share</span>
+</button>
+</header>
+<div class="flex flex-col items-center justify-center px-8 py-10">
+<div class="relative mb-8">
+<div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+<div class="relative size-24 bg-white dark:bg-[#2d2419] rounded-full flex items-center justify-center shadow-xl border border-primary/10">
+<span class="material-symbols-outlined text-primary text-5xl font-light">check_circle</span>
+</div>
+</div>
+<h1 class="serif-font text-3xl font-bold text-center leading-tight mb-3">Shukran, your order is confirmed</h1>
+<p class="text-center text-[#897961] dark:text-[#c4b5a0] text-sm max-w-[280px] mx-auto leading-relaxed">
+                Your piece of the desert is being prepared with care and will be with you shortly.
+            </p>
+</div>
+<div class="px-6 mb-8">
+<div class="bg-white dark:bg-[#2d2419] rounded-xl p-6 shadow-sm border border-[#e5e1da] dark:border-[#3d3123]">
+<div class="flex justify-between items-center mb-6 border-b border-[#f1eee9] dark:border-[#3d3123] pb-4">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-[#897961] mb-1">Order Number</p>
+<p class="font-mono text-sm font-semibold">#DXB-8829104</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] uppercase tracking-widest text-[#897961] mb-1">Expected Delivery</p>
+<p class="serif-font text-sm font-bold text-primary">Oct 24 - 26</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4">
+<div class="w-20 h-24 rounded-lg overflow-hidden bg-sand dark:bg-[#1a140d] flex-shrink-0">
+<img alt="Al Maha Table Lamp" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKl5DxbQXC4oebYrMtCtUTk0KQ00zsJgeFHl-YfldYqOv-fPra-uSu27DyV78EAlXbTsWeRNNcSe3vgpgSKFOWmT-ChyY2bPJ_sZuFECrh5dXN0ZOXvHyxrCX8Kfp80dqZp4l8qHnPgkHG4yTBa3hvOngJI6-7pBhNXqtw-RPYOZKw7bokffv82T226phvMviJOLqSqcWrR1gJYnfauSctcjlkyl6i9-DnCBclNxokGzjH3UlD4eq9x5ORIQsxGK227eJAX9XZOVo"/>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<h3 class="serif-font text-sm font-bold">Al Maha Table Lamp</h3>
+<p class="text-[11px] text-[#897961] mb-1">Sandy Cream / Large</p>
+<div class="flex justify-between items-end">
+<p class="text-xs font-medium">Qty: 1</p>
+<p class="text-sm font-semibold text-primary">AED 1,250</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-[#f1eee9] dark:border-[#3d3123] space-y-2">
+<div class="flex justify-between text-xs text-[#897961]">
+<span>Subtotal</span>
+<span>AED 1,250</span>
+</div>
+<div class="flex justify-between text-xs text-[#897961]">
+<span>Delivery</span>
+<span class="text-green-600 dark:text-green-400 font-medium">Complimentary</span>
+</div>
+<div class="flex justify-between text-base font-bold serif-font mt-2 pt-2">
+<span>Total</span>
+<span>AED 1,250</span>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 mb-24 space-y-4">
+<h2 class="serif-font text-lg font-bold px-1">Delivery Address</h2>
+<div class="bg-white dark:bg-[#2d2419] rounded-xl p-5 shadow-sm border border-[#e5e1da] dark:border-[#3d3123] flex gap-4">
+<div class="size-10 rounded-full bg-sand dark:bg-[#3d3123] flex items-center justify-center text-[#897961]">
+<span class="material-symbols-outlined text-xl">location_on</span>
+</div>
+<div>
+<p class="font-bold text-sm mb-1">Fatima Al Hashimi</p>
+<p class="text-xs text-[#897961] dark:text-[#c4b5a0] leading-relaxed">
+                        Villa 42, Al Wasl Road,<br/>
+                        Jumeirah 2, Dubai,<br/>
+                        United Arab Emirates
+                    </p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3 pt-4">
+<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-white dark:bg-[#2d2419] border border-[#e5e1da] dark:border-[#3d3123] shadow-sm">
+<span class="material-symbols-outlined text-primary mb-2">package_2</span>
+<span class="text-xs font-semibold">Track Order</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-white dark:bg-[#2d2419] border border-[#e5e1da] dark:border-[#3d3123] shadow-sm">
+<span class="material-symbols-outlined text-primary mb-2">support_agent</span>
+<span class="text-xs font-semibold">Get Help</span>
+</button>
+</div>
+</div>
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light/90 dark:via-background-dark/90 to-transparent">
+<button class="w-full bg-[#181511] dark:bg-[#f8f7f6] text-white dark:text-[#181511] py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-xl active:scale-[0.98] transition-transform">
+                Back to Home
+            </button>
+</div>
+</div>
+
+</body></html>
+
+<!-- Home & Product Feed -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&amp;family=Noto+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand-light": "#e5e1da",
+                        "text-muted": "#897961",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Noto Sans', sans-serif;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .serif-font {
+                font-family: 'Noto Serif', serif;
+            }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[430px] mx-auto shadow-2xl">
+<div class="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-6">
+<button class="flex items-center justify-center rounded-full size-10 bg-white/80 backdrop-blur-md text-[#181511] shadow-sm">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-full size-10 bg-white/80 backdrop-blur-md text-[#181511] shadow-sm">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="flex items-center justify-center rounded-full size-10 bg-white/80 backdrop-blur-md text-[#181511] shadow-sm">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<div class="relative w-full aspect-[4/5] bg-white overflow-hidden">
+<img alt="Oasis Air Purifier" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfhUAdluxYwuMIoPc-vh_-gqMY-whMvU2K0mPlSE85UUaui38lzNcqlDk-VexlWpq0kP8ZF9SjFmrQUIbcm34HBhXszMhL7sFyu_YYowDkTIIZhfCKcoasapUF22btQX62wFRoOqxJ9EASao4HsGyc_PKsCPkObnOBvCczpdp8k8rITrRv1nvhhWU012sYPMzedi9e5v0x7VGnd1KbjFgQ6_wxEHMo65nil8jtCSSHrOw5AnS-ygQbv_faKj609hc-kH_1rZkYJrE"/>
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+</div>
+</div>
+<div class="relative -mt-8 bg-background-light dark:bg-background-dark rounded-t-3xl px-6 pt-8 pb-32 flex flex-col gap-8">
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="text-text-muted dark:text-[#c4b5a0] text-xs font-semibold tracking-widest uppercase">Electronics • Pure Air Series</span>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm fill-current">star</span>
+<span class="text-xs font-bold">4.9 (124 reviews)</span>
+</div>
+</div>
+<h1 class="serif-font text-3xl font-bold leading-tight text-[#181511] dark:text-white mt-1">Oasis Air Purifier</h1>
+<p class="text-2xl font-semibold text-primary">AED 2,890</p>
+</div>
+<div class="flex flex-col gap-3">
+<h3 class="serif-font text-lg font-semibold text-[#181511] dark:text-white">The Essence of Purity</h3>
+<p class="text-sm leading-relaxed text-[#5a4e3f] dark:text-[#c4b5a0]">
+                    Inspired by the refreshing breeze of desert oases, this purifier combines medical-grade HEPA filtration with a whisper-quiet aesthetic. Designed to nurture your sanctuary with clean, cool air.
+                </p>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-xs font-bold uppercase tracking-wider text-text-muted">Available Finishes</span>
+<div class="flex gap-4">
+<div class="size-10 rounded-full border-2 border-primary p-0.5 flex items-center justify-center bg-transparent">
+<div class="size-full rounded-full bg-[#f4ece1]"></div>
+</div>
+<div class="size-10 rounded-full border border-sand-light p-0.5 flex items-center justify-center bg-transparent">
+<div class="size-full rounded-full bg-[#3d3123]"></div>
+</div>
+<div class="size-10 rounded-full border border-sand-light p-0.5 flex items-center justify-center bg-transparent">
+<div class="size-full rounded-full bg-[#c2b2a1]"></div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#2d2419] rounded-2xl p-6 border border-sand-light dark:border-[#3d3123] flex flex-col gap-4">
+<h3 class="serif-font text-md font-bold text-[#181511] dark:text-white border-b border-sand-light dark:border-[#3d3123] pb-3">Technical Specifications</h3>
+<div class="grid grid-cols-2 gap-y-4">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-tight">Coverage Area</span>
+<span class="text-sm font-medium">85 sq. meters</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-tight">Noise Level</span>
+<span class="text-sm font-medium">18 dB (Silent Mode)</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-tight">Filtration</span>
+<span class="text-sm font-medium">H13 HEPA Grade</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-text-muted uppercase font-bold tracking-tight">Connectivity</span>
+<span class="text-sm font-medium">Wi-Fi &amp; App Sync</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 py-2 border-t border-b border-sand-light dark:border-[#3d3123]">
+<div class="flex items-center justify-center size-10 rounded-full bg-sand-light/30 text-primary">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold">Complimentary Delivery</span>
+<span class="text-[11px] text-text-muted">Expected within 48 hours in UAE</span>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white/90 dark:bg-[#1a140d]/90 backdrop-blur-xl border-t border-[#e5e1da] dark:border-[#3d3123] px-6 py-5 flex items-center gap-4 z-50">
+<div class="flex items-center bg-sand-light dark:bg-[#2d2419] rounded-full h-12 px-2">
+<button class="size-8 flex items-center justify-center text-text-muted">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<span class="w-8 text-center text-sm font-bold">1</span>
+<button class="size-8 flex items-center justify-center text-[#181511] dark:text-white">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<button class="flex-1 bg-primary text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-primary/30 active:scale-95 transition-transform">
+                Add to Sanctuary
+            </button>
+</div>
+</div>
+
+</body></html>
+
+<!-- Saved Wishlist -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Saved Wishlist</title>
+<!-- Google Fonts: Noto Serif -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6", // Soft Cream
+                        "background-dark": "#221a10",
+                        "sand-muted": "#e6e1db",
+                        "text-bronze": "#3d3428"
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Serif', serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .heart-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-bronze dark:text-gray-200">
+<div class="relative mx-auto min-h-screen max-w-[430px] bg-background-light dark:bg-background-dark shadow-2xl overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 pt-6 pb-2">
+<div class="flex items-center justify-between mb-4">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-sand-muted/50 transition-colors">
+<span class="material-symbols-outlined text-text-bronze dark:text-gray-200">arrow_back_ios_new</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-center flex-1 font-display">My Wishlist</h1>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-sand-muted/50 transition-colors">
+<span class="material-symbols-outlined text-text-bronze dark:text-gray-200">more_horiz</span>
+</button>
+</div>
+<!-- Categories / Filter Bar -->
+<div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+<a class="flex flex-col items-center border-b-2 border-primary pb-2 shrink-0" href="#">
+<span class="text-xs font-bold uppercase tracking-widest text-text-bronze dark:text-gray-100">All Items</span>
+</a>
+<a class="flex flex-col items-center border-b-2 border-transparent pb-2 shrink-0" href="#">
+<span class="text-xs font-medium uppercase tracking-widest text-text-bronze/60 dark:text-gray-400">Electronics</span>
+</a>
+<a class="flex flex-col items-center border-b-2 border-transparent pb-2 shrink-0" href="#">
+<span class="text-xs font-medium uppercase tracking-widest text-text-bronze/60 dark:text-gray-400">Lifestyle</span>
+</a>
+<a class="flex flex-col items-center border-b-2 border-transparent pb-2 shrink-0" href="#">
+<span class="text-xs font-medium uppercase tracking-widest text-text-bronze/60 dark:text-gray-400">Home</span>
+</a>
+</div>
+<div class="flex items-center justify-between py-3 border-t border-sand-muted dark:border-gray-700 mt-2">
+<p class="text-[11px] font-sans uppercase tracking-[0.2em] text-text-bronze/50 dark:text-gray-400">12 Beautiful Pieces</p>
+<button class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest">
+<span>Sort &amp; Filter</span>
+<span class="material-symbols-outlined text-sm">tune</span>
+</button>
+</div>
+</header>
+<!-- Product Grid -->
+<main class="p-4">
+<div class="grid grid-cols-2 gap-x-4 gap-y-8">
+<!-- Product Card 1 -->
+<div class="flex flex-col group">
+<div class="relative aspect-[4/5] w-full rounded-lg overflow-hidden bg-white dark:bg-stone-800 border border-sand-muted dark:border-stone-700">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-105" data-alt="Modern minimalist wireless headphones in sand color" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCjpzjZWtrA71GypM3_b7mlal30BnwA7aGIUMyTEJX57nf9DpQ5-OFdNOYs83OBCxwg7olRCV_BiGhAqjrGBbu_0r9FnVh8lZrBxNZlByVoYOd9Zv72FV5fZ3ynTqQ9-Jf2ZLt5C1INh3u6CX3Otv2XJ3Q-MtD5j_-Eau4ARwJA8Jco2wUl8QvvRT_G_S_CMFsHucsP9S9vO47XR44vq3tJxb9X2GkvPpNs7XyVodnmFdkv4pPLTzY6PieC5ZGKGT0zfVLcJ1GCPkM');"></div>
+<button class="absolute top-3 right-3 z-10 size-8 flex items-center justify-center bg-white/90 dark:bg-black/50 backdrop-blur rounded-full shadow-sm">
+<span class="material-symbols-outlined heart-filled text-primary text-[20px]">heart_check</span>
+</button>
+</div>
+<div class="mt-3 px-1">
+<p class="text-[10px] uppercase tracking-widest text-text-bronze/40 dark:text-gray-500 font-sans mb-1">Bang &amp; Olufsen</p>
+<h3 class="text-sm font-medium leading-tight text-text-bronze dark:text-gray-200">Beoplay H95 Sand Edition</h3>
+<p class="mt-1 text-sm font-bold text-primary">AED 3,250</p>
+<button class="mt-3 w-full py-2 border border-sand-muted dark:border-stone-700 rounded-lg text-[10px] uppercase tracking-widest font-bold hover:bg-primary hover:text-white transition-colors">
+                            Add to Bag
+                        </button>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex flex-col group">
+<div class="relative aspect-[4/5] w-full rounded-lg overflow-hidden bg-white dark:bg-stone-800 border border-sand-muted dark:border-stone-700">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-105" data-alt="Minimalist wooden desk lamp with warm glow" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB0f_oS2H_BthzcPUmkq6jkzEJR94dewRfClu6qCgBo-lIfS-pyxzPI_xPjKjZzp6kDkhVarMwN61TEee2Uci1cPehOZGaRZjzUTHo6niJxijOj6pxaq53wsVcqNe_Wx4uKB2IOEvS0DOrtE-zXaJgAqRIgre4J9pv9D3aqZsSv0wwxrcOe-XxTm10OymIgZfMTeb8AP7C8Kq7h7L0ZILHcBbHVXvszsqC3guY557-UbYg5oJPUSCj2lqYHKa-80YI_V89q7mp4rIw');"></div>
+<button class="absolute top-3 right-3 z-10 size-8 flex items-center justify-center bg-white/90 dark:bg-black/50 backdrop-blur rounded-full shadow-sm">
+<span class="material-symbols-outlined heart-filled text-primary text-[20px]">heart_check</span>
+</button>
+<span class="absolute bottom-3 left-3 px-2 py-0.5 bg-primary/90 text-white text-[9px] uppercase tracking-tighter font-bold rounded-full">Few Left</span>
+</div>
+<div class="mt-3 px-1">
+<p class="text-[10px] uppercase tracking-widest text-text-bronze/40 dark:text-gray-500 font-sans mb-1">Menu Design</p>
+<h3 class="text-sm font-medium leading-tight text-text-bronze dark:text-gray-200">Hashira Table Lamp</h3>
+<p class="mt-1 text-sm font-bold text-primary">AED 1,180</p>
+<button class="mt-3 w-full py-2 border border-sand-muted dark:border-stone-700 rounded-lg text-[10px] uppercase tracking-widest font-bold hover:bg-primary hover:text-white transition-colors">
+                            Add to Bag
+                        </button>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col group">
+<div class="relative aspect-[4/5] w-full rounded-lg overflow-hidden bg-white dark:bg-stone-800 border border-sand-muted dark:border-stone-700">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-105" data-alt="Premium espresso machine with brass details" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGSwgd5tTOuzDnCihhR_T8SWkqRSx2qbQ-hZEPPBNTp1QBwZ-ZNZUbMGv8da_pS4_isFhpIOxLysXFFyLH_geIXNOBZwvDpgYbzcllLp3bJVCOPHjtMD_Q8kVIWdRQ4vq5cja33MUpFDLKUCqs0VqDn7te7vOabedEZ30hirW4ggZUXwB7MBS7IYKq3wifQ32bBalKdZ_Q_GEke95jEz32dS9523ZWEqZyyRW2s-j9ahJ91h43QBSX_4Gvl-8kbgHrMJBTR9RTliw');"></div>
+<button class="absolute top-3 right-3 z-10 size-8 flex items-center justify-center bg-white/90 dark:bg-black/50 backdrop-blur rounded-full shadow-sm">
+<span class="material-symbols-outlined heart-filled text-primary text-[20px]">heart_check</span>
+</button>
+</div>
+<div class="mt-3 px-1">
+<p class="text-[10px] uppercase tracking-widest text-text-bronze/40 dark:text-gray-500 font-sans mb-1">Leica Home</p>
+<h3 class="text-sm font-medium leading-tight text-text-bronze dark:text-gray-200">M-Series Coffee System</h3>
+<p class="mt-1 text-sm font-bold text-primary">AED 4,800</p>
+<button class="mt-3 w-full py-2 border border-sand-muted dark:border-stone-700 rounded-lg text-[10px] uppercase tracking-widest font-bold hover:bg-primary hover:text-white transition-colors">
+                            Add to Bag
+                        </button>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col group">
+<div class="relative aspect-[4/5] w-full rounded-lg overflow-hidden bg-white dark:bg-stone-800 border border-sand-muted dark:border-stone-700">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-105" data-alt="Terracotta minimalist ceramic vase set" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBlpVDGoPTqGCHYmZnVlGD4O7w8sm-9ShjTLecWojX_yY-CHb7aLdYLMzguo0ppTb8lxu2I5-7hZtdceaXfJ7ziRKlvDMzBpTsnkENfZF6ezAeRCmr21IIY_g3lZsw2EdsmgRNq8pBPzFH3nW11oyGhS8o8-BiI076PNWBaO-GteKrZhteDr5G4mRv-JMaNYmut1KyTZl4MSg3bjroWPafpqFInkIozA5KqJ5TZ7q-IN4AeKfgZjQ5bO6N0P3zSmdKaYSuehJlpd58');"></div>
+<button class="absolute top-3 right-3 z-10 size-8 flex items-center justify-center bg-white/90 dark:bg-black/50 backdrop-blur rounded-full shadow-sm">
+<span class="material-symbols-outlined heart-filled text-primary text-[20px]">heart_check</span>
+</button>
+</div>
+<div class="mt-3 px-1">
+<p class="text-[10px] uppercase tracking-widest text-text-bronze/40 dark:text-gray-500 font-sans mb-1">Desert Craft</p>
+<h3 class="text-sm font-medium leading-tight text-text-bronze dark:text-gray-200">Nomad Ceramic Set</h3>
+<p class="mt-1 text-sm font-bold text-primary">AED 650</p>
+<button class="mt-3 w-full py-2 border border-sand-muted dark:border-stone-700 rounded-lg text-[10px] uppercase tracking-widest font-bold hover:bg-primary hover:text-white transition-colors">
+                            Add to Bag
+                        </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Quick Action -->
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-20">
+<button class="flex items-center gap-3 bg-text-bronze dark:bg-primary text-white px-6 py-4 rounded-full shadow-2xl transition-transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="text-sm font-bold uppercase tracking-widest">Bag All Items</span>
+</button>
+</div>
+<!-- iOS Tab Bar Placeholder -->
+<nav class="sticky bottom-0 w-full bg-background-light/95 dark:bg-background-dark/95 border-t border-sand-muted dark:border-gray-800 flex justify-around items-center pt-3 pb-8 px-4">
+<div class="flex flex-col items-center gap-1 text-text-bronze/40 dark:text-gray-500">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-sans">Discover</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-text-bronze/40 dark:text-gray-500">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-sans">Search</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined heart-filled">favorite</span>
+<span class="text-[10px] font-sans font-bold">Wishlist</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-text-bronze/40 dark:text-gray-500">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="text-[10px] font-sans">Bag</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-text-bronze/40 dark:text-gray-500">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-sans">Profile</span>
+</div>
+</nav>
+</div>
+</body></html>
+
+<!-- User Profile Hub -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+        .serif-font {
+            font-family: 'Noto Serif', serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 22px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] antialiased">
+<div class="max-w-md mx-auto min-h-screen flex flex-col relative overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-6 pt-12">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 dark:bg-white/10 backdrop-blur-sm border border-black/5 dark:border-white/5">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="serif-font text-xl font-bold tracking-tight">Profile</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 dark:bg-white/10 backdrop-blur-sm border border-black/5 dark:border-white/5 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-background-light dark:ring-background-dark"></span>
+</button>
+</header>
+<!-- Profile Hero Section -->
+<section class="flex flex-col items-center px-6 pb-10 text-center">
+<div class="relative mb-6">
+<div class="size-32 rounded-full border-4 border-white dark:border-white/10 shadow-lg overflow-hidden bg-white/20" data-alt="Professional headshot of a Middle Eastern male smiling gently" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_Ckgkg1_A65Qmg4itYelSU437_Zi3Iz4LNvIlbEK6FX50_t68gYupRqqlj9BG_wQsJH0NuDvFnBpRX36WUla9bJUVuzf5xwgf5As2QhO-cbJRQDLYaVcNPdBoT2YkqGZdmj29J1g46MyXtT6FMkgMt_LOqhRfRmTV8y0kSHjtiQKXVInNxWWFrvtgxzUpfo_dBWFU8qqX2RU1Kwp3wAKp_uJDlqL2vN7D3PPbhdrFwb-2mhtP2a42DkK9iMxYnlCuf_Xv2p5357w'); background-size: cover; background-position: center;">
+</div>
+<div class="absolute bottom-0 right-1 bg-primary text-white p-1.5 rounded-full border-2 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined !text-[14px]">edit</span>
+</div>
+</div>
+<h2 class="serif-font text-3xl font-bold mb-1">Ahmed Al-Maktoum</h2>
+<div class="flex items-center justify-center gap-2 mb-2">
+<span class="bg-primary/10 text-primary px-3 py-0.5 rounded-full text-xs font-semibold tracking-wider uppercase">Premium Gold</span>
+</div>
+<p class="text-[#897961] dark:text-[#b5a796] text-sm">ahmed.a@example.ae</p>
+</section>
+<!-- Statistics/Quick Actions -->
+<div class="grid grid-cols-3 gap-4 px-6 mb-10">
+<div class="bg-white/40 dark:bg-white/5 rounded-xl p-3 text-center border border-black/5 dark:border-white/5">
+<p class="text-xs text-[#897961] dark:text-[#b5a796]">Orders</p>
+<p class="font-bold text-lg">24</p>
+</div>
+<div class="bg-white/40 dark:bg-white/5 rounded-xl p-3 text-center border border-black/5 dark:border-white/5">
+<p class="text-xs text-[#897961] dark:text-[#b5a796]">Credits</p>
+<p class="font-bold text-lg">1,250</p>
+</div>
+<div class="bg-white/40 dark:bg-white/5 rounded-xl p-3 text-center border border-black/5 dark:border-white/5">
+<p class="text-xs text-[#897961] dark:text-[#b5a796]">Points</p>
+<p class="font-bold text-lg">8k</p>
+</div>
+</div>
+<!-- Menu Section: Account Settings -->
+<div class="px-6 mb-4">
+<h3 class="serif-font text-sm font-bold uppercase tracking-widest text-primary/80 mb-4 px-1">Account Settings</h3>
+<div class="bg-white/60 dark:bg-white/10 rounded-2xl overflow-hidden border border-black/5 dark:border-white/5">
+<a class="flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-background-light dark:bg-background-dark flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="font-medium">Personal Information</span>
+</div>
+<span class="material-symbols-outlined text-[#897961]">chevron_right</span>
+</a>
+<div class="h-px bg-black/5 dark:bg-white/5 mx-5"></div>
+<a class="flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-background-light dark:bg-background-dark flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<span class="font-medium">Saved Addresses</span>
+</div>
+<span class="material-symbols-outlined text-[#897961]">chevron_right</span>
+</a>
+<div class="h-px bg-black/5 dark:bg-white/5 mx-5"></div>
+<a class="flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-background-light dark:bg-background-dark flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<span class="font-medium">Payment Methods</span>
+</div>
+<span class="material-symbols-outlined text-[#897961]">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Menu Section: Support -->
+<div class="px-6 mb-10">
+<h3 class="serif-font text-sm font-bold uppercase tracking-widest text-primary/80 mb-4 px-1">Support &amp; Security</h3>
+<div class="bg-white/60 dark:bg-white/10 rounded-2xl overflow-hidden border border-black/5 dark:border-white/5">
+<a class="flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-background-light dark:bg-background-dark flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">help</span>
+</div>
+<span class="font-medium">Help Center</span>
+</div>
+<span class="material-symbols-outlined text-[#897961]">chevron_right</span>
+</a>
+<div class="h-px bg-black/5 dark:bg-white/5 mx-5"></div>
+<a class="flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-background-light dark:bg-background-dark flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<span class="font-medium">Privacy &amp; Security</span>
+</div>
+<span class="material-symbols-outlined text-[#897961]">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Logout Button -->
+<div class="px-6 pb-20">
+<button class="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border border-primary/20 bg-primary/5 text-primary font-bold transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">logout</span>
+                Sign Out
+            </button>
+<p class="text-center text-[10px] text-[#897961] dark:text-[#b5a796] mt-6 tracking-widest uppercase">Version 4.2.0 • Made for Dubai</p>
+</div>
+<!-- iOS Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-black/5 dark:border-white/10 px-8 py-4 flex justify-between items-center z-50 rounded-t-xl">
+<button class="flex flex-col items-center gap-1 text-[#897961]">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#897961]">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium">Search</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#897961]">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="text-[10px] font-medium">Orders</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</button>
+</nav>
+<!-- Dynamic Notch Indicator (iOS) -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/10 dark:bg-white/10 rounded-full z-[60]"></div>
+</div>
+</body></html>
+
+<!-- Shipping Addresses -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shipping Addresses</title>
+<!-- Google Fonts: Manrope for body, Playfair Display for that premium serif feel -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand-light": "#F2EFE9",
+                        "sand-dark": "#32291e",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-ring {
+            box-shadow: 0 0 0 2px #ec9213;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#181511] dark:text-[#f8f7f6] min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-[#e6e1db] dark:border-[#3d3429]">
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-sand-light dark:hover:bg-sand-dark transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h1 class="font-serif text-xl font-semibold tracking-tight">Shipping Addresses</h1>
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-sand-light dark:hover:bg-sand-dark transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full">
+<!-- UAE Context Intro -->
+<div class="py-2">
+<p class="text-sm font-medium text-[#897961] dark:text-[#b0a28e] uppercase tracking-widest mb-1">Saved Locations</p>
+<p class="text-xs text-[#897961]/80 dark:text-[#b0a28e]/60">Select your preferred delivery point across the Emirates.</p>
+</div>
+<!-- Address Card 1: Default/Home -->
+<div class="relative group bg-white dark:bg-[#2c2215] border-2 border-primary rounded-xl p-5 shadow-sm transition-all">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div>
+<h3 class="font-bold text-lg leading-tight">Home - Villa 12</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white uppercase tracking-wider mt-1">Default</span>
+</div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-[#897961] hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<div class="space-y-1 text-[#4d4439] dark:text-[#d4cfc7] text-sm leading-relaxed">
+<p>Al Wasl Road, Jumeirah 1</p>
+<p>Dubai, United Arab Emirates</p>
+<p class="pt-2 flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-[16px]">call</span>
+                    +971 50 123 4567
+                </p>
+</div>
+<!-- Selection indicator -->
+<div class="absolute top-4 right-4">
+<div class="size-6 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[16px] font-bold">check</span>
+</div>
+</div>
+</div>
+<!-- Address Card 2: Office -->
+<div class="group bg-white dark:bg-[#2c2215] border border-[#e6e1db] dark:border-[#3d3429] rounded-xl p-5 shadow-sm hover:border-[#d6cfc5] dark:hover:border-[#4d4439] transition-all">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-sand-light dark:bg-sand-dark flex items-center justify-center text-[#897961]">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div>
+<h3 class="font-bold text-lg leading-tight">Downtown Office</h3>
+<p class="text-xs text-[#897961] mt-0.5">Corporate</p>
+</div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-[#897961] hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<div class="space-y-1 text-[#4d4439] dark:text-[#d4cfc7] text-sm leading-relaxed">
+<p>Emirates Towers, Level 15</p>
+<p>Sheikh Zayed Road, Dubai, UAE</p>
+<p class="pt-2 flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-[16px]">call</span>
+                    +971 4 987 6543
+                </p>
+</div>
+</div>
+<!-- Address Card 3: Apartment -->
+<div class="group bg-white dark:bg-[#2c2215] border border-[#e6e1db] dark:border-[#3d3429] rounded-xl p-5 shadow-sm hover:border-[#d6cfc5] dark:hover:border-[#4d4439] transition-all">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-sand-light dark:bg-sand-dark flex items-center justify-center text-[#897961]">
+<span class="material-symbols-outlined">apartment</span>
+</div>
+<div>
+<h3 class="font-bold text-lg leading-tight">Burj Khalifa Res.</h3>
+<p class="text-xs text-[#897961] mt-0.5">Apartment 104</p>
+</div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-[#897961] hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<div class="space-y-1 text-[#4d4439] dark:text-[#d4cfc7] text-sm leading-relaxed">
+<p>Downtown Dubai</p>
+<p>Dubai, UAE</p>
+<p class="pt-2 flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-[16px]">call</span>
+                    +971 52 555 0199
+                </p>
+</div>
+</div>
+<!-- Extra spacing for fixed button -->
+<div class="h-24"></div>
+</main>
+<!-- Bottom Action Area -->
+<div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light/95 dark:via-background-dark/95 to-transparent pt-8 pb-6 px-4">
+<div class="max-w-lg mx-auto">
+<button class="w-full bg-primary hover:bg-[#d48311] text-white h-14 rounded-xl font-bold text-base shadow-lg shadow-primary/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">add_location_alt</span>
+                Add New Address
+            </button>
+<!-- iOS Indicator Mockup -->
+<div class="w-32 h-1.5 bg-[#181511]/10 dark:bg-white/10 rounded-full mx-auto mt-6"></div>
+</div>
+</div>
+</body></html>
+
+<!-- Search & Explore -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Search &amp; Explore</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#fdfcf8", /* Custom cream/sand base */
+                        "background-dark": "#102216",
+                        "sand-muted": "#f2eee4",
+                        "cream-rich": "#f9f8f3",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+        .serif-text {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#2d2a26] dark:text-gray-100 min-h-screen">
+<div class="max-w-[430px] mx-auto bg-background-light dark:bg-background-dark min-h-screen shadow-2xl relative overflow-hidden">
+<!-- Top App Bar & Search -->
+<header class="pt-10 px-6">
+<div class="flex items-center justify-between mb-8">
+<h1 class="serif-text text-3xl font-bold tracking-tight text-[#2d2a26] dark:text-white">Search &amp; Explore</h1>
+<div class="w-10 h-10 rounded-full bg-sand-muted dark:bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#2d2a26] dark:text-white text-[20px]">shopping_bag</span>
+</div>
+</div>
+<div class="relative group">
+<label class="flex flex-col w-full">
+<div class="flex w-full h-14 items-center rounded-xl bg-sand-muted/50 dark:bg-white/5 border border-[#e5e0d1] dark:border-white/10 px-4 focus-within:ring-2 focus-within:ring-primary/40 transition-all duration-300">
+<span class="material-symbols-outlined text-[#6b665c] dark:text-gray-400 mr-3">search</span>
+<input class="form-input flex-1 border-none bg-transparent focus:outline-0 focus:ring-0 text-[#2d2a26] dark:text-white placeholder:text-[#a39e92] dark:placeholder:text-gray-500 text-base font-normal leading-normal" placeholder="Discover premium tech..." type="text"/>
+</div>
+</label>
+</div>
+</header>
+<!-- Recent Searches Section -->
+<section class="mt-10 px-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="serif-text text-lg font-bold text-[#2d2a26] dark:text-white">Recent Searches</h2>
+<button class="text-xs font-medium text-[#a39e92] uppercase tracking-wider hover:text-primary transition-colors">Clear All</button>
+</div>
+<div class="flex gap-3 flex-wrap">
+<div class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-sand-muted dark:bg-white/5 px-4 cursor-pointer hover:bg-sand-muted/80 transition-all">
+<span class="material-symbols-outlined text-sm text-[#a39e92]">history</span>
+<p class="text-[#4a463f] dark:text-gray-300 text-sm font-medium">Noise-cancelling</p>
+</div>
+<div class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-sand-muted dark:bg-white/5 px-4 cursor-pointer hover:bg-sand-muted/80 transition-all">
+<span class="material-symbols-outlined text-sm text-[#a39e92]">history</span>
+<p class="text-[#4a463f] dark:text-gray-300 text-sm font-medium">Smart garden</p>
+</div>
+<div class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-sand-muted dark:bg-white/5 px-4 cursor-pointer hover:bg-sand-muted/80 transition-all">
+<span class="material-symbols-outlined text-sm text-[#a39e92]">history</span>
+<p class="text-[#4a463f] dark:text-gray-300 text-sm font-medium">Air Purifier</p>
+</div>
+</div>
+</section>
+<!-- Trending Categories Section -->
+<section class="mt-12 px-6 pb-24">
+<h2 class="serif-text text-lg font-bold text-[#2d2a26] dark:text-white mb-6">Trending Categories</h2>
+<div class="grid grid-cols-2 gap-4">
+<!-- Category 1 -->
+<div class="relative group cursor-pointer overflow-hidden rounded-xl h-48 bg-[#e9ece9] dark:bg-white/5">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" data-alt="Modern eco-friendly solar charging gadgets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJiLyk190z6Zv5GN9yiR6arKvahKAgr8I9G0jusU3Nl7pqU1lIFHEiRwXEunUw075efL6XNb94pgdqOqmk_Krxz1sQy7Nn5Wk55_BvuOHSCbVaSa3Uke3FVG_2DZp0QFdZY9XG1EcwAme1F0R1Uje8xPnX5vKe7koLQHSSxE4kae5QbX7086AkLPFse9iLbp-xyypCDGwP2GYwyaO_oGPZHBa4fC7wyrWrPx9FVAP0pkC90OSRtZF7dGPb_5yQGzYrFR2bKALTrhQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="text-white text-sm font-medium uppercase tracking-widest mb-1">Curation</p>
+<h3 class="serif-text text-white text-lg font-bold">Sustainable Tech</h3>
+</div>
+</div>
+<!-- Category 2 -->
+<div class="relative group cursor-pointer overflow-hidden rounded-xl h-48 bg-[#f2eee4] dark:bg-white/5">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" data-alt="Minimalist desk with air purifier and plants" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzOncPNKbQobGrqYgwXnFVlprPb66taUFOwc5huczRbgjQr37njWNtZDfxtHEj8HCjbw2VNX277JF91xID0eNZUylua7ynZ2csEd0YCrJ7gzVZMC5McoAryY9Pabhn6WSKqND3NKNEZ4X1T9x65FlBSAp1nbFakKEXmzq__rkFCkT6AIl7lkZCylcA2f8Y4KDtKzXOCgbQiJSa3h87Yin0yChSDVnwuJ3-Hyy5Zxg07wOet0F6jrHY-YAWHkMyWsBWsQMMW-HgY2M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="text-white text-sm font-medium uppercase tracking-widest mb-1">Living</p>
+<h3 class="serif-text text-white text-lg font-bold">Home Wellness</h3>
+</div>
+</div>
+<!-- Category 3 -->
+<div class="relative group cursor-pointer overflow-hidden rounded-xl h-48 bg-[#e5e0d1] dark:bg-white/5 col-span-2">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-70" data-alt="Luxury camping setup in the desert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa2ElnKlJbbFBwP6enM9hp-PPkAv6C1TrEClLP2bcQZ2DotEXftJutVnwcU6UI8a02R7Bb-FoO_hW3D4ZUlVOFnjJA_ce8cAtmIijnvfLnwA-PLUhpMGq-03XvFPBgZf3VC4Gysfr9tKd7eXfxUl0YDujoNgGm29fly7VlbqIr-NAw7M22E2ogerLklt-RFiGPy3ciV-mbF7vsW1mb3AXfXvDnkj0muvYJT8won46hTzBOlxoq0VQdskrePsc8dR52012dy3zbQj8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-white text-sm font-medium uppercase tracking-widest mb-1">Exclusive</p>
+<h3 class="serif-text text-white text-2xl font-bold">Desert Essentials</h3>
+</div>
+<div class="bg-primary p-3 rounded-full">
+<span class="material-symbols-outlined text-black">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tag Cloud for further discovery -->
+<div class="col-span-2 pt-4 flex gap-2 overflow-x-auto no-scrollbar">
+<div class="flex-none px-4 py-2 border border-[#e5e0d1] dark:border-white/10 rounded-full text-xs font-semibold text-[#6b665c] dark:text-gray-400 uppercase tracking-widest">Minimalism</div>
+<div class="flex-none px-4 py-2 border border-[#e5e0d1] dark:border-white/10 rounded-full text-xs font-semibold text-[#6b665c] dark:text-gray-400 uppercase tracking-widest">Smart Living</div>
+<div class="flex-none px-4 py-2 border border-[#e5e0d1] dark:border-white/10 rounded-full text-xs font-semibold text-[#6b665c] dark:text-gray-400 uppercase tracking-widest">Innovation</div>
+<div class="flex-none px-4 py-2 border border-[#e5e0d1] dark:border-white/10 rounded-full text-xs font-semibold text-[#6b665c] dark:text-gray-400 uppercase tracking-widest">Equestrian</div>
+</div>
+</div>
+</section>
+<!-- Bottom Navigation (iOS Style) -->
+<nav class="absolute bottom-0 left-0 right-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-[#e5e0d1] dark:border-white/10 pb-8 pt-4 px-10 flex justify-between items-center z-20">
+<div class="flex flex-col items-center gap-1 group">
+<span class="material-symbols-outlined text-[#a39e92] dark:text-gray-500 transition-colors">home</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-[#a39e92]">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="text-primary flex flex-col items-center gap-1">
+<span class="material-symbols-outlined fill-1">explore</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Explore</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<span class="material-symbols-outlined text-[#a39e92] dark:text-gray-500">favorite</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-[#a39e92]">Saved</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<span class="material-symbols-outlined text-[#a39e92] dark:text-gray-500">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-[#a39e92]">Profile</span>
+</div>
+</nav>
+<!-- Apple-style Indicator Bar -->
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-[#2d2a26] dark:bg-white rounded-full opacity-20 z-30"></div>
+</div>
+<style>
+        /* Custom styles for hidden scrollbar but scrollable area */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>
+
+<!-- Empty Cart State -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Empty Cart State</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Serif', serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-[#f8f7f6] antialiased">
+<div class="relative flex h-screen w-full flex-col overflow-hidden max-w-[430px] mx-auto border-x border-[#f4f3f0]/20 shadow-2xl">
+<!-- TopAppBar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between z-10">
+<button class="text-[#181511] dark:text-[#f8f7f6] flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios</span>
+</button>
+<h2 class="text-[#181511] dark:text-[#f8f7f6] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center font-display pr-12">Shopping Cart</h2>
+</header>
+<!-- Main Content Area (Empty State) -->
+<main class="flex-1 flex flex-col px-6 py-8 items-center justify-center gap-10">
+<!-- Minimalist Illustration Container -->
+<div class="relative w-full aspect-square max-w-[280px] flex items-center justify-center">
+<!-- Decorative background elements -->
+<div class="absolute inset-0 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl"></div>
+<!-- The Illustration: Minimalist Basket -->
+<div class="relative z-10 w-full h-full flex items-center justify-center">
+<div class="w-48 h-48 bg-center bg-no-repeat bg-contain" data-alt="Minimalist line art illustration of a premium sand-colored woven basket" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB18vi9o_btlay5FD4b31j4z7Ku3KVQKPUU1ntiZQVhPF-hm1RWLQrb8BAPtjrqVOrDiQ7jk9w-lUSmJjkXGQ7RgOHzLWms1mmtjfC-iff-_eV3a5ewC1-zgzNA-gUgGUMcwbMu4xCYUIvE839d2nr8HWr-AjSKMITUSwfHROjLcqKo0S9ZYjYgvxNebORHfYlTPNAyo0IIQbs_rIf8jDBKv6LXrdpSn-ZwF-wcdeGGQ0eS2RCF-HDfFzO0SmwL14Dun_91DrHLKOo");'>
+<!-- Custom SVG Overlay for the 'Empty State' Look -->
+<svg class="w-full h-full text-primary/30" viewbox="0 0 100 100">
+<path d="M20 40 Q50 30 80 40 L75 80 Q50 90 25 80 Z" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+<path d="M30 40 L30 80 M50 38 L50 88 M70 40 L70 80" stroke="currentColor" stroke-width="0.5"></path>
+<circle cx="50" cy="20" fill="currentColor" r="2"></circle>
+</svg>
+</div>
+</div>
+</div>
+<!-- Empty State Message -->
+<div class="flex flex-col items-center gap-4 text-center">
+<h1 class="text-[#181511] dark:text-[#f8f7f6] text-2xl font-bold leading-tight font-display tracking-wide">
+                    Your cart is feeling light
+                </h1>
+<p class="text-[#897961] dark:text-[#b0a18e] text-base font-normal leading-relaxed max-w-[300px] font-display">
+                    Browse our curated collection of premium electronics and lifestyle essentials.
+                </p>
+</div>
+<!-- Primary CTA -->
+<button class="w-full max-w-[280px] bg-primary hover:bg-primary/90 text-white h-14 rounded-lg font-bold text-base tracking-[0.05em] shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+                START SHOPPING
+            </button>
+<!-- Secondary CTA -->
+<button class="text-[#897961] dark:text-[#b0a18e] text-sm font-medium underline underline-offset-4 tracking-wide font-display">
+                View Your Wishlist
+            </button>
+</main>
+<!-- Recommended Section (Peek at bottom) -->
+<section class="bg-white dark:bg-[#2c2317] rounded-t-3xl pt-6 pb-8 px-4 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
+<div class="flex items-center justify-between mb-4 px-2">
+<h3 class="text-[#181511] dark:text-[#f8f7f6] text-base font-bold font-display">Recommended for You</h3>
+<span class="text-primary text-xs font-bold uppercase tracking-widest">See All</span>
+</div>
+<div class="flex overflow-x-auto gap-4 no-scrollbar pb-2">
+<!-- Product Card 1 -->
+<div class="flex flex-col gap-3 min-w-[140px] max-w-[140px]">
+<div class="aspect-square bg-[#f4f3f0] dark:bg-[#3d3122] rounded-xl bg-cover bg-center" data-alt="High-end noise cancelling gold headphones" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBlRQ8urcE2XsFuIeQePZltNsqSoE83kfegklJapGV_Agl6rVP4k6R_kUUARXFe7kfKpoijbkMIkp-17AVfrH5sRvktedGnLCDp7_nXUFNISgEvv274mwj0NzlH-H7k4YDp2dbZ9to0lFpeesOVjWUtxPGzzbC89ZzYPuXg9ecFQyv0nhYQHhP2FPwBZ1qZRIQZPt2X6S10aGNvL0JrP6SQVblbWV6yCFxgOvVIwnVy-8st9PfFG0fCanN8YOtVRRgkO-ZNcv5NE9w");'></div>
+<div>
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium leading-tight truncate font-display">Aura Headphones</p>
+<p class="text-primary text-xs font-bold mt-1 uppercase tracking-tighter">AED 1,299</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex flex-col gap-3 min-w-[140px] max-w-[140px]">
+<div class="aspect-square bg-[#f4f3f0] dark:bg-[#3d3122] rounded-xl bg-cover bg-center" data-alt="Minimalist smart speaker in sand finish" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJgSR9Li3gfnXxbvoXn-umlr5Br6is2PtlQ-sTNE46iJ6r7iiwbswrNVp1AhK4Xo1UAmh1D_jBv-eIIDdLF166_h5_rOdyGQf2k3SKZ3bdzIYXdv0AKqMiTx2RIU_e5bBm3ZpS4l7SNOtJYpurIT2pPZGYymfNnSxNjOfn72Ley2HCNLDhylaJZIKHwxsQMFNFXdZUuYpsnTwHt-Y4f9MplJoStbtAsj1owVjCfaTaHlTe-kkyN93d0-QCCqPuPz01oMN3xPSQln4");'></div>
+<div>
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium leading-tight truncate font-display">Echo Sphere</p>
+<p class="text-primary text-xs font-bold mt-1 uppercase tracking-tighter">AED 899</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col gap-3 min-w-[140px] max-w-[140px]">
+<div class="aspect-square bg-[#f4f3f0] dark:bg-[#3d3122] rounded-xl bg-cover bg-center" data-alt="Premium watch with leather strap" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCDI6ZFq046a1UsY78bAryaR_3ronylhChUoDBWcb0bIJ0vViMGaLwlXqGUxqVoy7pQkqpra6eq3A_WkoO6A_OOdXlQIoX-LH-fgZbvvN_4L4CHtQC97zBbyEjlJJqrNsxFq4YyyhLBy40HqWL0teRI5xm7ukAMsJL4R8L6VHBtAH6CQRMLNBq28iJ5T-KCF2X4iyovz1L88qByCBsOOqsCqDZSfXcE8B9EG-TnQFLl4MuVJ0c3kXQZ4WO3vDypFrQ0yrhoCTTvqWU");'></div>
+<div>
+<p class="text-[#181511] dark:text-[#f8f7f6] text-sm font-medium leading-tight truncate font-display">Sand Edition Watch</p>
+<p class="text-primary text-xs font-bold mt-1 uppercase tracking-tighter">AED 2,100</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Navigation Bar -->
+<nav class="flex gap-2 border-t border-[#f4f3f0] dark:border-[#3d3122] bg-white dark:bg-background-dark px-4 pb-8 pt-3">
+<a class="flex flex-1 flex-col items-center gap-1 text-[#897961] dark:text-[#b0a18e]" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-bold uppercase tracking-widest font-sans">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-[#897961] dark:text-[#b0a18e]" href="#">
+<span class="material-symbols-outlined">search</span>
+<p class="text-[10px] font-bold uppercase tracking-widest font-sans">Shop</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+<p class="text-[10px] font-bold uppercase tracking-widest font-sans">Cart</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-[#897961] dark:text-[#b0a18e]" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<p class="text-[10px] font-bold uppercase tracking-widest font-sans">Wishlist</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-[#897961] dark:text-[#b0a18e]" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-[10px] font-bold uppercase tracking-widest font-sans">Profile</p>
+</a>
+</nav>
+</div>
+</body></html>
+
+<!-- Activity Notifications -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Activity Notifications</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Noto Serif -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#ec9213",
+              "background-light": "#f8f7f6",
+              "background-dark": "#221a10",
+              "sand-light": "#FFFDF9",
+              "sand-muted": "#897961",
+              "sand-dark": "#181511",
+            },
+            fontFamily: {
+              "display": ["Noto Serif", "serif"],
+              "sans": ["Noto Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Serif', serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-sand-dark dark:text-sand-light">
+<!-- Main Container (Phone Form Factor Sim) -->
+<div class="relative flex h-auto min-h-screen w-full max-w-[430px] mx-auto flex-col bg-sand-light dark:bg-background-dark shadow-2xl overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 flex items-center bg-sand-light/90 dark:bg-background-dark/90 backdrop-blur-md px-4 py-6 justify-between border-b border-sand-muted/10">
+<div class="text-sand-dark dark:text-sand-light flex size-10 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined cursor-pointer">arrow_back_ios</span>
+</div>
+<h2 class="text-sand-dark dark:text-sand-light text-xl font-semibold leading-tight tracking-tight flex-1 text-center">Activity</h2>
+<div class="flex size-10 items-center justify-end">
+<!-- Empty placeholder for symmetry or secondary action icon -->
+</div>
+</div>
+<!-- Utility Action Bar -->
+<div class="flex items-center justify-end px-6 pt-6 pb-2">
+<button class="text-primary text-xs font-semibold uppercase tracking-widest hover:opacity-80 transition-opacity">
+                Mark all as read
+            </button>
+</div>
+<!-- Section: Today -->
+<div class="px-6 py-4">
+<h3 class="text-sand-muted text-sm font-medium uppercase tracking-[0.1em] mb-4">Today</h3>
+<div class="space-y-3">
+<!-- Unread Notification: Order Shipped -->
+<div class="relative flex flex-col gap-3 p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/10">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-xl">package_2</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sand-dark dark:text-white text-base font-semibold leading-snug">Order Shipped</p>
+<p class="text-sand-muted dark:text-sand-muted text-sm font-normal leading-relaxed mt-1">Your order #9821 has been carefully packaged and is on its way to you.</p>
+</div>
+</div>
+<div class="shrink-0 flex flex-col items-end gap-2">
+<p class="text-sand-muted text-[10px] font-medium uppercase tracking-tighter">2h ago</p>
+<div class="size-2 bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Unread Notification: Price Drop -->
+<div class="relative flex flex-col gap-3 p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/10">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-xl">sell</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sand-dark dark:text-white text-base font-semibold leading-snug">Price Drop</p>
+<p class="text-sand-muted dark:text-sand-muted text-sm font-normal leading-relaxed mt-1">The Silk Sand Abaya from your wishlist is now at a special price for a limited time.</p>
+</div>
+</div>
+<div class="shrink-0 flex flex-col items-end gap-2">
+<p class="text-sand-muted text-[10px] font-medium uppercase tracking-tighter">5h ago</p>
+<div class="size-2 bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Yesterday -->
+<div class="px-6 py-4">
+<h3 class="text-sand-muted text-sm font-medium uppercase tracking-[0.1em] mb-4">Yesterday</h3>
+<div class="space-y-3">
+<!-- Read Notification: New Collection -->
+<div class="relative flex flex-col gap-3 p-4 bg-transparent rounded-xl border border-transparent">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-sand-muted/10 text-sand-muted">
+<span class="material-symbols-outlined text-xl">auto_awesome</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sand-dark dark:text-white text-base font-semibold leading-snug opacity-80">New Collection</p>
+<p class="text-sand-muted dark:text-sand-muted text-sm font-normal leading-relaxed mt-1 opacity-80">A new collection inspired by desert sunsets has just arrived in our boutique.</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-sand-muted text-[10px] font-medium uppercase tracking-tighter">Yesterday</p>
+</div>
+</div>
+</div>
+<!-- Read Notification: Account Update -->
+<div class="relative flex flex-col gap-3 p-4 bg-transparent rounded-xl border border-transparent">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-sand-muted/10 text-sand-muted">
+<span class="material-symbols-outlined text-xl">person_check</span>
+</div>
+<div class="flex flex-col">
+<p class="text-sand-dark dark:text-white text-base font-semibold leading-snug opacity-80">Loyalty Status Updated</p>
+<p class="text-sand-muted dark:text-sand-muted text-sm font-normal leading-relaxed mt-1 opacity-80">Congratulations! You've reached the Gold Tier. Enjoy your new exclusive benefits.</p>
+</div>
+</div>
+<div class="shrink-0">
+<p class="text-sand-muted text-[10px] font-medium uppercase tracking-tighter">Yesterday</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Featured Nurturing Insight (Minimalist Image/Card) -->
+<div class="mt-8 px-6 pb-20">
+<div class="relative overflow-hidden rounded-xl h-48 group">
+<img alt="Desert sands under soft golden light" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Minimalist abstract desert dunes with soft golden morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUrlIGF-oW5yPlYVUkMMc1nzJyoL-DBB7zbYe269D5tgfpWhl4MdG1fZTY3LA6APONevDx-efmW30d0h184uMomypdcO8ITS_OxJXmgSOmzc9d3CxxCXk1Hx_yVri562NGbbXJqdhHvR2i1VfN66R6TylNQKrLt_JEX3ELVApX7OTMb9I6Duyu_q2mFppElQ-n0JZjyRacI867UykkqfdpFqlxLXVMsnXKamZLFu-1A6YwCrq0LqfFuW_48Sxdm9FVlKsWzh687pc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-sand-dark/60 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Brand Story</p>
+<h4 class="text-white text-lg font-medium">The Art of Stillness</h4>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar (iOS style) -->
+<div class="fixed bottom-0 z-20 w-full max-w-[430px] bg-sand-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-sand-muted/10 px-8 py-4">
+<div class="flex items-center justify-between">
+<div class="flex flex-col items-center gap-1 text-sand-muted">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] uppercase tracking-tighter">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-sand-muted">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] uppercase tracking-tighter">Explore</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] uppercase tracking-tighter">Activity</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-sand-muted">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] uppercase tracking-tighter">Saved</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-sand-muted">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] uppercase tracking-tighter">Profile</span>
+</div>
+</div>
+<!-- iOS Home Indicator -->
+<div class="mt-4 mx-auto w-32 h-1 bg-sand-dark/20 dark:bg-white/20 rounded-full"></div>
+</div>
+</div>
+</body></html>
+
+<!-- Payment Options -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Payment Options</title>
+<!-- Google Fonts: Manrope for body, Playfair Display for that premium serif feel -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#fdfbf9", // Softer cream/sand
+                        "background-dark": "#221a10",
+                        "sand-muted": "#f4f1ed",
+                        "sand-dark": "#897961",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181511] dark:text-white min-h-screen">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-4 flex items-center justify-between">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h1 class="serif-title text-xl font-semibold tracking-tight">Payment Options</h1>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">security</span>
+</button>
+</div>
+<main class="px-4 pb-32 max-w-md mx-auto">
+<!-- Saved Cards Section -->
+<div class="mt-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="serif-title text-lg font-semibold">Your Saved Cards</h2>
+</div>
+<div class="space-y-4">
+<!-- Visa Card -->
+<div class="relative group cursor-pointer">
+<div class="w-full h-48 rounded-2xl p-6 flex flex-col justify-between overflow-hidden relative shadow-sm border border-black/5 dark:border-white/10 bg-gradient-to-br from-[#f8f5f2] to-[#e8e2db] dark:from-[#3a2f24] dark:to-[#221a10]">
+<!-- Decorative sand pattern -->
+<div class="absolute -right-10 -top-10 size-40 rounded-full bg-primary/5 blur-3xl"></div>
+<div class="flex justify-between items-start z-10">
+<img alt="Visa Logo" class="h-4 opacity-80 dark:invert" data-alt="Visa payment network logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL2Se5aWvC90QrfYFJcPYM3VIYzksPN6x6btrYxIuPEO7XNI1aPkFhN69Foie7iiAfNN7LzYHc2QEkPbx5a0hZUuf0yU8rVApP38gO1ErjedETRL5D5TdVJJ8V6RdL3MaSk4GRQZPswQ_bXtxJv7T13_Rxz6kwK_dFqtEOp8fvU8QJJ9CAurR4pAd1ynuqa6EvEh4fKEYKXog2YWrus1kQFiZNUtUUck1yRGHE0UA5jnCg4VBi9Ro40N4nbxH-PjVwtiWn0aCGgBc"/>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div class="z-10">
+<p class="text-xs uppercase tracking-widest text-sand-dark dark:text-sand-muted/60 mb-1">Card Holder</p>
+<p class="font-medium tracking-wide">Faisal Al Saud</p>
+</div>
+<div class="flex justify-between items-end z-10">
+<p class="text-xl font-display tracking-[0.2em] font-light">•••• •••• •••• 4242</p>
+<p class="text-sm font-medium">12/26</p>
+</div>
+</div>
+</div>
+<!-- Mastercard Item (List Style) -->
+<div class="flex items-center gap-4 bg-white dark:bg-white/5 p-4 rounded-xl border border-black/5 dark:border-white/10 shadow-sm transition-all hover:border-primary/30">
+<div class="size-12 rounded-lg bg-sand-muted dark:bg-[#3a2f24] flex items-center justify-center p-2">
+<img alt="Mastercard Logo" class="w-full" data-alt="Mastercard payment network logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh66qGKcEiCVEYOwipV8Y0ukL9DSaCzamaRhAPhllF5Kx1uaL-S-ABU-KzY13TEQPXW9liapNPPQQJ97yNItgiaPSR2t_bwXcXpRsPro9UMBhBAGe7SZV9g8KxG4bfEMrPVC_2bYvNj9MeC37ms6CGk7i9tJTuVKH7WdhePHiD5ftbr8vjpFetrnxlCfhxTcGjH26Y4qys9HWzMWRW4ZICibSUWw9VacM5M8-ee8TzMwnKw2O0-0NGVam0WJYadFh0FtpTaXjC48E"/>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-sm">Mastercard Platinum</p>
+<p class="text-xs text-sand-dark dark:text-sand-muted/60">•••• 8890 • Exp 05/25</p>
+</div>
+<div class="size-6 rounded-full border-2 border-primary/20 flex items-center justify-center">
+<!-- Unselected state -->
+</div>
+</div>
+</div>
+<!-- Add New Card Action -->
+<button class="mt-4 w-full flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-primary/30 text-primary font-bold hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+<span>Add New Payment Method</span>
+</button>
+</div>
+<!-- Express Checkout / Apple Pay -->
+<div class="mt-10">
+<h2 class="serif-title text-lg font-semibold mb-4">Express Checkout</h2>
+<button class="w-full bg-black text-white h-14 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors shadow-lg">
+<span class="material-symbols-outlined text-2xl">ios</span>
+<span class="text-lg font-semibold tracking-tight">Pay</span>
+</button>
+</div>
+<!-- Buy Now Pay Later -->
+<div class="mt-10">
+<h2 class="serif-title text-lg font-semibold mb-4">Flexible Payments</h2>
+<div class="bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl p-4 flex items-center gap-4 group cursor-pointer hover:border-[#3ce2ad]/50 transition-all">
+<div class="size-12 rounded-lg bg-[#3ce2ad] flex items-center justify-center p-2">
+<!-- Placeholder for Tabby Logo with text if svg not available -->
+<span class="font-bold text-black text-xs">tabby</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<p class="font-semibold text-sm">Tabby</p>
+<span class="bg-[#3ce2ad]/20 text-[#29a57e] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Popular in UAE</span>
+</div>
+<p class="text-xs text-sand-dark dark:text-sand-muted/60">4 interest-free payments of AED 450.00</p>
+</div>
+<span class="material-symbols-outlined text-sand-dark/40 group-hover:text-primary transition-colors">arrow_forward_ios</span>
+</div>
+</div>
+<!-- Security Message -->
+<div class="mt-12 flex flex-col items-center justify-center text-center opacity-40">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-sm">lock</span>
+<p class="text-[10px] uppercase tracking-[0.2em] font-bold">256-bit Secure Encryption</p>
+</div>
+<p class="text-[11px] max-w-[240px]">Your payment information is processed securely and is never stored on our servers.</p>
+</div>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-black/5 dark:border-white/5">
+<div class="max-w-md mx-auto">
+<div class="flex justify-between items-center mb-4 px-2">
+<span class="text-sand-dark dark:text-sand-muted/70">Total Amount</span>
+<span class="text-xl font-bold">AED 1,800.00</span>
+</div>
+<button class="w-full bg-primary text-white h-14 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                Confirm &amp; Pay
+            </button>
+<!-- iOS Home Indicator Space -->
+<div class="h-6 w-full"></div>
+</div>
+</div>
+</body></html>
+
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pin Location on Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec9213",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                        "sand": "#f4f1ea",
+                        "cream": "#fdfbf7",
+                        "dust": "#897961"
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .map-container {
+            background-color: #f4f1ea;
+            background-image: 
+                radial-gradient(circle at 20% 30%, #eeebe1 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, #eeebe1 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .ios-shadow {
+            box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#181511] antialiased">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Full Screen Map Background -->
+<div class="absolute inset-0 z-0 map-container dark:bg-background-dark" data-alt="Soft sand-toned minimalist map of Dubai area" data-location="Dubai" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDsQ4qL2Xi0sbDi6EV_5XSBzZi1JvoNuJf1okxSP2skJolkGYCZWhOzQ5uPNve1B3ZFiamh88uxKoaAInkIiD9tvLB5RjsawggsyPQi97dpbdgcJ3HM0BX0LvQ2BMlcaoa0DG1QjhB9huHVDyI5qpETqGqQ5yDP-rdK4WMEXrk11ISeyud0ZedYKNiehH0M_W_0IvVn3dFNfTQxGxNzsvgOjfovuezgkdIJZyNqRZ97hGaexFzZ_lxkIZkoAAul8rZiRQkDSQlwzPw");'>
+</div>
+<!-- Top Navigation / Search -->
+<div class="relative z-10 px-4 pt-12 pb-4">
+<div class="flex items-center gap-3">
+<button class="flex size-11 items-center justify-center rounded-xl bg-cream/90 dark:bg-background-dark/90 backdrop-blur-md ios-shadow text-[#181511] dark:text-white">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="flex flex-1 items-center h-11 bg-cream/90 dark:bg-background-dark/90 backdrop-blur-md rounded-xl ios-shadow px-3 gap-2">
+<span class="material-symbols-outlined text-dust">search</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm placeholder:text-dust/70 dark:text-white" placeholder="Search for area or building..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Central Pin Placeholder -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+<div class="flex flex-col items-center mb-10 translate-y-[-50%]">
+<div class="relative flex items-center justify-center">
+<!-- Pin Shadow -->
+<div class="absolute bottom-[-12px] w-2 h-1 bg-black/10 rounded-full blur-[1px]"></div>
+<!-- The Pin -->
+<div class="relative z-10 flex flex-col items-center">
+<div class="size-10 bg-primary rounded-full border-4 border-cream dark:border-background-dark shadow-lg flex items-center justify-center">
+<div class="size-2 bg-cream dark:bg-background-dark rounded-full"></div>
+</div>
+<div class="w-1 h-6 bg-primary -mt-1 rounded-full shadow-sm"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Buttons (Right side) -->
+<div class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
+<button class="flex size-11 items-center justify-center rounded-xl bg-cream/90 dark:bg-background-dark/90 backdrop-blur-md ios-shadow text-[#181511] dark:text-white">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+<div class="flex flex-col rounded-xl bg-cream/90 dark:bg-background-dark/90 backdrop-blur-md ios-shadow">
+<button class="flex size-11 items-center justify-center text-[#181511] dark:text-white border-b border-sand dark:border-dust/20">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex size-11 items-center justify-center text-[#181511] dark:text-white">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+</div>
+<!-- Bottom Sheet Card -->
+<div class="mt-auto relative z-30 px-4 pb-8">
+<div class="bg-cream dark:bg-background-dark rounded-3xl ios-shadow overflow-hidden flex flex-col">
+<!-- Drag Handle -->
+<div class="flex justify-center pt-3 pb-1">
+<div class="w-10 h-1.5 rounded-full bg-sand dark:bg-dust/30"></div>
+</div>
+<div class="p-5 pt-2">
+<h2 class="text-[#181511] dark:text-white text-lg font-bold tracking-tight mb-4">Confirm Your Delivery Location</h2>
+<div class="flex items-start gap-4 p-4 rounded-2xl bg-sand/50 dark:bg-white/5 mb-6">
+<div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">location_on</span>
+</div>
+<div class="flex flex-col flex-1 overflow-hidden">
+<div class="flex justify-between items-center w-full">
+<p class="text-[#181511] dark:text-white text-base font-semibold truncate">Jumeirah 1</p>
+<button class="text-primary text-xs font-bold uppercase tracking-widest">Change</button>
+</div>
+<p class="text-dust text-sm leading-relaxed line-clamp-2 mt-0.5">Street 12B, Villa 4, Near Jumeirah Beach Road, Dubai, UAE</p>
+</div>
+</div>
+<button class="w-full h-14 bg-primary hover:bg-primary/90 text-white rounded-2xl font-bold text-base transition-colors shadow-md shadow-primary/20 flex items-center justify-center gap-2">
+<span>Confirm Location</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<!-- iOS Home Indicator Space -->
+<div class="h-4"></div>
+</div>
+</div>
+</div>
+</body></html>

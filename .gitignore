@@ -1,0 +1,22 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.db
+
+# Node
+node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+
+# IDE / misc
+.idea/
+.DS_Store
