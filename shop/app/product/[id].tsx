@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
-  Image,
   TouchableOpacity,
   ScrollView,
   Alert,
@@ -10,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { Text, View } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import api from "@/lib/api";
@@ -197,7 +197,7 @@ export default function ProductDetailScreen() {
           </TouchableOpacity>
           <Animated.View style={[styles.imageWrap, { transform: [{ translateY: imageTranslateY }] }]}>
             {product.image_url ? (
-              <Image source={{ uri: product.image_url }} style={styles.image} resizeMode="cover" />
+              <Image source={{ uri: product.image_url }} style={styles.image} contentFit="cover" />
             ) : (
               <View style={[styles.imagePlaceholder, { backgroundColor: colors.sandDivider + "40" }]}>
                 <FontAwesome name="image" size={64} color={colors.textMuted} />

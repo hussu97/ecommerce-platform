@@ -703,7 +703,7 @@ export function ProductsPage() {
                   <tr key={p.id} className="border-b border-sand-divider last:border-0">
                     <td className="py-4 px-4">
                       <div className="h-12 w-12 rounded-xl bg-sand-divider/40 overflow-hidden">
-                        {p.image_url ? <img src={p.image_url} alt="" className="h-full w-full object-cover" /> : <div className="h-full w-full flex items-center justify-center text-xs text-text-muted">—</div>}
+                        {p.image_url ? <img src={p.image_url} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" /> : <div className="h-full w-full flex items-center justify-center text-xs text-text-muted">—</div>}
                       </div>
                     </td>
                     <td className="py-4 px-4 font-medium text-text-primary">{p.name}</td>

@@ -11,6 +11,7 @@ import api from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { PageLoader } from "@/components/PageLoader";
 import Link from "next/link";
+import Image from "next/image";
 import { Truck, ChevronRight, Home, Building2, MapPin } from "lucide-react";
 
 const stripePromise = loadStripe("pk_test_TYooMQauvdEDq54NiTphI7jx");
@@ -378,15 +379,17 @@ export default function CheckoutPage() {
             {items.map((item) => (
               <div key={item.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="size-12 rounded-lg overflow-hidden bg-[#f8f7f6] shrink-0">
+                  <div className="size-12 rounded-lg overflow-hidden bg-[#f8f7f6] shrink-0 relative">
                     {item.product.image_url ? (
-                      <img
+                      <Image
                         src={item.product.image_url}
                         alt={item.product.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="48px"
+                        className="object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[10px] text-[#897961]">
+                      <div className="absolute inset-0 flex items-center justify-center text-[10px] text-[#897961]">
                         —
                       </div>
                     )}

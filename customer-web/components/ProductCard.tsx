@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Product, useCartStore } from "@/stores/useCartStore";
 import { useWishlistStore } from "@/stores/useWishlistStore";
@@ -89,15 +90,17 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="aspect-[4/5] rounded-xl overflow-hidden bg-white shadow-sm relative group">
-        <Link href={`/products/${productSlug}`} className="block w-full h-full">
+        <Link href={`/products/${productSlug}`} className="block w-full h-full relative">
           {product.image_url ? (
-            <img
+            <Image
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-text-muted bg-background-light">
+            <div className="absolute inset-0 flex items-center justify-center text-text-muted bg-background-light">
               {t("no_image")}
             </div>
           )}

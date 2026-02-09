@@ -4,13 +4,13 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  Image,
   RefreshControl,
   Alert,
   Dimensions,
   Platform,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -141,7 +141,7 @@ export default function WishlistScreen() {
               >
                 <View style={[styles.imageContainer, { backgroundColor: colors.sandDivider + "40" }]}>
                   {product.image_url ? (
-                    <Image source={{ uri: product.image_url }} style={styles.image} resizeMode="cover" />
+                    <Image source={{ uri: product.image_url }} style={styles.image} contentFit="cover" />
                   ) : (
                     <Text style={[styles.noImage, { color: colors.textMuted }]}>{t("no_image")}</Text>
                   )}

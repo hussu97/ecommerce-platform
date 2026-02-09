@@ -56,6 +56,11 @@ Both `customer-api` and `admin-api` use the same SQLite database. Set `admin-api
 | `/wishlist` | Wishlist (logged-in only): list, add by product_slug, remove, move-to-cart |
 | `/i18n` | Languages, UI strings, language preference |
 
+## Product images and CDN
+
+- Product and brand images are referenced by `image_url` (string) from the API. Frontends use that URL as-is.
+- **CDN:** To serve images from a CDN, configure the API or upload pipeline to store CDN URLs in `image_url` (e.g. `https://cdn.example.com/uploads/...`). Add the CDN host to customer-web `images.remotePatterns` in [customer-web/next.config.ts](customer-web/next.config.ts) if using Next.js Image optimization with that origin.
+
 ## Multi-language (i18n)
 
 - **Languages table**: `languages` – new languages added here are supported across admin + customer apps.

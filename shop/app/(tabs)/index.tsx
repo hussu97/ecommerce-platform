@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   StyleSheet,
-  Image,
   TouchableOpacity,
   ActivityIndicator,
   Platform,
@@ -12,6 +11,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
+import { Image } from "expo-image";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { Text } from "@/components/Themed";
@@ -236,7 +236,7 @@ export default function ShopScreen() {
                 <Image
                   source={{ uri: item.image_url }}
                   style={styles.image}
-                  resizeMode="cover"
+                  contentFit="cover"
                 />
               ) : (
                 <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: colors.sandDivider + "40" }]}>
@@ -327,7 +327,7 @@ export default function ShopScreen() {
               <Image
                 source={{ uri: item.image_url }}
                 style={styles.image}
-                resizeMode="cover"
+                contentFit="cover"
               />
             ) : (
               <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: colors.sandDivider + "40" }]}>

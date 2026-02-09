@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import {
   StyleSheet,
   FlatList,
-  Image,
   TouchableOpacity,
   Alert,
   View,
   RefreshControl,
 } from "react-native";
+import { Image } from "expo-image";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useCartStore } from "@/stores/useCartStore";
@@ -63,7 +63,7 @@ export default function CartScreen() {
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.sandDivider }]}>
             <View style={styles.imageWrap}>
               {item.product.image_url ? (
-                <Image source={{ uri: item.product.image_url }} style={styles.thumb} resizeMode="cover" />
+                <Image source={{ uri: item.product.image_url }} style={styles.thumb} contentFit="cover" />
               ) : (
                 <View style={[styles.thumb, styles.thumbPlaceholder, { backgroundColor: colors.background }]}>
                   <FontAwesome name="image" size={24} color={colors.textMuted} />

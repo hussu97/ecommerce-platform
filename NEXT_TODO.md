@@ -63,7 +63,7 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
 | ✅ | **Skeleton Loading** | Replace spinners with skeletons for product cards and PDP. | — |
-| ⬜ | **Image Optimization** | Lazy loading, responsive images, Next.js Image, CDN. | Low–Medium |
+| ✅ | **Image Optimization** | Lazy loading, responsive images, Next.js Image, CDN. | Low–Medium |
 | ⬜ | **Offline Support (Shop)** | Cache product list/cart for limited offline use (e.g. via AsyncStorage). | Medium |
 | ⬜ | **Push Notifications (Shop)** | Order and promotion notifications via Expo Push. | Medium |
 | 🔶 | **Accessibility (a11y)** | ARIA labels, keyboard nav, focus management, screen reader support. *Current:* minimal aria/role/alt usage. | Medium |

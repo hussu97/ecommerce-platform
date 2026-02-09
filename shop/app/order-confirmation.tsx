@@ -4,10 +4,10 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  Image,
   Linking,
   Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import { Text } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -157,7 +157,7 @@ export default function OrderConfirmationScreen() {
             <View style={styles.firstItemRow}>
               <View style={[styles.firstItemImageWrap, { backgroundColor: colors.background }]}>
                 {firstItem.product?.image_url ? (
-                  <Image source={{ uri: firstItem.product.image_url }} style={styles.firstItemImage} resizeMode="cover" />
+                  <Image source={{ uri: firstItem.product.image_url }} style={styles.firstItemImage} contentFit="cover" />
                 ) : (
                   <View style={styles.firstItemImagePlaceholder}>
                     <FontAwesome name="image" size={24} color={colors.textMuted} />

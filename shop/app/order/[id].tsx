@@ -7,10 +7,10 @@ import {
   TextInput,
   Alert,
   View,
-  Image,
   Platform,
   Linking,
 } from "react-native";
+import { Image } from "expo-image";
 import { Text } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -243,7 +243,7 @@ export default function OrderDetailScreen() {
               >
                 <View style={[styles.itemImageWrap, { backgroundColor: colors.background }]}>
                   {item.product?.image_url ? (
-                    <Image source={{ uri: item.product.image_url }} style={styles.itemImage} resizeMode="cover" />
+                    <Image source={{ uri: item.product.image_url }} style={styles.itemImage} contentFit="cover" />
                   ) : (
                     <View style={styles.itemImagePlaceholder}>
                       <FontAwesome name="image" size={28} color={colors.textMuted} />

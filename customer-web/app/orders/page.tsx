@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
@@ -127,9 +128,9 @@ export default function OrdersPage() {
                   <div className="flex flex-col gap-2">
                     <div className="aspect-[4/5] rounded-xl overflow-hidden bg-white shadow-sm relative">
                       {product?.image_url ? (
-                        <img src={product.image_url} alt={product.name || ""} className="w-full h-full object-cover" />
+                        <Image src={product.image_url} alt={product.name || ""} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#897961]">
+                        <div className="absolute inset-0 flex items-center justify-center text-[#897961]">
                           <Package className="size-10" />
                         </div>
                       )}

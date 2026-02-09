@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/useCartStore";
 import { useI18nStore } from "@/stores/useI18nStore";
@@ -73,15 +74,17 @@ export default function CartPage() {
             key={item.id}
             className="flex gap-4 bg-white p-3 rounded-xl shadow-sm border border-[#e5e1da]"
           >
-            <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-[#f8f7f6]">
+            <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-[#f8f7f6] relative">
               {item.product.image_url ? (
-                <img
+                <Image
                   src={item.product.image_url}
                   alt={item.product.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="96px"
+                  className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-[#897961]">
+                <div className="absolute inset-0 flex items-center justify-center text-xs text-[#897961]">
                   {t("no_image")}
                 </div>
               )}

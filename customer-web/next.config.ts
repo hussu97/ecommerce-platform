@@ -4,6 +4,14 @@ import type { NextConfig } from "next";
 const backendOrigin = process.env.BACKEND_ORIGIN || "http://127.0.0.1:8000";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      { protocol: "http", hostname: "127.0.0.1", pathname: "/**", port: "8000" },
+      { protocol: "http", hostname: "localhost", pathname: "/**", port: "8000" },
+      { protocol: "http", hostname: "customer-api", pathname: "/**", port: "8000" },
+    ],
+  },
   async rewrites() {
     return [
       {

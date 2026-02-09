@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -134,15 +135,17 @@ export default function WishlistPage() {
             return (
               <div key={slug} className="flex flex-col">
                 <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-white shadow-sm border border-[#e5e1da] group">
-                  <Link href={`/products/${slug}`} className="block w-full h-full">
+                  <Link href={`/products/${slug}`} className="block w-full h-full relative">
                     {product.image_url ? (
-                      <img
+                      <Image
                         src={product.image_url}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 768px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#897961] bg-[#f8f7f6] text-sm">
+                      <div className="absolute inset-0 flex items-center justify-center text-[#897961] bg-[#f8f7f6] text-sm">
                         {t("no_image")}
                       </div>
                     )}

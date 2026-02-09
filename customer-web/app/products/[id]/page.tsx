@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Product, useCartStore } from "@/stores/useCartStore";
 import { useWishlistStore } from "@/stores/useWishlistStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -174,13 +175,15 @@ export default function ProductDetailPage() {
         {/* Image column */}
         <div className="relative w-full aspect-[4/5] md:aspect-square md:sticky md:top-24 bg-white overflow-hidden rounded-xl md:rounded-2xl">
           {product.image_url ? (
-            <img
+            <Image
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#897961] bg-[#f8f7f6]">
+            <div className="absolute inset-0 flex items-center justify-center text-[#897961] bg-[#f8f7f6]">
               {t("no_image_available")}
             </div>
           )}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useI18nStore } from "@/stores/useI18nStore";
@@ -103,11 +104,11 @@ export default function OrderSuccessPage() {
               <div className="space-y-4">
                 {order.items.slice(0, 3).map((item) => (
                   <div key={item.id} className="flex gap-4">
-                    <div className="w-20 h-24 rounded-lg overflow-hidden bg-[#e5e1da] flex-shrink-0">
+                    <div className="w-20 h-24 rounded-lg overflow-hidden bg-[#e5e1da] flex-shrink-0 relative">
                       {item.product?.image_url ? (
-                        <img src={item.product.image_url} alt={item.product.name || ""} className="w-full h-full object-cover" />
+                        <Image src={item.product.image_url} alt={item.product.name || ""} fill sizes="80px" className="object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#897961] text-xs">—</div>
+                        <div className="absolute inset-0 flex items-center justify-center text-[#897961] text-xs">—</div>
                       )}
                     </div>
                     <div className="flex flex-col justify-center flex-1 min-w-0">

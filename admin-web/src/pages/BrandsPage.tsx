@@ -234,7 +234,7 @@ export function BrandsPage() {
                   <tr key={b.id} className="border-b border-sand-divider last:border-0">
                     <td className="py-4 px-4">
                       <div className="h-10 w-10 rounded-xl bg-sand-divider/40 overflow-hidden">
-                        {b.logo_url ? <img src={b.logo_url} alt="" className="h-full w-full object-contain" /> : <div className="h-full w-full flex items-center justify-center text-xs text-text-muted">—</div>}
+                        {b.logo_url ? <img src={b.logo_url} alt="" className="h-full w-full object-contain" loading="lazy" decoding="async" /> : <div className="h-full w-full flex items-center justify-center text-xs text-text-muted">—</div>}
                       </div>
                     </td>
                     <td className="py-4 px-4 font-medium text-text-primary">{b.name}</td>
