@@ -15,3 +15,21 @@ Search & Explore: A discovery-focused page featuring a search bar, recent histor
 Empty Cart State: A thoughtful, visually pleasing "empty" state that encourages users to start shopping with a gentle nudge.
 Activity Notifications: A minimalist list for delivery updates and price drops, designed to be helpful without being overwhelming.
 Payment Options: A secure-feeling screen for managing cards and local payment methods like Apple Pay and Tabby.
+
+---
+
+## Loading and transitions
+
+**When to use skeleton vs spinner**
+
+- **Skeleton**: Use when the layout is known (product grid, PDP, admin tables). Reduces perceived wait and keeps layout stable.
+- **Spinner**: Use for full-page loads where layout is unknown, or inline (e.g. inside a button) for small actions.
+
+**Transition patterns** (from design_template.html)
+
+- **Primary actions**: `active:scale-[0.98]` or `active:scale-95`, `transition-transform`.
+- **Inputs**: `transition-all duration-200`.
+- **Cards / product imagery**: `transition-transform duration-500 group-hover:scale-105`.
+- **Links / list items**: `transition-colors`, `hover:bg-black/5` where applicable.
+
+Loading UI uses design tokens: **primary** for spinners, **sand-divider** / **background-light** for skeleton placeholders, **rounded-xl** for shape.

@@ -4,11 +4,11 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -19,6 +19,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { useColorScheme } from "@/components/useColorScheme";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 const IMAGE_ASPECT = 4 / 5;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -34,21 +35,34 @@ export default function ProductDetailScreen() {
   const [error, setError] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
+  const sizesSectionY = useRef<number>(0);
   const router = useRouter();
   const addToCart = useCartStore((s) => s.addToCart);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const getQuantityForProduct = useCartStore((s) => s.getQuantityForProduct);
+  const getQuantityForProductAndChild = useCartStore((s) => s.getQuantityForProductAndChild);
   const t = useI18nStore((s) => s.t);
   const currentLanguage = useI18nStore((s) => s.currentLanguage);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const quantity = product ? getQuantityForProduct(product.slug ?? product.id) : 0;
+  type Child = { id: number; code: string; size_value: string; stock_net: number };
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const slug = product?.slug ?? product?.id ?? "";
+  const quantity = product && selectedChild ? getQuantityForProductAndChild(slug, selectedChild.code) : 0;
+  const children = product?.children ?? [];
+  const singleSized = product?.single_sized ?? false;
+  const showSizeSelector = !singleSized && children.length > 0 && (children.length > 1 || (children[0] && children[0].size_value !== "single_size"));
 
   useEffect(() => {
     if (!id) return;
     api
       .get<Product>(`/products/${id}`)
-      .then((r) => setProduct(r.data))
+      .then((r) => {
+        const p = r.data;
+        setProduct(p);
+        if (p?.single_sized && p?.children?.length) setSelectedChild(p.children[0]);
+        else setSelectedChild(null);
+      })
       .catch(() => {
         setProduct(null);
         setError(t("failed_to_load_product"));
@@ -65,10 +79,10 @@ export default function ProductDetailScreen() {
   }, [product?.slug, product?.id]);
 
   const handleAdd = async () => {
-    if (!product) return;
+    if (!product || !selectedChild) return;
     setIsUpdating(true);
     try {
-      await addToCart(product);
+      await addToCart(product, selectedChild.code);
     } catch (e: unknown) {
       const msg =
         e && typeof e === "object" && "message" in e
@@ -81,26 +95,26 @@ export default function ProductDetailScreen() {
   };
 
   const handleIncrease = async () => {
-    if (!product) return;
+    if (!product || !selectedChild) return;
     setIsUpdating(true);
     try {
-      await updateQuantity(product.slug ?? product.id, quantity + 1);
+      await updateQuantity(slug, selectedChild.code, quantity + 1);
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleDecrease = async () => {
-    if (!product || quantity <= 1) return;
+    if (!product || !selectedChild || quantity <= 1) return;
     setIsUpdating(true);
     try {
-      await updateQuantity(product.slug ?? product.id, quantity - 1);
+      await updateQuantity(slug, selectedChild.code, quantity - 1);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const stockNet = product ? (product.stock_net ?? product.stock_quantity ?? 0) : 0;
+  const stockNet = selectedChild?.stock_net ?? product?.stock_net ?? product?.stock_quantity ?? 0;
 
   const imageTranslateY = scrollY.interpolate({
     inputRange: [0, IMAGE_HEIGHT],
@@ -115,11 +129,7 @@ export default function ProductDetailScreen() {
   });
 
   if (loading) {
-    return (
-      <View style={[styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   if (error || !product) {
@@ -130,9 +140,14 @@ export default function ProductDetailScreen() {
     );
   }
 
+  const scrollToSizes = () => {
+    scrollViewRef.current?.scrollTo({ y: sizesSectionY.current, animated: true });
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.ScrollView
+        ref={scrollViewRef as React.RefObject<ScrollView>}
         style={styles.scroll}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
@@ -230,6 +245,40 @@ export default function ProductDetailScreen() {
               </View>
             )}
 
+            {/* Size selector */}
+            {showSizeSelector && children.length > 0 && (
+              <View
+                style={styles.section}
+                onLayout={(e) => {
+                  sizesSectionY.current = (IMAGE_HEIGHT - CONTENT_OVERLAP) + e.nativeEvent.layout.y;
+                }}
+              >
+                <Text style={[styles.sectionTitle, { fontFamily: FontFamily.serif, color: colors.text }]}>
+                  {t("size")}
+                </Text>
+                <View style={styles.sizeRow}>
+                  {children.map((ch) => (
+                    <TouchableOpacity
+                      key={ch.id}
+                      onPress={() => setSelectedChild(ch)}
+                      disabled={ch.stock_net <= 0}
+                      style={[
+                        styles.sizePill,
+                        {
+                          borderColor: colors.sandDivider,
+                          backgroundColor: selectedChild?.id === ch.id ? colors.primary + "20" : colors.background,
+                          borderWidth: selectedChild?.id === ch.id ? 2 : 1,
+                          opacity: ch.stock_net <= 0 ? 0.5 : 1,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.sizePillText, { color: colors.text }]}>{ch.size_value}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+
             {/* Delivery */}
             <View style={[styles.deliveryRow, { borderColor: colors.sandDivider }]}>
               <View style={[styles.deliveryIconWrap, { backgroundColor: colors.sandDivider + "50" }]}>
@@ -276,45 +325,57 @@ export default function ProductDetailScreen() {
         </Animated.View>
       </Animated.ScrollView>
 
-      {/* Fixed bottom: qty + Add to Cart */}
+      {/* Fixed bottom: qty + Add to Cart or Select size */}
       <View style={[styles.footer, { backgroundColor: colors.surface, borderColor: colors.sandDivider }]}>
-        <View style={[styles.qtyPill, { borderColor: colors.sandDivider, backgroundColor: colors.background }]}>
+        {singleSized || selectedChild ? (
+          <View style={[styles.qtyPill, { borderColor: colors.sandDivider, backgroundColor: colors.background }]}>
+            <TouchableOpacity
+              style={styles.qtyBtn}
+              onPress={handleDecrease}
+              disabled={isUpdating || quantity <= 1 || stockNet <= 0}
+            >
+              <FontAwesome name="minus" size={18} color={colors.text} />
+            </TouchableOpacity>
+            {isUpdating ? (
+              <ActivityIndicator size="small" color={colors.primary} style={styles.qtyLoader} />
+            ) : (
+              <Text style={[styles.qtyNum, { color: colors.text }]}>{quantity}</Text>
+            )}
+            <TouchableOpacity
+              style={styles.qtyBtn}
+              onPress={handleIncrease}
+              disabled={isUpdating || quantity >= stockNet || stockNet <= 0}
+            >
+              <FontAwesome name="plus" size={18} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+        ) : null}
+        {singleSized || selectedChild ? (
           <TouchableOpacity
-            style={styles.qtyBtn}
-            onPress={handleDecrease}
-            disabled={isUpdating || quantity <= 1 || stockNet <= 0}
+            style={[
+              styles.addBtn,
+              { backgroundColor: colors.primary },
+              (isUpdating || stockNet <= 0 || !selectedChild) && styles.addBtnDisabled,
+            ]}
+            onPress={handleAdd}
+            disabled={isUpdating || stockNet <= 0 || !selectedChild}
+            activeOpacity={0.85}
           >
-            <FontAwesome name="minus" size={18} color={colors.text} />
+            {isUpdating ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.addBtnText}>{t("add_to_cart")}</Text>
+            )}
           </TouchableOpacity>
-          {isUpdating ? (
-            <ActivityIndicator size="small" color={colors.primary} style={styles.qtyLoader} />
-          ) : (
-            <Text style={[styles.qtyNum, { color: colors.text }]}>{quantity}</Text>
-          )}
+        ) : (
           <TouchableOpacity
-            style={styles.qtyBtn}
-            onPress={handleIncrease}
-            disabled={isUpdating || quantity >= stockNet || stockNet <= 0}
+            style={[styles.addBtn, { backgroundColor: colors.primary }]}
+            onPress={scrollToSizes}
+            activeOpacity={0.85}
           >
-            <FontAwesome name="plus" size={18} color={colors.text} />
+            <Text style={styles.addBtnText}>{t("select_size")}</Text>
           </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={[
-            styles.addBtn,
-            { backgroundColor: colors.primary },
-            (isUpdating || stockNet <= 0) && styles.addBtnDisabled,
-          ]}
-          onPress={handleAdd}
-          disabled={isUpdating || stockNet <= 0}
-          activeOpacity={0.85}
-        >
-          {isUpdating ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.addBtnText}>{t("add_to_cart")}</Text>
-          )}
-        </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -381,6 +442,9 @@ const styles = StyleSheet.create({
   specRow: { width: "50%", marginBottom: 14 },
   specLabel: { fontSize: 10, fontWeight: "700", letterSpacing: 0.5, textTransform: "uppercase", marginBottom: 2 },
   specValue: { fontSize: 14, fontWeight: "500" },
+  sizeRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 8 },
+  sizePill: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999 },
+  sizePillText: { fontSize: 14, fontWeight: "600" },
   deliveryRow: {
     flexDirection: "row",
     alignItems: "center",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/api";
+import { PageLoader } from "../components/PageLoader";
 import { Package, ShoppingBag, ArrowRight } from "lucide-react";
 
 export function DashboardPage() {
@@ -22,11 +23,7 @@ export function DashboardPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="animate-spin h-10 w-10 border-2 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -65,13 +62,13 @@ export function DashboardPage() {
         <div className="flex gap-4">
           <Link
             to="/products"
-            className="px-5 py-2.5 bg-primary text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            className="px-5 py-2.5 bg-primary text-white rounded-xl font-medium hover:opacity-90 active:scale-[0.98] transition-transform"
           >
             Add Product
           </Link>
           <Link
             to="/orders"
-            className="px-5 py-2.5 bg-white border border-sand-divider text-text-primary rounded-xl font-medium hover:bg-sand-divider/30 transition-colors"
+            className="px-5 py-2.5 bg-white border border-sand-divider text-text-primary rounded-xl font-medium hover:bg-sand-divider/30 active:scale-[0.98] transition-transform"
           >
             View Orders
           </Link>

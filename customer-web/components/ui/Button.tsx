@@ -11,10 +11,10 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
         const variants = {
-            primary: "bg-[#ec9213] text-white hover:bg-[#ec9213]/90 shadow-md shadow-[#ec9213]/20 border-none",
-            secondary: "bg-[#e5e1da] text-[#181511] hover:bg-[#e5e1da]/80 border border-[#e5e1da]",
-            ghost: "hover:bg-black/5 text-[#181511]",
-            outline: "border border-[#e5e1da] bg-transparent hover:bg-white/50 text-[#181511]",
+            primary: "bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20 border-none active:scale-[0.98] transition-transform",
+            secondary: "bg-sand-divider text-text-primary hover:bg-sand-divider/80 border border-sand-divider active:scale-[0.98] transition-transform",
+            ghost: "hover:bg-black/5 text-text-primary transition-colors",
+            outline: "border border-sand-divider bg-transparent hover:bg-white/50 text-text-primary active:scale-[0.98] transition-transform",
         };
 
         const sizes = {
@@ -28,7 +28,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 ref={ref}
                 disabled={isLoading || disabled}
                 className={cn(
-                    "inline-flex items-center justify-center rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec9213] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+                    "inline-flex items-center justify-center rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
                     variants[variant],
                     sizes[size],
                     className

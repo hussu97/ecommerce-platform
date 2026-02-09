@@ -11,6 +11,7 @@ from app.core.audit import log_audit_from_request
 from app.models.user import User
 from app.models.order import Order, OrderItem
 from app.models.product import Product
+from app.models.product_child import ProductChild
 from app.models.customer_address import CustomerAddress
 from app.models.stock_reservation import StockReservation
 from app.schemas.order import OrderCreate, OrderResponse, OrderItemResponse, OrderItemProductSchema, OrderItemReviewSchema, PaymentIntentCreate
@@ -53,23 +54,39 @@ async def create_order(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    """Create a new order and reserve stock."""
-    # 1. Resolve slugs to products and validate
-    slugs = list({item.product_slug.lower() for item in order_in.items})
-    result = await db.execute(
-        select(Product).where(Product.slug.in_(slugs)).with_for_update()
-    )
-    products_by_slug = {p.slug: p for p in result.scalars().all()}
-
+    """Create a new order and reserve stock. Each item requires child_code (product variant)."""
+    # 1. Resolve products and children, validate stock on child
+    products_by_slug = {}
+    children_by_key = {}  # (product_id, child_code) -> ProductChild
     for item in order_in.items:
-        product = products_by_slug.get(item.product_slug.lower())
-        if not product or not product.is_active:
-            raise HTTPException(status_code=404, detail=f"Product {item.product_slug} not found")
-        stock_net = product.stock_quantity - (product.stock_reserved or 0)
-        if stock_net < item.quantity:
+        slug = item.product_slug.lower()
+        if slug in products_by_slug:
+            product = products_by_slug[slug]
+        else:
+            result = await db.execute(
+                select(Product).where(Product.slug == slug, Product.is_active == True).with_for_update()
+            )
+            product = result.scalar_one_or_none()
+            if not product:
+                raise HTTPException(status_code=404, detail=f"Product {item.product_slug} not found")
+            products_by_slug[slug] = product
+        key = (product.id, item.child_code.strip())
+        if key not in children_by_key:
+            child_res = await db.execute(
+                select(ProductChild).where(
+                    ProductChild.product_id == product.id,
+                    ProductChild.code == item.child_code.strip(),
+                ).with_for_update()
+            )
+            child = child_res.scalar_one_or_none()
+            if not child:
+                raise HTTPException(status_code=404, detail=f"Variant {item.child_code} not found for product {item.product_slug}")
+            children_by_key[key] = child
+        child = children_by_key[key]
+        if child.stock_net < item.quantity:
             raise HTTPException(
                 status_code=400,
-                detail=f"Insufficient stock for product {product.name}. Available: {stock_net}",
+                detail=f"Insufficient stock for {product.name} ({child.size_value}). Available: {child.stock_net}",
             )
 
     # 2. Resolve shipping address string (saved address by address_code or inline)
@@ -106,13 +123,15 @@ async def create_order(
     new_order.order_number = f"ORD-{new_order.id:06d}"
     await db.flush()
 
-    # 3. Create order items and stock reservations
+    # 3. Create order items and stock reservations (on child)
     for idx, item in enumerate(order_in.items, start=1):
         product = products_by_slug[item.product_slug.lower()]
+        child = children_by_key[(product.id, item.child_code.strip())]
         new_item = OrderItem(
             order_id=new_order.id,
             order_item_number=idx,
             product_id=product.id,
+            product_child_id=child.id,
             quantity=item.quantity,
             price_at_purchase=item.price_at_purchase,
             status="pending",
@@ -120,16 +139,16 @@ async def create_order(
         db.add(new_item)
         await db.flush()
 
-        # Create reservation and increment product.stock_reserved
         reservation = StockReservation(
             order_id=new_order.id,
             order_item_id=new_item.id,
             product_id=product.id,
+            product_child_id=child.id,
             quantity=item.quantity,
             status="active",
         )
         db.add(reservation)
-        product.stock_reserved = (product.stock_reserved or 0) + item.quantity
+        child.stock_reserved = (child.stock_reserved or 0) + item.quantity
 
     await log_audit_from_request(db, request, "order.create", "order", str(new_order.id), current_user.id, 201)
     await db.commit()
@@ -163,6 +182,7 @@ def _build_order_response(order, items_with_product, review_map):
                 id=oi.id,
                 order_item_number=oi.order_item_number or 1,
                 product_id=oi.product_id,
+                product_child_id=oi.product_child_id,
                 quantity=oi.quantity,
                 price_at_purchase=oi.price_at_purchase,
                 status=oi.status or "pending",

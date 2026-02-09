@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, ScrollView, View, ActivityIndicator } from "react-native";
+import { StyleSheet, TextInput, TouchableOpacity, ScrollView, View } from "react-native";
 import { Text } from "@/components/Themed";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -8,6 +8,7 @@ import api from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { useColorScheme } from "@/components/useColorScheme";
 import type { SavedAddress } from "../index";
 
@@ -105,11 +106,7 @@ export default function EditAddressScreen() {
 
   if (!isAuthenticated) return null;
   if (loading) {
-    return (
-      <View style={[styles.container, styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   return (

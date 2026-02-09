@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
-import { Loader2, MapPin, Check, Package, Truck } from "lucide-react";
+import { PageLoader } from "@/components/PageLoader";
+import { MapPin, Check, Package, Truck } from "lucide-react";
 
 interface OrderItemProduct {
   id: string;
@@ -68,11 +69,7 @@ export default function OrderDetailPage() {
   if (!isAuthenticated) return null;
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#ec9213]" />
-      </div>
-    );
+    return <PageLoader className="min-h-[60vh]" />;
   }
 
   if (!order) {

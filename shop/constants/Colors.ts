@@ -1,15 +1,18 @@
-// Design system: match design_template.html
-// Primary #ec9213, background light #f8f7f6, dark #221a10, sand #e5e1da, muted #897961
-const primary = "#ec9213";
-const backgroundLight = "#f8f7f6";
-const backgroundDark = "#221a10";
-const sandDivider = "#e5e1da";
-const textMuted = "#897961";
-const surfaceLight = "#ffffff";
-const surfaceDark = "#2d2419";
-const borderDark = "#3d3123";
-const textPrimary = "#181511";
-const mutedDark = "#c4b5a0";
+// Design tokens from single source: @ecommerce/design-tokens
+import tokens from "@ecommerce/design-tokens";
+
+const {
+  primary,
+  backgroundLight,
+  backgroundDark,
+  sandDivider,
+  textMuted,
+  surfaceLight,
+  surfaceDark,
+  borderDark,
+  textPrimary,
+  mutedDark,
+} = tokens;
 
 const tintColorLight = primary;
 const tintColorDark = primary;
@@ -44,13 +47,13 @@ export default {
 };
 
 export const DesignTokens = {
-  primary: "#ec9213",
-  backgroundLight: "#f8f7f6",
-  backgroundDark: "#221a10",
-  sandDivider: "#e5e1da",
-  textMuted: "#897961",
-  textPrimary: "#181511",
-  surfaceLight: "#ffffff",
-  surfaceDark: "#2d2419",
-  borderDark: "#3d3123",
+  primary,
+  backgroundLight,
+  backgroundDark,
+  sandDivider,
+  textMuted,
+  textPrimary,
+  surfaceLight,
+  surfaceDark,
+  borderDark,
 };

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   TouchableOpacity,
   Modal,
   TextInput,
@@ -22,6 +21,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { useColorScheme } from "@/components/useColorScheme";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 interface OrderItemProduct {
   id: string;
@@ -147,11 +147,7 @@ export default function OrderDetailScreen() {
   if (!isAuthenticated) return null;
 
   if (loading) {
-    return (
-      <View style={[styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   if (!order) {

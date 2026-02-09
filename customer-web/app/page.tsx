@@ -4,10 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Product } from "@/stores/useCartStore";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { FiltersOverlay, type FilterValues, type SortOption } from "@/components/FiltersOverlay";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
-import { Loader2, Search, Package, SlidersHorizontal } from "lucide-react";
+import { Search, Package, SlidersHorizontal } from "lucide-react";
 
 interface FilterCategory {
   id: number;
@@ -250,18 +251,20 @@ export default function Home() {
       {/* Product Grid - 2 cols mobile, 3–4 desktop */}
       <div id="products" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 px-4 pb-24 md:pb-12">
         {isLoading ? (
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 flex justify-center items-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-[#ec9213]" />
-          </div>
+          <>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </>
         ) : error ? (
           <div className="col-span-2 md:col-span-3 lg:col-span-4 text-center py-10 text-red-500">{error}</div>
         ) : products.length === 0 ? (
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-[#e5e1da]">
-            <Package className="h-16 w-16 text-[#897961] mb-4" />
-            <h3 className="serif-font text-lg font-bold text-[#181511] mb-2">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-sand-divider">
+            <Package className="h-16 w-16 text-text-muted mb-4" />
+            <h3 className="serif-font text-lg font-bold text-text-primary mb-2">
               {t("no_products_title")}
             </h3>
-            <p className="text-[#897961] text-center max-w-md text-sm">
+            <p className="text-text-muted text-center max-w-md text-sm">
               {t("no_products_hint")}
             </p>
           </div>

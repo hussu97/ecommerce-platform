@@ -5,6 +5,7 @@ from sqlalchemy import select
 from app.db.session import get_db
 from app.models.order import Order, OrderItem
 from app.models.product import Product
+from app.models.product_child import ProductChild
 from app.models.stock_reservation import StockReservation
 from app.models.user import User
 from app.schemas.order import OrderResponse
@@ -42,7 +43,7 @@ async def update_order_status(
     new_status = order_status.lower()
     prev_status = order.status.lower() if order.status else ""
 
-    # Shipped: deactivate reservations, decrement product.stock_quantity (gross) and product.stock_reserved
+    # Shipped: deactivate reservations; decrement child's stock_quantity and stock_reserved
     if new_status == "shipped":
         reservations = await db.execute(
             select(StockReservation).where(
@@ -52,13 +53,13 @@ async def update_order_status(
         )
         for res in reservations.scalars().all():
             res.status = "shipped"
-            product_result = await db.execute(select(Product).where(Product.id == res.product_id))
-            product = product_result.scalar_one_or_none()
-            if product:
-                product.stock_quantity = max(0, product.stock_quantity - res.quantity)
-                product.stock_reserved = max(0, (product.stock_reserved or 0) - res.quantity)
+            child_result = await db.execute(select(ProductChild).where(ProductChild.id == res.product_child_id))
+            child = child_result.scalar_one_or_none()
+            if child:
+                child.stock_quantity = max(0, child.stock_quantity - res.quantity)
+                child.stock_reserved = max(0, (child.stock_reserved or 0) - res.quantity)
 
-    # Cancelled: deactivate reservations, decrement product.stock_reserved only (no gross change)
+    # Cancelled: deactivate reservations; decrement child's stock_reserved only
     elif new_status == "cancelled":
         reservations = await db.execute(
             select(StockReservation).where(
@@ -68,10 +69,10 @@ async def update_order_status(
         )
         for res in reservations.scalars().all():
             res.status = "cancelled"
-            product_result = await db.execute(select(Product).where(Product.id == res.product_id))
-            product = product_result.scalar_one_or_none()
-            if product:
-                product.stock_reserved = max(0, (product.stock_reserved or 0) - res.quantity)
+            child_result = await db.execute(select(ProductChild).where(ProductChild.id == res.product_child_id))
+            child = child_result.scalar_one_or_none()
+            if child:
+                child.stock_reserved = max(0, (child.stock_reserved or 0) - res.quantity)
 
     order.status = new_status
     await db.commit()
@@ -114,11 +115,11 @@ async def update_order_item_status(
         )
         for reservation in res.scalars().all():
             reservation.status = "shipped"
-            product_result = await db.execute(select(Product).where(Product.id == reservation.product_id))
-            product = product_result.scalar_one_or_none()
-            if product:
-                product.stock_quantity = max(0, product.stock_quantity - reservation.quantity)
-                product.stock_reserved = max(0, (product.stock_reserved or 0) - reservation.quantity)
+            child_result = await db.execute(select(ProductChild).where(ProductChild.id == reservation.product_child_id))
+            child = child_result.scalar_one_or_none()
+            if child:
+                child.stock_quantity = max(0, child.stock_quantity - reservation.quantity)
+                child.stock_reserved = max(0, (child.stock_reserved or 0) - reservation.quantity)
 
     item.status = new_status
     await db.commit()

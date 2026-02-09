@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../lib/api";
+import { TableSkeleton } from "../components/TableSkeleton";
 import { Plus, Pencil, Trash2, X, Globe } from "lucide-react";
 
 interface Brand {
@@ -227,7 +228,7 @@ export function BrandsPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={4} className="py-10 text-center text-text-muted">Loading...</td></tr>
+                <TableSkeleton rows={5} cols={4} />
               ) : (
                 brands.map((b) => (
                   <tr key={b.id} className="border-b border-sand-divider last:border-0">

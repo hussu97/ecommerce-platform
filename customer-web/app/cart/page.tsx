@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/useCartStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import { Button } from "@/components/ui/Button";
-import { Trash2, Plus, Minus, Loader2, ArrowLeft } from "lucide-react";
+import { PageLoader } from "@/components/PageLoader";
+import { Trash2, Plus, Minus, ArrowLeft } from "lucide-react";
 import { useEffect } from "react";
 
 export default function CartPage() {
@@ -25,11 +26,7 @@ export default function CartPage() {
   }, [fetchCart]);
 
   if (isLoading && items.length === 0) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#ec9213]" />
-      </div>
-    );
+    return <PageLoader className="min-h-[60vh]" />;
   }
 
   if (items.length === 0) {
@@ -99,7 +96,7 @@ export default function CartPage() {
                     {item.product.name}
                   </Link>
                   <button
-                    onClick={() => removeFromCart(item.product.slug ?? item.product.id)}
+                    onClick={() => removeFromCart(item.product.slug ?? item.product.id, item.child?.code ?? "")}
                     className="text-[#897961] hover:text-[#181511] shrink-0"
                   >
                     <Trash2 className="size-5" />
@@ -107,6 +104,7 @@ export default function CartPage() {
                 </div>
                 <p className="text-xs text-[#897961] mt-0.5">
                   {item.product.category_path || item.product.brand_name || "-"}
+                  {item.child?.size_value && item.child.size_value !== "single_size" ? ` · ${t("size")}: ${item.child.size_value}` : ""}
                 </p>
               </div>
               <div className="flex items-center justify-between mt-2">
@@ -116,7 +114,7 @@ export default function CartPage() {
                 <div className="flex items-center gap-3 bg-[#f8f7f6] px-2 py-1 rounded-full">
                   <button
                     className="size-6 flex items-center justify-center rounded-full bg-white shadow-sm text-xs font-bold hover:bg-[#e5e1da]"
-                    onClick={() => updateQuantity(item.product.slug ?? item.product.id, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.product.slug ?? item.product.id, item.child?.code ?? "", item.quantity - 1)}
                   >
                     -
                   </button>
@@ -125,7 +123,7 @@ export default function CartPage() {
                   </span>
                   <button
                     className="size-6 flex items-center justify-center rounded-full bg-white shadow-sm text-xs font-bold hover:bg-[#e5e1da]"
-                    onClick={() => updateQuantity(item.product.slug ?? item.product.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.product.slug ?? item.product.id, item.child?.code ?? "", item.quantity + 1)}
                   >
                     +
                   </button>

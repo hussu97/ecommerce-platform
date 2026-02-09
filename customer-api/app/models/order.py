@@ -26,9 +26,11 @@ class OrderItem(Base):
     order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
     order_item_number = Column(Integer, default=1, nullable=False)  # 1-based within order
     product_id = Column(String(36), ForeignKey("products.id"), nullable=False)
+    product_child_id = Column(Integer, ForeignKey("product_children.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
     price_at_purchase = Column(Float, nullable=False)
     status = Column(String, default="pending")  # pending, shipped, delivered
 
     order = relationship("Order", back_populates="items")
     product = relationship("Product", foreign_keys=[product_id])
+    product_child = relationship("ProductChild", foreign_keys=[product_child_id])

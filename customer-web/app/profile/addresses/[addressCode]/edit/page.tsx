@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
+import { PageLoader } from "@/components/PageLoader";
 import { ChevronLeft } from "lucide-react";
 import type { SavedAddress } from "../../page";
 
@@ -110,8 +111,8 @@ export default function EditAddressPage() {
   if (!isAuthenticated) return null;
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f7f6] flex items-center justify-center">
-        <div className="size-8 border-2 border-[#ec9213] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background-light flex items-center justify-center">
+        <PageLoader />
       </div>
     );
   }

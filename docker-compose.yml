@@ -1,0 +1,88 @@
+services:
+  customer-api:
+    build: ./customer-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "sqlite+aiosqlite:////data/ecommerce.db"
+    volumes:
+      - dbdata:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  admin-api:
+    build: ./admin-api
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: "sqlite+aiosqlite:////data/ecommerce.db"
+      STORAGE_PATH: "/app/uploads"
+    volumes:
+      - dbdata:/data
+      - uploaddata:/app/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  bulk-import-worker:
+    build: ./admin-api
+    command: ["python", "-m", "app.workers.bulk_import"]
+    environment:
+      DATABASE_URL: "sqlite+aiosqlite:////data/ecommerce.db"
+      STORAGE_PATH: "/app/uploads"
+    volumes:
+      - dbdata:/data
+      - uploaddata:/app/uploads
+    depends_on:
+      admin-api:
+        condition: service_healthy
+
+  init:
+    build: ./customer-api
+    command: ["/bin/sh", "/app/scripts/docker-init.sh"]
+    environment:
+      DATABASE_URL: "sqlite+aiosqlite:////data/ecommerce.db"
+    volumes:
+      - dbdata:/data
+    depends_on:
+      customer-api:
+        condition: service_healthy
+    restart: "no"
+
+  customer-web:
+    build: ./customer-web
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_ORIGIN: "http://customer-api:8000"
+    depends_on:
+      customer-api:
+        condition: service_healthy
+
+  admin-web:
+    build: ./admin-web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_PROXY_TARGET: "http://admin-api:8001"
+    depends_on:
+      admin-api:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    profiles:
+      - with-redis
+
+volumes:
+  dbdata:
+  uploaddata:

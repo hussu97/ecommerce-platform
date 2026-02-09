@@ -9,6 +9,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { PageLoader } from "@/components/PageLoader";
 import Link from "next/link";
 import { Truck, ChevronRight, Home, Building2, MapPin } from "lucide-react";
 
@@ -49,6 +50,7 @@ function CheckoutForm({
         const orderRes = await api.post("/orders/", {
           items: items.map((item) => ({
             product_slug: item.product.slug ?? item.product.id,
+            child_code: item.child?.code ?? "",
             quantity: item.quantity,
             price_at_purchase: item.product.price,
           })),
@@ -231,9 +233,7 @@ export default function CheckoutPage() {
                 )}
               </div>
               {addressesLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="size-8 border-2 border-[#ec9213] border-t-transparent rounded-full animate-spin" />
-                </div>
+                <PageLoader className="py-8 min-h-[120px]" />
               ) : addresses.length > 0 ? (
                 <form onSubmit={handleAddressSubmit} className="space-y-3">
                   <div className="space-y-2">
@@ -434,6 +434,7 @@ export default function CheckoutPage() {
                       const orderRes = await api.post("/orders/", {
                         items: cartItems.map((item) => ({
                           product_slug: item.product.slug ?? item.product.id,
+                          child_code: item.child?.code ?? "",
                           quantity: item.quantity,
                           price_at_purchase: item.product.price,
                         })),

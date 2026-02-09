@@ -4,7 +4,6 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  ActivityIndicator,
   Image,
   Linking,
   Platform,
@@ -19,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { useColorScheme } from "@/components/useColorScheme";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 interface OrderItemProduct {
   id: string;
@@ -89,11 +89,7 @@ export default function OrderConfirmationScreen() {
   if (!isAuthenticated || !id) return null;
 
   if (loading) {
-    return (
-      <View style={[styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   if (!order) {

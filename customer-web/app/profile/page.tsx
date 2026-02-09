@@ -7,7 +7,8 @@ import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Loader2, Package, MapPin } from "lucide-react";
+import { PageLoader } from "@/components/PageLoader";
+import { Package, MapPin } from "lucide-react";
 
 interface Order {
     id: number;
@@ -46,11 +47,7 @@ export default function ProfilePage() {
     }, [isAuthenticated, router]);
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[60vh]">
-                <Loader2 className="h-10 w-10 animate-spin text-secondary" />
-            </div>
-        );
+        return <PageLoader className="min-h-[60vh]" />;
     }
 
     return (

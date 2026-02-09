@@ -5,6 +5,7 @@ from datetime import datetime
 
 class OrderItemSchema(BaseModel):
     product_slug: str = Field(..., max_length=255)
+    child_code: str = Field(..., max_length=64)  # product child code (required)
     quantity: int = Field(..., ge=1, le=100)
     price_at_purchase: float = Field(..., ge=0)
 
@@ -50,6 +51,7 @@ class OrderItemResponse(BaseModel):
     id: int
     order_item_number: int
     product_id: str
+    product_child_id: int
     quantity: int
     price_at_purchase: float
     status: str

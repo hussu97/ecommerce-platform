@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -15,6 +14,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { useColorScheme } from "@/components/useColorScheme";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 interface Order {
   id: number;
@@ -53,6 +53,10 @@ export default function ProfileScreen() {
 
   if (!isAuthenticated) return null;
 
+  if (isLoading) {
+    return <FullScreenLoader />;
+  }
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -78,9 +82,7 @@ export default function ProfileScreen() {
       </View>
 
       <Text style={[styles.sectionTitle, { fontFamily: FontFamily.serif, color: colors.text }]}>{t("order_history")}</Text>
-      {isLoading ? (
-        <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
-      ) : orders.length === 0 ? (
+      {orders.length === 0 ? (
         <View style={[styles.empty, { backgroundColor: colors.surface, borderColor: colors.sandDivider }]}>
           <Text style={[styles.emptyText, { color: colors.textMuted }]}>{t("no_orders_yet")}</Text>
         </View>

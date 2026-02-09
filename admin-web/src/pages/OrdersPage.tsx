@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../lib/api";
+import { PageLoader } from "../components/PageLoader";
 
 interface Order {
   id: number;
@@ -28,11 +29,7 @@ export function OrdersPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="animate-spin h-10 w-10 border-2 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

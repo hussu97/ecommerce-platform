@@ -14,7 +14,9 @@ Monorepo for the e-commerce platform: customer-facing and admin apps, with share
 | **Admin Web** | `admin-web/` | 5173 | React + Vite – desktop admin dashboard |
 | **Shop** | `shop/` | - | React Native + Expo – cross-platform (Web, iOS, Android); feature-parallel to customer-web |
 
-**Note:** `customer-web` and `shop` must stay feature-parallel. When adding frontend features, implement in both apps. See `.cursor/rules/frontend-parity.mdc`.
+**Note:** `customer-web` and `shop` must stay feature-parallel. When adding frontend features, implement in both apps. See `.cursor/rules/project-standards.mdc`.
+
+**Design tokens:** Colors, spacing, radius, and typography are defined in `packages/design-tokens`. When changing any design token, update that package only (see project rules). Run `npm run tokens:build` from repo root to regenerate theme CSS.
 
 ---
 
@@ -92,9 +94,22 @@ npm run android     # Android emulator
 
 ---
 
+## Docker Compose
+
+Run the full stack (APIs, customer-web, admin-web, bulk-import worker) in containers:
+
+```bash
+docker compose up --build
+```
+
+Then open http://localhost:3000 (customer) and http://localhost:5173 (admin). The **Shop** app runs on the host: `cd shop && npm start`. See [docs/DOCKER.md](docs/DOCKER.md).
+
+---
+
 ## Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) – Architecture overview
+- [docs/DOCKER.md](docs/DOCKER.md) – Docker Compose
 - [PRODUCTION.md](PRODUCTION.md) – Production deployment guide
 - [customer-api/README.md](customer-api/README.md) – Customer API
 - [admin-api/README.md](admin-api/README.md) – Admin API
@@ -169,6 +184,8 @@ Design tokens (used across customer-web, admin-web, shop): **primary** `#ec9213`
 
 | Date | Change |
 |------|--------|
+| 2025-02-09 | **Loading and transition consistency:** Unified skeleton vs spinner rules; PageLoader, ProductCardSkeleton, PdpSkeleton (customer-web); TableSkeleton (admin-web); FullScreenLoader (shop). Transitions aligned with design_template. (customer-web, admin-web, shop) |
+| 2025-02-09 | **Design tokens single source:** `packages/design-tokens` with tokens.json, generated theme.css, and JS export. customer-web and admin-web import theme; shop uses package in Colors. Rule: token changes only in packages/design-tokens. |
 | 2025-02-09 | **Taxonomy & Attributes Admin:** Admin-web can create, update, and deactivate taxonomies (Taxonomies page); create, update, and deactivate taxonomy attributes and options (Attributes page). Added `is_active` to Taxonomy, TaxonomyAttribute, TaxonomyAttributeOption. Customer-facing endpoints filter by `is_active`. Run `reset_and_seed.py` to add new columns to existing DB. |
 | 2025-02-08 | Cleanup: removed unused Address model (use CustomerAddress); removed outdated planning docs (implementation_plan, prompts_plan, walkthrough); updated READMEs and ARCHITECTURE |
 | 2025-02-08 | Consolidated apps into monorepo: renamed `frontend`→`customer-web`, `backend`→`customer-api`; moved `admin-api`, `admin-web`, `shop` into repo; added global README |

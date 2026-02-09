@@ -1,0 +1,57 @@
+---
+description: Conventions, frontend parity (customer-web & shop), post-task checks (incl. NEXT_TODO status updates), and changelog.
+alwaysApply: true
+---
+
+# Project standards and post-task checks
+
+## Conventions (all new code)
+
+- **Translations / i18n**: Translations must come from the backend (API), not hardcoded. Use language APIs, UI strings endpoints, and translation tables. Do not add new user-facing strings in the frontend without a backend source (e.g. i18n/languages, product_translations, taxonomy_translations).
+- **APIs: use code/slug, not DB ID**: Prefer stable identifiers: language **code** (e.g. `en`, `ar`), taxonomy **slug**, brand **slug**, product **slug**. Avoid exposing or requiring auto-generated DB IDs in API contracts where a code/slug exists. Cart uses `product_slug`; product URLs are slug-based.
+- **Consistency**: Match existing patterns (customer-api, admin-api, customer-web, admin-web, shop). Reuse existing helpers, schemas, and naming.
+- **Architecture docs**: When changes impact the architecture (new services, ports, DB, APIs, or deployment), update [ARCHITECTURE.md](ecommerce-platform/ARCHITECTURE.md) so the overview table and “Running” sections stay accurate.
+- **Frontend design**: When making frontend changes (customer-web, admin-web, or shop UI), take inspiration from [design_template.html](ecommerce-platform/design_template.html) for layout, tokens, and patterns so the app stays aligned with the design system.
+- **Loading and transitions**: Use skeleton for known layouts (product grid, PDP, admin tables); use spinner for full-page or inline actions. Follow design_template transition patterns (active:scale, duration-200/500, transition-colors). See [DESIGN_TEMPLATE.md](ecommerce-platform/DESIGN_TEMPLATE.md) “Loading and transitions.”
+- **Design tokens**: Colors, spacing, radius, and typography values are defined only in the single source (`packages/design-tokens`). When adding or changing any design token, update that package (e.g. `tokens.json` and run `npm run tokens:build` to regenerate `theme.css`); do not define or hardcode token values in customer-web, admin-web, or shop. Each app may use tokens differently to achieve platform-appropriate UI (desktop web, mobile web, native app).
+
+---
+
+## Frontend parity: customer-web & shop
+
+Two customer-facing apps must stay feature-parallel:
+
+| App | Tech | Platforms |
+|-----|------|-----------|
+| **customer-web** | Next.js (React) | Web only |
+| **shop** | React Native + Expo | Web, iOS, Android |
+
+When making frontend changes:
+
+1. **Implement in both apps** – New feature, UI string, or behavior goes in both `customer-web/` and `shop/`.
+2. **Same i18n keys** – Add new UI strings in all three places:
+   - `customer-api/reset_and_seed.py` (UI_STRINGS)
+   - `customer-web/stores/useI18nStore.ts` (DEFAULT_STRINGS)
+   - `shop/stores/useI18nStore.ts` (DEFAULT_STRINGS)
+3. **Align design** – Primary `#232f3e`, secondary `#ff9900`. Keep layout and flows similar where possible.
+4. **Products API** – Both use `customer-api`. **GET /products/** returns `{ products, filters }` (categories, brands, attributes with counts). Do NOT call /taxonomies/ or /brands/ separately for product listing; use /products/ filters.
+
+Feature checklist (keep in sync): Search, category & brand & attribute filters with counts, language switcher, login/signup/profile/orders, cart, checkout, product detail, all UI strings EN + AR.
+
+---
+
+## Post-task verification (after most tasks)
+
+1. **Translations**: Any new user-facing text is backed by backend i18n or translation tables; no new hardcoded copy. For customer-web/shop, same keys in all three places above.
+2. **Identifiers**: New or changed APIs use code/slug (or existing ID pattern) consistently; no new reliance on raw DB IDs where a code/slug exists.
+3. **Architecture**: If the change added or changed services, ports, DB, or run instructions, update [ARCHITECTURE.md](ecommerce-platform/ARCHITECTURE.md).
+4. **NEXT_TODO.md**: When changes implement or partially implement a feature or task listed in [NEXT_TODO.md](ecommerce-platform/NEXT_TODO.md), update that task’s status in the file: set status to ✅ (Implemented) or 🔶 (Partial), and if partial, add or adjust the *Current:* note to describe what exists. If the change completes a previously partial item, upgrade to ✅ and remove the *Current:* note. Optionally add a one-line entry to the “Changelog (Implemented)” table at the bottom of NEXT_TODO.md.
+5. **Design tokens**: If the change added or modified design tokens (colors, spacing, radius, typography), confirm they were updated in `packages/design-tokens` only and that consuming apps use the package (no new local token definitions).
+6. **Changelog**: Append a short entry to the project changelog (e.g. `CHANGELOG.md` at repo root): what changed and which area (admin-api, admin-web, customer-web, shop, etc.). One to two lines per entry.
+
+Example changelog entry:
+
+```markdown
+## [Unreleased]
+- Bulk upload: template and worker use category_name/brand_name (no IDs). (admin-api, bulk-import-worker)
+```

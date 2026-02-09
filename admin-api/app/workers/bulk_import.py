@@ -25,15 +25,18 @@ from sqlalchemy.orm import selectinload
 
 from app.db.session import AsyncSessionLocal
 from app.models.product import Product
+from app.models.product_child import ProductChild
 from app.models.product_translation import ProductTranslation
 from app.models.product_attribute_value import ProductAttributeValue
 from app.models.product_bulk_upload import ProductBulkUpload
-from app.models.user import User  # ensure User is in registry for ProductBulkUpload.user_rel
+from app.models.user import User
 from app.models.taxonomy import Taxonomy
 from app.models.taxonomy_attribute import TaxonomyAttribute, TaxonomyAttributeOption
 from app.models.brand import Brand
 from app.models.language import Language
 from app.storage import get_storage
+from app.core.codegen import generate_parent_code, generate_child_code
+from app.core.config import settings
 
 
 POLL_INTERVAL = 5
@@ -100,14 +103,53 @@ async def _process_row(
     db: AsyncSession,
     row: dict,
     row_num: int,
-    taxonomy_id: int,
+    default_taxonomy_id: int,
     attr_name_to_option_ids: dict[str, dict[str, int]],
     lang_en_id: Optional[int],
     lang_ar_id: Optional[int],
-    brands_by_id: dict[int, Brand],
+    taxonomies_by_name: dict[str, int],
+    taxonomies_by_slug: dict[str, int],
     brands_by_name: dict[str, Brand],
+    brands_by_slug: dict[str, Brand],
+    products_by_code: dict[str, Product],
 ) -> tuple[bool, Optional[str]]:
-    """Process one row. Returns (success, error_message)."""
+    """Process one row. Option A: single-size (is_single_size or no size_value + barcode) or multi-size (size_value).
+    Every product gets at least one child."""
+    parent_code_val = (row.get("parent_code") or "").strip()
+    size_value_val = (row.get("size_value") or "").strip()
+    barcode_val = (row.get("barcode") or "").strip()
+    is_single = str(row.get("is_single_size") or "").strip().lower() in ("1", "true", "yes")
+
+    # Adding child to existing parent (multi-size extra child)
+    if parent_code_val and size_value_val:
+        product = products_by_code.get(parent_code_val.upper()) or products_by_code.get(parent_code_val)
+        if not product:
+            return False, f"parent_code not found: {parent_code_val}"
+        existing = await db.execute(
+            select(ProductChild).where(
+                ProductChild.product_id == product.id,
+                ProductChild.size_value == size_value_val,
+            )
+        )
+        if existing.scalar_one_or_none():
+            return False, f"duplicate size_value {size_value_val} for product {product.code}"
+        try:
+            stock = int(float(row.get("stock_quantity") or 0))
+        except (ValueError, TypeError):
+            stock = 0
+        child_code = await generate_child_code(db, product.id)
+        child = ProductChild(
+            product_id=product.id,
+            code=child_code,
+            barcode=barcode_val or None,
+            size_value=size_value_val,
+            stock_quantity=max(0, stock),
+        )
+        db.add(child)
+        await db.flush()
+        return True, None
+
+    # New product (single-size or first row of multi-size)
     name_en = (row.get("name_en") or "").strip()
     name_ar = (row.get("name_ar") or "").strip()
     name = name_en or name_ar
@@ -124,25 +166,21 @@ async def _process_row(
         stock = int(float(row.get("stock_quantity") or 0))
     except (ValueError, TypeError):
         pass
-    category_id = taxonomy_id
-    try:
-        cid = row.get("category_id")
-        if cid is not None and str(cid).strip():
-            category_id = int(float(cid))
-    except (ValueError, TypeError):
-        pass
+    category_id = default_taxonomy_id
+    cat_val = (row.get("category_name") or row.get("category_slug") or "").strip()
+    if cat_val:
+        t = taxonomies_by_name.get(cat_val.lower()) or taxonomies_by_slug.get(_slugify(cat_val))
+        if t is not None:
+            category_id = t
+        else:
+            return False, f"category not found: {cat_val}"
     brand_id = None
-    brand_val = row.get("brand_id") or row.get("brand_name")
-    if brand_val is not None and str(brand_val).strip():
-        try:
-            bid = int(float(brand_val))
-            if bid in brands_by_id:
-                brand_id = bid
-        except (ValueError, TypeError):
-            pass
-        if brand_id is None and isinstance(brand_val, str):
-            b = brands_by_name.get(brand_val.strip().lower())
-            brand_id = b.id if b else None
+    brand_val = (row.get("brand_name") or row.get("brand_slug") or "").strip()
+    if brand_val:
+        b = brands_by_name.get(brand_val.lower()) or brands_by_slug.get(_slugify(brand_val))
+        brand_id = b.id if b else None
+        if b is None:
+            return False, f"brand not found: {brand_val}"
     is_active = True
     av = str(row.get("is_active", "")).strip().lower()
     if av in ("0", "false", "no", "inactive"):
@@ -156,12 +194,15 @@ async def _process_row(
             break
         slug = f"{base_slug}-{n}"
         n += 1
+    code = await generate_parent_code(db)
     product = Product(
+        code=code,
         name=name,
         slug=slug,
         description=(row.get("description_en") or row.get("description_ar") or "").strip() or None,
         price=price,
-        stock_quantity=max(0, stock),
+        stock_quantity=0,
+        stock_reserved=0,
         image_url=(row.get("image_url") or "").strip() or None,
         category_id=category_id,
         brand_id=brand_id,
@@ -169,6 +210,8 @@ async def _process_row(
     )
     db.add(product)
     await db.flush()
+    products_by_code[code] = product
+
     if name_en and lang_en_id:
         db.add(ProductTranslation(product_id=product.id, language_id=lang_en_id, name=name_en, description=(row.get("description_en") or "").strip() or None))
     if name_ar and lang_ar_id:
@@ -182,6 +225,46 @@ async def _process_row(
         opt_id = value_to_opt_id.get(val.lower()) or value_to_opt_id.get(val)
         if opt_id:
             db.add(ProductAttributeValue(product_id=product.id, option_id=opt_id))
+
+    # Single-size: one child with size_value single_size
+    if is_single or (not size_value_val and (barcode_val or stock is not None)):
+        child_code = await generate_child_code(db, product.id)
+        child = ProductChild(
+            product_id=product.id,
+            code=child_code,
+            barcode=barcode_val or None,
+            size_value=settings.SINGLE_SIZE_VALUE,
+            stock_quantity=max(0, stock),
+        )
+        db.add(child)
+        await db.flush()
+        return True, None
+
+    # Multi-size first child
+    if size_value_val:
+        child_code = await generate_child_code(db, product.id)
+        child = ProductChild(
+            product_id=product.id,
+            code=child_code,
+            barcode=barcode_val or None,
+            size_value=size_value_val,
+            stock_quantity=max(0, stock),
+        )
+        db.add(child)
+        await db.flush()
+        return True, None
+
+    # No size and not single: treat as single-size with no barcode
+    child_code = await generate_child_code(db, product.id)
+    child = ProductChild(
+        product_id=product.id,
+        code=child_code,
+        barcode=None,
+        size_value=settings.SINGLE_SIZE_VALUE,
+        stock_quantity=max(0, stock),
+    )
+    db.add(child)
+    await db.flush()
     return True, None
 
 
@@ -249,18 +332,25 @@ async def process_upload(upload: ProductBulkUpload, content: bytes, ext: str) ->
         lang_ar_id = lang_ar.id if lang_ar else None
         result = await db.execute(select(Brand))
         brands = result.scalars().all()
-    brands_by_id = {b.id: b for b in brands}
+        result = await db.execute(select(Taxonomy))
+        taxonomies = result.scalars().all()
     brands_by_name = {b.name.lower(): b for b in brands}
+    brands_by_slug = {(b.slug or "").lower(): b for b in brands if b.slug}
+    taxonomies_by_name = {t.name.lower(): t.id for t in taxonomies}
+    taxonomies_by_slug = {(t.slug or "").lower(): t.id for t in taxonomies if t.slug}
     processed = 0
     errors = 0
     error_details: dict = {}
+    products_by_code: dict[str, Product] = {}
     async with AsyncSessionLocal() as db:
         for i, row in enumerate(rows):
             row_num = i + 2
             ok, err = await _process_row(
                 db, row, row_num, upload.taxonomy_id or 0,
                 attr_name_to_option_ids, lang_en_id, lang_ar_id,
-                brands_by_id, brands_by_name,
+                taxonomies_by_name, taxonomies_by_slug,
+                brands_by_name, brands_by_slug,
+                products_by_code,
             )
             if ok:
                 processed += 1

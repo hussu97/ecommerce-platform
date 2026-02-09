@@ -12,7 +12,7 @@ from sqlalchemy import text
 from app.db.session import engine
 from app.db.base import Base
 from app.models import (
-    user, product, order, taxonomy, stock_reservation, brand, taxonomy_attribute,
+    user, product, product_child, order, taxonomy, stock_reservation, brand, taxonomy_attribute,
     product_attribute_value, language, product_translation, taxonomy_translation,
     brand_translation, taxonomy_attribute_translation, ui_string, visitor_preference,
     audit_log, product_bulk_upload,

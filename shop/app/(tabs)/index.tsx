@@ -21,6 +21,8 @@ import { useI18nStore } from "@/stores/useI18nStore";
 import { useColorScheme } from "@/components/useColorScheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FiltersModal, type FilterValues, type SortOption } from "@/components/FiltersModal";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
+import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 
 interface FilterCategory {
   id: number;
@@ -82,7 +84,7 @@ export default function ShopScreen() {
   const router = useRouter();
   const addToCart = useCartStore((s) => s.addToCart);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const getQuantityForProduct = useCartStore((s) => s.getQuantityForProduct);
+  const getQuantityForProductAndChild = useCartStore((s) => s.getQuantityForProductAndChild);
   const t = useI18nStore((s) => s.t);
   const currentLanguage = useI18nStore((s) => s.currentLanguage);
   const colorScheme = useColorScheme();
@@ -151,10 +153,12 @@ export default function ShopScreen() {
   }, [searchInput]);
 
   const handleAddToCart = async (item: Product) => {
+    const firstChild = item.children?.[0];
+    if (!firstChild) return;
     const slug = item.slug ?? item.id;
     setAddingSlug(slug);
     try {
-      await addToCart(item);
+      await addToCart(item, firstChild.code);
     } catch (e: unknown) {
       const msg =
         e && typeof e === "object" && "message" in e
@@ -167,10 +171,12 @@ export default function ShopScreen() {
   };
 
   const handleUpdateQty = async (item: Product, newQty: number) => {
+    const firstChild = item.children?.[0];
+    if (!firstChild) return;
     const slug = (item.slug ?? item.id).toString();
     setAddingSlug(slug);
     try {
-      await updateQuantity(slug, newQty);
+      await updateQuantity(slug, firstChild.code, newQty);
     } finally {
       setAddingSlug(null);
     }
@@ -178,12 +184,103 @@ export default function ShopScreen() {
 
   const renderItem = ({ item }: { item: Product }) => {
     const slug = (item.slug ?? item.id).toString();
-    const qty = getQuantityForProduct(slug);
-    const stockNet = item.stock_net ?? item.stock_quantity ?? 0;
+    const isSingleSized =
+      item.single_sized ??
+      (item.children?.length === 1 && item.children[0]?.size_value === "single_size");
+    const singleChild = isSingleSized ? item.children?.[0] : null;
+    const childCode = singleChild?.code ?? "";
+    const qty = singleChild ? getQuantityForProductAndChild(slug, childCode) : 0;
+    const stockNet = singleChild?.stock_net ?? item.stock_net ?? item.stock_quantity ?? 0;
     const isUpdating = addingSlug === slug;
     const hasRating = item.avg_rating != null || (item.rating_count ?? 0) > 0;
     const headerText = item.brand_name || item.name;
     const subheaderText = item.brand_name ? item.name : (item.category_path || t("brand"));
+
+    if (isSingleSized && singleChild) {
+      return (
+        <View style={[styles.card, { backgroundColor: colors.background }]}>
+          <TouchableOpacity
+            onPress={() => router.push(`/product/${item.slug ?? item.id}`)}
+            activeOpacity={0.9}
+            style={styles.cardContentTap}
+          >
+            <View style={[styles.imageWrap, { backgroundColor: colors.surface }]}>
+              {item.image_url ? (
+                <Image
+                  source={{ uri: item.image_url }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: colors.sandDivider + "40" }]}>
+                  <Text style={[styles.noImageText, { color: colors.textMuted }]}>{t("no_image")}</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.cardTextBlock}>
+              <Text style={[styles.cardHeader, { fontFamily: FontFamily.serif, color: colors.text }]} numberOfLines={1}>
+                {headerText}
+              </Text>
+              <Text style={[styles.cardSubheader, { color: colors.textMuted }]} numberOfLines={1}>
+                {subheaderText}
+              </Text>
+              {hasRating && (
+                <View style={styles.ratingRow}>
+                  <Text style={[styles.ratingStar, { color: colors.primary }]}>{"\u2605"}</Text>
+                  <Text style={[styles.ratingText, { color: colors.textMuted }]}>
+                    {item.avg_rating?.toFixed(1) ?? "-"} ({item.rating_count ?? 0})
+                  </Text>
+                </View>
+              )}
+              <Text style={[styles.price, { color: colors.primary }]}>
+                AED {item.price.toFixed(2)}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          {qty > 0 ? (
+            <View style={[styles.qtyPill, { borderColor: colors.sandDivider, backgroundColor: colors.background }]}>
+              <TouchableOpacity
+                style={styles.qtyBtn}
+                onPress={() => handleUpdateQty(item, qty - 1)}
+                disabled={isUpdating || qty <= 1}
+              >
+                <FontAwesome name="minus" size={14} color={colors.text} />
+              </TouchableOpacity>
+              {isUpdating ? (
+                <ActivityIndicator size="small" color={colors.primary} style={styles.qtyLoader} />
+              ) : (
+                <Text style={[styles.qtyNum, { color: colors.text }]}>{qty}</Text>
+              )}
+              <TouchableOpacity
+                style={styles.qtyBtn}
+                onPress={() => handleUpdateQty(item, qty + 1)}
+                disabled={isUpdating || qty >= stockNet || stockNet <= 0}
+              >
+                <FontAwesome name="plus" size={14} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[
+                styles.addBtn,
+                { backgroundColor: colors.primary },
+                (isUpdating || stockNet <= 0) && styles.addBtnDisabled,
+              ]}
+              onPress={() => handleAddToCart(item)}
+              disabled={isUpdating || stockNet <= 0}
+              activeOpacity={0.7}
+            >
+              {isUpdating ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.addBtnText}>{t("add_to_cart")}</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
+      );
+    }
+
     return (
       <View style={[styles.card, { backgroundColor: colors.background }]}>
         <TouchableOpacity
@@ -224,55 +321,30 @@ export default function ShopScreen() {
             </Text>
           </View>
         </TouchableOpacity>
-        {qty > 0 ? (
-          <View style={[styles.qtyPill, { borderColor: colors.sandDivider, backgroundColor: colors.background }]}>
-            <TouchableOpacity
-              style={styles.qtyBtn}
-              onPress={() => handleUpdateQty(item, qty - 1)}
-              disabled={isUpdating || qty <= 1}
-            >
-              <FontAwesome name="minus" size={14} color={colors.text} />
-            </TouchableOpacity>
-            {isUpdating ? (
-              <ActivityIndicator size="small" color={colors.primary} style={styles.qtyLoader} />
-            ) : (
-              <Text style={[styles.qtyNum, { color: colors.text }]}>{qty}</Text>
-            )}
-            <TouchableOpacity
-              style={styles.qtyBtn}
-              onPress={() => handleUpdateQty(item, qty + 1)}
-              disabled={isUpdating || qty >= stockNet || stockNet <= 0}
-            >
-              <FontAwesome name="plus" size={14} color={colors.text} />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={[
-              styles.addBtn,
-              { backgroundColor: colors.primary },
-              (isUpdating || stockNet <= 0) && styles.addBtnDisabled,
-            ]}
-            onPress={() => handleAddToCart(item)}
-            disabled={isUpdating || stockNet <= 0}
-            activeOpacity={0.7}
-          >
-            {isUpdating ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.addBtnText}>{t("add_to_cart")}</Text>
-            )}
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={[styles.addBtn, { backgroundColor: colors.primary }]}
+          onPress={() => router.push(`/product/${item.slug ?? item.id}`)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.addBtnText}>{t("view_variants")}</Text>
+        </TouchableOpacity>
       </View>
     );
   };
 
   if (loading && (products ?? []).length === 0) {
     return (
-      <View style={[styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={styles.skeletonGrid}
+        showsVerticalScrollIndicator={false}
+      >
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <View key={i} style={styles.skeletonCardWrap}>
+            <ProductCardSkeleton />
+          </View>
+        ))}
+      </ScrollView>
     );
   }
 
@@ -487,6 +559,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 16,
     justifyContent: "space-between",
+  },
+  skeletonGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 16,
+    gap: 16,
+    justifyContent: "space-between",
+    paddingBottom: 40,
+  },
+  skeletonCardWrap: {
+    width: CARD_WIDTH,
   },
   card: {
     width: CARD_WIDTH,

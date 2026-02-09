@@ -1,0 +1,13 @@
+{
+  "name": "ecommerce-platform",
+  "private": true,
+  "workspaces": [
+    "customer-web",
+    "admin-web",
+    "shop",
+    "packages/*"
+  ],
+  "scripts": {
+    "tokens:build": "npm run build -w @ecommerce/design-tokens"
+  }
+}

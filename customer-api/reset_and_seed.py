@@ -19,7 +19,7 @@ from sqlalchemy import select, delete
 from app.db.session import engine, AsyncSessionLocal
 from app.db.base import Base
 from app.models import (
-    user, product, order, cart, taxonomy, brand, taxonomy_attribute,
+    user, product, product_child, order, cart, taxonomy, brand, taxonomy_attribute,
     product_attribute_value, language, product_translation, taxonomy_translation,
     brand_translation, taxonomy_attribute_translation, ui_string, visitor_preference,
     stock_reservation, product_review, customer_address, audit_log,
@@ -33,6 +33,7 @@ from app.models.taxonomy_attribute_translation import TaxonomyAttributeTranslati
 from app.models.brand import Brand
 from app.models.brand_translation import BrandTranslation
 from app.models.product import Product
+from app.models.product_child import ProductChild
 from app.models.product_translation import ProductTranslation
 from app.models.product_attribute_value import ProductAttributeValue
 from app.models.ui_string import UIString
@@ -40,6 +41,7 @@ from app.models.customer_address import CustomerAddress
 from app.models.order import Order, OrderItem
 from app.models.product_review import ProductReview
 from app.core.security import get_password_hash
+from app.core.config import settings
 
 
 def slugify(s: str) -> str:
@@ -272,6 +274,7 @@ UI_STRINGS = {
         "section_status": "Status",
         "edit_review": "Edit review", "rate": "Rate",
         "rate_product": "Rate this product", "optional_comment": "Optional comment", "submit": "Submit",
+        "size": "Size", "select_size": "Select size", "view_variants": "View variants",
     },
     "ar": {
         "add_to_cart": "أضف إلى السلة", "add_to_sanctuary": "أضف إلى الملاذ", "in_cart": "في السلة",
@@ -385,6 +388,7 @@ UI_STRINGS = {
         "section_status": "الحالة",
         "edit_review": "تعديل التقييم", "rate": "قيّم",
         "rate_product": "قيّم هذا المنتج", "optional_comment": "تعليق اختياري", "submit": "إرسال",
+        "size": "المقاس", "select_size": "اختر المقاس", "view_variants": "عرض المقاسات",
     },
 }
 
@@ -454,9 +458,10 @@ async def reset_and_seed():
             session.add(BrandTranslation(brand_id=b.id, language_id=langs["ar"].id, name=name_ar))
         await session.commit()
 
-        # 6. Products + translations (track product ids for orders)
+        # 6. Products + code + children (single child per product with size_value single_size) + translations
         print("Seeding products...")
         product_ids: list[str] = []
+        product_id_to_first_child_id: dict[str, int] = {}
         for name_en, desc_en, name_ar, desc_ar, price, stock, img, tax_name, brand_name, attr_pairs in PRODUCTS:
             tax = tax_by_name.get(tax_name)
             brand_obj = brand_by_name.get(brand_name)
@@ -473,11 +478,35 @@ async def reset_and_seed():
                 slug = f"{base_slug}-{n}"
                 n += 1
 
-            p = Product(name=name_en, slug=slug, description=desc_en, price=price, stock_quantity=stock,
-                        image_url=img, category_id=cat_id, brand_id=brand_id, is_active=True)
+            code = f"{settings.PARENT_CODE_PREFIX}{uuid.uuid4().hex[:8].upper()}{settings.PARENT_CODE_SUFFIX}"
+            p = Product(
+                code=code,
+                name=name_en,
+                slug=slug,
+                description=desc_en,
+                price=price,
+                stock_quantity=0,
+                stock_reserved=0,
+                image_url=img,
+                category_id=cat_id,
+                brand_id=brand_id,
+                is_active=True,
+            )
             session.add(p)
             await session.flush()
             product_ids.append(p.id)
+            child_code = f"{settings.CHILD_CODE_PREFIX}{p.id[:8].upper()}-1{settings.CHILD_CODE_SUFFIX}"
+            child = ProductChild(
+                product_id=p.id,
+                code=child_code,
+                barcode=None,
+                size_value=settings.SINGLE_SIZE_VALUE,
+                stock_quantity=stock,
+                stock_reserved=0,
+            )
+            session.add(child)
+            await session.flush()
+            product_id_to_first_child_id[p.id] = child.id
             session.add(ProductTranslation(product_id=p.id, language_id=langs["ar"].id, name=name_ar, description=desc_ar))
 
             # Attribute options
@@ -546,9 +575,15 @@ async def reset_and_seed():
             addr_by_user[u.id] = addrs
         await session.commit()
 
-        # Products by slug for order items (need product id and price)
+        # Products with first child id for order items (need product id, child id, price)
         r = await session.execute(select(Product.id, Product.slug, Product.price).where(Product.is_active == True))
         products_list = list(r.all())
+        # Build (product_id, product_child_id, slug, price) for orders
+        products_with_child = [
+            (pid, product_id_to_first_child_id[pid], slug, price)
+            for pid, slug, price in products_list
+            if pid in product_id_to_first_child_id
+        ]
 
         # Orders: 3-5 per customer
         order_counter = 0
@@ -560,15 +595,14 @@ async def reset_and_seed():
             for _ in range(n_orders):
                 order_counter += 1
                 ord_num = f"ORD-{order_counter:05d}"
-                # Pick 1-3 products per order
-                n_items = min(random.randint(1, 3), len(products_list))
-                chosen = random.sample(products_list, n_items)
+                n_items = min(random.randint(1, 3), len(products_with_child))
+                chosen = random.sample(products_with_child, n_items)
                 total = 0.0
                 items_data = []
-                for idx, (pid, _, price) in enumerate(chosen):
+                for idx, (pid, child_id, _, price) in enumerate(chosen):
                     qty = random.randint(1, 2)
                     total += price * qty
-                    items_data.append((idx + 1, pid, qty, price))
+                    items_data.append((idx + 1, pid, child_id, qty, price))
                 ord_obj = Order(
                     order_number=ord_num,
                     user_id=u.id,
@@ -578,11 +612,12 @@ async def reset_and_seed():
                 )
                 session.add(ord_obj)
                 await session.flush()
-                for idx, pid, qty, price in items_data:
+                for idx, pid, child_id, qty, price in items_data:
                     oi = OrderItem(
                         order_id=ord_obj.id,
-                        order_item_number=idx,  # idx is 1-based from enumerate
+                        order_item_number=idx,
                         product_id=pid,
+                        product_child_id=child_id,
                         quantity=qty,
                         price_at_purchase=price,
                         status=random.choice(["pending", "shipped", "delivered"]),

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useI18nStore } from "@/stores/useI18nStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import api from "@/lib/api";
+import { PageLoader } from "@/components/PageLoader";
 import { CheckCircle, MapPin, Package, HelpCircle } from "lucide-react";
 
 interface OrderItem {
@@ -56,11 +57,7 @@ export default function OrderSuccessPage() {
   }, [orderId, isAuthenticated]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-pulse text-[#897961]">{t("processing")}</div>
-      </div>
-    );
+    return <PageLoader className="min-h-[60vh]" />;
   }
 
   return (

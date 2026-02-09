@@ -96,6 +96,7 @@ export default function CheckoutScreen() {
       const { data: order } = await api.post<{ id: number }>("/orders/", {
         items: items.map((i) => ({
           product_slug: i.product.slug ?? i.product.id,
+          child_code: i.child?.code ?? "",
           quantity: i.quantity,
           price_at_purchase: i.product.price,
         })),

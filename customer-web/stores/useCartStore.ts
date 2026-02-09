@@ -15,13 +15,24 @@ export interface Product {
   stock_net?: number;
   avg_rating?: number | null;
   rating_count?: number;
+  children?: { id: number; code: string; size_value: string; stock_net: number }[];
+  single_sized?: boolean;
+}
+
+export interface CartItemChild {
+  id: number;
+  code: string;
+  size_value?: string | null;
+  stock_net: number;
 }
 
 export interface CartItem {
   id: number;
   product_id: string;
+  product_child_id: number;
   quantity: number;
   product: Product;
+  child?: CartItemChild | null;
 }
 
 interface CartState {
@@ -29,13 +40,14 @@ interface CartState {
   isLoading: boolean;
   error: string | null;
   fetchCart: () => Promise<void>;
-  addToCart: (product: Product, quantity?: number) => Promise<void>;
-  removeFromCart: (productSlug: string) => Promise<void>;
-  updateQuantity: (productSlug: string, quantity: number) => Promise<void>;
+  addToCart: (product: Product, childCode: string, quantity?: number) => Promise<void>;
+  removeFromCart: (productSlug: string, childCode: string) => Promise<void>;
+  updateQuantity: (productSlug: string, childCode: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   getCartTotal: () => number;
   getItemCount: () => number;
   getQuantityForProduct: (productId: string) => number;
+  getQuantityForProductAndChild: (productSlug: string, childCode: string) => number;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -56,10 +68,10 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  addToCart: async (product, quantity = 1) => {
+  addToCart: async (product, childCode, quantity = 1) => {
     try {
       const slug = product.slug ?? product.id;
-      await api.post("/cart/items/", { product_slug: slug, quantity });
+      await api.post("/cart/items/", { product_slug: slug, child_code: childCode, quantity });
       await get().fetchCart();
     } catch (err) {
       console.error("Failed to add to cart", err);
@@ -67,12 +79,14 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  removeFromCart: async (productSlug: string) => {
+  removeFromCart: async (productSlug: string, childCode: string) => {
     try {
-      await api.delete(`/cart/items/${productSlug}`);
+      await api.delete(`/cart/items/${productSlug}/${encodeURIComponent(childCode)}`);
       set((state) => ({
         items: state.items.filter(
-          (item) => (item.product?.slug ?? item.product_id) !== productSlug
+          (item) =>
+            (item.product?.slug ?? item.product_id) !== productSlug ||
+            item.child?.code !== childCode
         ),
       }));
     } catch (err) {
@@ -81,16 +95,16 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  updateQuantity: async (productSlug: string, quantity: number) => {
+  updateQuantity: async (productSlug: string, childCode: string, quantity: number) => {
     if (quantity <= 0) {
-      await get().removeFromCart(productSlug);
+      await get().removeFromCart(productSlug, childCode);
       return;
     }
     try {
-      await api.put(`/cart/items/${productSlug}`, { quantity });
+      await api.put(`/cart/items/${productSlug}/${encodeURIComponent(childCode)}`, { quantity });
       set((state) => ({
         items: state.items.map((item) =>
-          (item.product?.slug ?? item.product_id) === productSlug
+          (item.product?.slug ?? item.product_id) === productSlug && item.child?.code === childCode
             ? { ...item, quantity }
             : item
         ),
@@ -126,7 +140,14 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   getQuantityForProduct: (productId: string) => {
     const { items } = get();
-    const item = items.find((i) => i.product_id === productId);
+    return items.filter((i) => i.product_id === productId).reduce((s, i) => s + i.quantity, 0);
+  },
+
+  getQuantityForProductAndChild: (productSlug: string, childCode: string) => {
+    const { items } = get();
+    const item = items.find(
+      (i) => (i.product?.slug ?? i.product_id) === productSlug && i.child?.code === childCode
+    );
     return item?.quantity ?? 0;
   },
 }));

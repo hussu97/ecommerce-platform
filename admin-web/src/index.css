@@ -1,21 +1,5 @@
 @import "tailwindcss";
-
-@theme {
-  /* Design system: match design_template.html */
-  --color-primary: #ec9213;
-  --color-background-light: #f8f7f6;
-  --color-background-dark: #221a10;
-  --color-sand-divider: #e5e1da;
-  --color-text-muted: #897961;
-  --color-text-primary: #181511;
-
-  --font-display: "Noto Serif", serif;
-  --font-sans: "Noto Sans", sans-serif;
-
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-}
+@import "@ecommerce/design-tokens/theme.css";
 
 :root {
   background-color: var(--color-background-light);

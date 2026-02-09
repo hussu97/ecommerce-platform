@@ -7,6 +7,7 @@ import { Product, useCartStore } from "@/stores/useCartStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { PdpSkeleton } from "@/components/PdpSkeleton";
 import { Loader2, Plus, Minus, Star, ArrowLeft, Truck } from "lucide-react";
 
 interface Review {
@@ -27,9 +28,23 @@ export default function ProductDetailPage() {
 
   const addToCart = useCartStore((state) => state.addToCart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const getQuantityForProduct = useCartStore((state) => state.getQuantityForProduct);
+  const getQuantityForProductAndChild = useCartStore((state) => state.getQuantityForProductAndChild);
 
-  const quantity = product ? getQuantityForProduct(product.id) : 0;
+  type Child = { id: number; code: string; size_value: string; stock_net: number };
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const slug = product?.slug ?? product?.id ?? "";
+  const quantity = product && selectedChild ? getQuantityForProductAndChild(slug, selectedChild.code) : 0;
+  const children = product?.children ?? [];
+  const singleSized = product?.single_sized ?? false;
+  const showSizeSelector = !singleSized && children.length > 0 && (children.length > 1 || (children[0] && children[0].size_value !== "single_size"));
+
+  useEffect(() => {
+    if (product?.single_sized && product?.children?.length) {
+      setSelectedChild(product.children[0]);
+    } else if (product) {
+      setSelectedChild(null);
+    }
+  }, [product?.id, product?.children, product?.single_sized]);
   const t = useI18nStore((s) => s.t);
   const currentLanguage = useI18nStore((s) => s.currentLanguage);
 
@@ -58,41 +73,43 @@ export default function ProductDetailPage() {
   }, [product?.slug, product?.id]);
 
   const handleAdd = async () => {
-    if (!product) return;
+    if (!product || !selectedChild) return;
     setIsUpdating(true);
     try {
-      await addToCart(product);
+      await addToCart(product, selectedChild.code);
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleIncrease = async () => {
-    if (!product) return;
+    if (!product || !selectedChild) return;
     setIsUpdating(true);
     try {
-      await updateQuantity(product.slug ?? product.id, quantity + 1);
+      await updateQuantity(slug, selectedChild.code, quantity + 1);
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleDecrease = async () => {
-    if (!product || quantity <= 1) return;
+    if (!product || !selectedChild || quantity <= 1) return;
     setIsUpdating(true);
     try {
-      await updateQuantity(product.slug ?? product.id, quantity - 1);
+      await updateQuantity(slug, selectedChild.code, quantity - 1);
     } finally {
       setIsUpdating(false);
     }
   };
 
+  const stockForSelected = selectedChild?.stock_net ?? product?.stock_net ?? 0;
+
+  const scrollToSizes = () => {
+    document.getElementById("pdp-sizes")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#ec9213]" />
-      </div>
-    );
+    return <PdpSkeleton />;
   }
 
   if (error || !product) {
@@ -198,6 +215,30 @@ export default function ProductDetailPage() {
           </div>
         )}
 
+        {/* Size selector (when multiple sizes and not single-sized) */}
+        {showSizeSelector && children.length > 0 && (
+          <div id="pdp-sizes" className="flex flex-col gap-2">
+            <span className="text-xs font-bold text-[#897961] uppercase tracking-wide">{t("size")}</span>
+            <div className="flex flex-wrap gap-2">
+              {children.map((ch) => (
+                <button
+                  key={ch.id}
+                  type="button"
+                  onClick={() => setSelectedChild(ch)}
+                  disabled={ch.stock_net <= 0}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-colors ${
+                    selectedChild?.id === ch.id
+                      ? "border-[#ec9213] bg-[#ec9213]/10 text-[#181511]"
+                      : "border-[#e5e1da] bg-white text-[#5a4e3f] hover:border-[#897961] disabled:opacity-50"
+                  }`}
+                >
+                  {ch.size_value}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Delivery */}
         <div className="flex items-center gap-4 py-2 border-t border-b border-[#e5e1da]">
           <div className="flex items-center justify-center size-10 rounded-full bg-[#e5e1da]/30 text-[#ec9213]">
@@ -205,25 +246,64 @@ export default function ProductDetailPage() {
           </div>
           <div className="flex flex-col">
             <span className="text-xs font-bold text-[#181511]">
-              {(product.stock_net ?? product.stock_quantity) > 0
-                ? t("complimentary_delivery")
-                : t("out_of_stock")}
+              {stockForSelected > 0 ? t("complimentary_delivery") : t("out_of_stock")}
             </span>
             <span className="text-[11px] text-[#897961]">
-              {(product.stock_net ?? product.stock_quantity) > 0
-                ? t("delivery_expected_uae")
-                : ""}
+              {stockForSelected > 0 ? t("delivery_expected_uae") : ""}
             </span>
           </div>
         </div>
 
         {/* Add to cart: inline on desktop, hidden on mobile (fixed bar shown below) */}
         <div className="hidden md:flex items-center gap-4 pt-4">
+          {(singleSized || selectedChild) && (
+            <div className="flex items-center bg-[#e5e1da] rounded-full h-12 px-2">
+              <button
+                className="size-8 flex items-center justify-center text-[#897961] disabled:opacity-50"
+                onClick={handleDecrease}
+                disabled={isUpdating || quantity <= 1 || stockForSelected <= 0}
+              >
+                <Minus className="size-5" />
+              </button>
+              <span className="w-8 text-center text-sm font-bold">{quantity}</span>
+              <button
+                className="size-8 flex items-center justify-center text-[#181511] disabled:opacity-50"
+                onClick={handleIncrease}
+                disabled={isUpdating || quantity >= stockForSelected || stockForSelected <= 0}
+              >
+                <Plus className="size-5" />
+              </button>
+            </div>
+          )}
+          {singleSized || selectedChild ? (
+            <Button
+              className="min-w-[200px] bg-[#ec9213] text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-[#ec9213]/30"
+              onClick={handleAdd}
+              disabled={isUpdating || stockForSelected <= 0 || !selectedChild}
+              isLoading={isUpdating}
+            >
+              {t("add_to_cart")}
+            </Button>
+          ) : (
+            <Button
+              className="min-w-[200px] bg-[#ec9213] text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-[#ec9213]/30"
+              onClick={scrollToSizes}
+            >
+              {t("select_size")}
+            </Button>
+          )}
+        </div>
+        </div>
+      </div>
+
+      {/* Add to cart: fixed bottom on mobile only */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] md:hidden bg-white/90 backdrop-blur-xl border-t border-[#e5e1da] px-6 py-5 flex items-center gap-4 z-50">
+        {(singleSized || selectedChild) && (
           <div className="flex items-center bg-[#e5e1da] rounded-full h-12 px-2">
             <button
               className="size-8 flex items-center justify-center text-[#897961] disabled:opacity-50"
               onClick={handleDecrease}
-              disabled={isUpdating || quantity <= 1 || (product.stock_net ?? product.stock_quantity) <= 0}
+              disabled={isUpdating || quantity <= 1 || stockForSelected <= 0}
             >
               <Minus className="size-5" />
             </button>
@@ -231,58 +311,29 @@ export default function ProductDetailPage() {
             <button
               className="size-8 flex items-center justify-center text-[#181511] disabled:opacity-50"
               onClick={handleIncrease}
-              disabled={
-                isUpdating ||
-                quantity >= (product.stock_net ?? product.stock_quantity) ||
-                (product.stock_net ?? product.stock_quantity) <= 0
-              }
+              disabled={isUpdating || quantity >= stockForSelected || stockForSelected <= 0}
             >
               <Plus className="size-5" />
             </button>
           </div>
+        )}
+        {singleSized || selectedChild ? (
           <Button
-            className="min-w-[200px] bg-[#ec9213] text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-[#ec9213]/30"
+            className="flex-1 bg-[#ec9213] text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-[#ec9213]/30"
             onClick={handleAdd}
-            disabled={isUpdating || (product.stock_net ?? product.stock_quantity) <= 0}
+            disabled={isUpdating || stockForSelected <= 0 || !selectedChild}
             isLoading={isUpdating}
           >
             {t("add_to_cart")}
           </Button>
-        </div>
-        </div>
-      </div>
-
-      {/* Add to cart: fixed bottom on mobile only */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] md:hidden bg-white/90 backdrop-blur-xl border-t border-[#e5e1da] px-6 py-5 flex items-center gap-4 z-50">
-        <div className="flex items-center bg-[#e5e1da] rounded-full h-12 px-2">
-          <button
-            className="size-8 flex items-center justify-center text-[#897961] disabled:opacity-50"
-            onClick={handleDecrease}
-            disabled={isUpdating || quantity <= 1 || (product.stock_net ?? product.stock_quantity) <= 0}
+        ) : (
+          <Button
+            className="flex-1 bg-[#ec9213] text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-[#ec9213]/30"
+            onClick={scrollToSizes}
           >
-            <Minus className="size-5" />
-          </button>
-          <span className="w-8 text-center text-sm font-bold">{quantity}</span>
-          <button
-            className="size-8 flex items-center justify-center text-[#181511] disabled:opacity-50"
-            onClick={handleIncrease}
-            disabled={
-              isUpdating ||
-              quantity >= (product.stock_net ?? product.stock_quantity) ||
-              (product.stock_net ?? product.stock_quantity) <= 0
-            }
-          >
-            <Plus className="size-5" />
-          </button>
-        </div>
-        <Button
-          className="flex-1 bg-[#ec9213] text-white h-12 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-[#ec9213]/30"
-          onClick={handleAdd}
-          disabled={isUpdating || (product.stock_net ?? product.stock_quantity) <= 0}
-          isLoading={isUpdating}
-        >
-          {t("add_to_cart")}
-        </Button>
+            {t("select_size")}
+          </Button>
+        )}
       </div>
 
       {/* Reviews section */}

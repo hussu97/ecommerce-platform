@@ -19,6 +19,7 @@ router = APIRouter()
 
 def _product_options():
     return (
+        selectinload(Product.children),
         selectinload(Product.category_rel),
         selectinload(Product.brand_rel),
         selectinload(Product.attribute_values).selectinload(ProductAttributeValue.option_rel).selectinload(TaxonomyAttributeOption.attribute),

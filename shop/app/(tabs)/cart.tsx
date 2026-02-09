@@ -4,7 +4,6 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
   View,
 } from "react-native";
@@ -16,6 +15,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { useColorScheme } from "@/components/useColorScheme";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export default function CartScreen() {
   const { items, isLoading, fetchCart, removeFromCart, updateQuantity } = useCartStore();
@@ -30,11 +30,7 @@ export default function CartScreen() {
   }, []);
 
   if (isLoading) {
-    return (
-      <View style={[styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   if (items.length === 0) {
@@ -74,6 +70,11 @@ export default function CartScreen() {
               <Text style={[styles.name, { fontFamily: FontFamily.serif, color: colors.text }]} numberOfLines={2}>
                 {item.product.name}
               </Text>
+              {item.child?.size_value && item.child.size_value !== "single_size" ? (
+                <Text style={[styles.priceLine, { color: colors.textMuted }]}>
+                  {t("size")}: {item.child.size_value}
+                </Text>
+              ) : null}
               <Text style={[styles.priceLine, { color: colors.textMuted }]}>
                 AED {item.product.price.toFixed(2)} × {item.quantity}
               </Text>
@@ -81,7 +82,7 @@ export default function CartScreen() {
                 <TouchableOpacity
                   style={styles.qtyBtn}
                   onPress={() =>
-                    updateQuantity(item.product.slug ?? item.product_id, item.quantity - 1)
+                    updateQuantity(item.product.slug ?? item.product_id, item.child?.code ?? "", item.quantity - 1)
                   }
                 >
                   <FontAwesome name="minus" size={14} color={colors.text} />
@@ -90,7 +91,7 @@ export default function CartScreen() {
                 <TouchableOpacity
                   style={styles.qtyBtn}
                   onPress={() =>
-                    updateQuantity(item.product.slug ?? item.product_id, item.quantity + 1)
+                    updateQuantity(item.product.slug ?? item.product_id, item.child?.code ?? "", item.quantity + 1)
                   }
                 >
                   <FontAwesome name="plus" size={14} color={colors.text} />
@@ -103,7 +104,7 @@ export default function CartScreen() {
                     {
                       text: t("remove"),
                       onPress: () =>
-                        removeFromCart(item.product.slug ?? item.product_id),
+                        removeFromCart(item.product.slug ?? item.product_id, item.child?.code ?? ""),
                       style: "destructive",
                     },
                   ])

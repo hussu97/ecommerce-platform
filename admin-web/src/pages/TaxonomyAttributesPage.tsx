@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../lib/api";
+import { PageLoader } from "../components/PageLoader";
 import { Plus, Pencil, Trash2, X, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
 
 interface Taxonomy {
@@ -335,8 +336,8 @@ export function TaxonomyAttributesPage() {
           Select a taxonomy to manage its attributes.
         </div>
       ) : loading ? (
-        <div className="bg-white rounded-2xl border border-sand-divider p-10 text-center text-text-muted">
-          Loading...
+        <div className="bg-white rounded-2xl border border-sand-divider">
+          <PageLoader className="p-10 min-h-[200px]" />
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-sand-divider overflow-hidden shadow-sm">

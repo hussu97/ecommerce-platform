@@ -1,29 +1,5 @@
 @import "tailwindcss";
-
-@theme {
-  /* Refined Design System - Golden Sand & Serif */
-  --color-primary: #ec9213;
-  --color-background-light: #f8f7f6;
-  --color-background-dark: #221a10;
-  --color-sand-divider: #e5e1da;
-  --color-sand-muted: #897961;
-  --color-dark-card: #2d2419;
-  --color-dark-border: #3d3123;
-  --color-text-primary: #181511;
-  --color-text-muted: #897961;
-  --color-muted-dark: #c4b5a0;
-  --color-gold: #d4af37;
-
-  --font-display: "Noto Serif", serif;
-  --font-sans: "Noto Sans", sans-serif;
-
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
-}
+@import "@ecommerce/design-tokens/theme.css";
 
 :root {
   background-color: var(--color-background-light);

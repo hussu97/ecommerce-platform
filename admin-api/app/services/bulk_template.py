@@ -11,12 +11,17 @@ from app.models.taxonomy_attribute import TaxonomyAttribute, TaxonomyAttributeOp
 
 
 def _get_headers_and_attr_options(taxonomy: Taxonomy) -> Tuple[List[str], dict]:
-    """Get column headers and attribute name -> option values for dropdowns."""
+    """Get column headers and attribute name -> option values for dropdowns.
+    Uses names/slugs only (no IDs). category_name defaults to template taxonomy if empty."""
     headers = [
         "name_en", "name_ar", "description_en", "description_ar",
         "price", "stock_quantity", "image_url",
-        "category_id", "brand_id",
+        "category_name", "brand_name",
         "is_active",
+        "parent_code",  # optional: link to existing product (by code) when adding children only
+        "size_value",   # optional: S, M, L, etc. Empty + barcode = single-size product (one child with single_size)
+        "barcode",      # optional: per child
+        "is_single_size",  # optional: 1/true = create one child with size_value single_size (barcode, stock_quantity used)
     ]
     attr_options: dict[str, List[str]] = {}
     if taxonomy.attributes:

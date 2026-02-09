@@ -9,17 +9,25 @@ class Product(Base):
     __tablename__ = "products"
 
     id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    code = Column(String(64), unique=True, nullable=False, index=True)  # auto-generated parent code
     name = Column(String, nullable=False, index=True)
     slug = Column(String, unique=True, index=True, nullable=True)  # codified from name
     description = Column(String)
     price = Column(Float, nullable=False)
-    stock_quantity = Column(Integer, default=0)  # gross
-    stock_reserved = Column(Integer, default=0)  # reserved by active orders
+    stock_quantity = Column(Integer, default=0)  # unused; stock lives on children
+    stock_reserved = Column(Integer, default=0)  # unused; reserved on children
     image_url = Column(String)
     category_id = Column(Integer, ForeignKey("taxonomies.id"), index=True, nullable=True)
     brand_id = Column(Integer, ForeignKey("brands.id"), index=True, nullable=True)
     is_active = Column(Boolean, default=True)
 
+    children = relationship(
+        "ProductChild",
+        back_populates="product",
+        foreign_keys="ProductChild.product_id",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
     category_rel = relationship("Taxonomy", backref="products", foreign_keys=[category_id])
     brand_rel = relationship("Brand", backref="products", foreign_keys=[brand_id])
     attribute_values = relationship(
@@ -46,5 +54,7 @@ class Product(Base):
 
     @property
     def stock_net(self) -> int:
-        """Available stock = gross - reserved."""
-        return max(0, self.stock_quantity - self.stock_reserved)
+        """Aggregated from children; 0 if no children."""
+        if not self.children:
+            return 0
+        return sum(c.stock_net for c in self.children)

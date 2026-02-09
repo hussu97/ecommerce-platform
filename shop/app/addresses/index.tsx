@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, ScrollView, ActivityIndicator } from "react-native";
+import { StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { FontFamily } from "@/constants/Typography";
 import { useColorScheme } from "@/components/useColorScheme";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export interface SavedAddress {
   address_code: string;
@@ -73,6 +74,10 @@ export default function AddressesScreen() {
 
   if (!isAuthenticated) return null;
 
+  if (loading) {
+    return <FullScreenLoader />;
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.sandDivider }]}>
@@ -85,10 +90,7 @@ export default function AddressesScreen() {
         <View style={styles.headerBtn} />
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} style={styles.loader} />
-      ) : (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
           <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>{t("saved_locations")}</Text>
           <Text style={[styles.sectionHint, { color: colors.textMuted }]}>{t("saved_locations_hint")}</Text>
           {addresses.map((addr) => (
@@ -136,7 +138,6 @@ export default function AddressesScreen() {
             </View>
           ))}
         </ScrollView>
-      )}
 
       <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.sandDivider }]}>
         <TouchableOpacity

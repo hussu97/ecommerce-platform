@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/api";
+import { TableSkeleton } from "../components/TableSkeleton";
 import { ChevronDown, ChevronRight, Upload, ArrowLeft } from "lucide-react";
 
 interface BulkUpload {
@@ -71,11 +72,7 @@ export function BulkUploadsPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-10 text-center text-text-muted">
-                    Loading...
-                  </td>
-                </tr>
+                <TableSkeleton rows={5} cols={6} />
               ) : uploads.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-10 text-center text-text-muted">

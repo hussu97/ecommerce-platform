@@ -6,16 +6,24 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.db.session import get_db
 from app.models.product import Product
+from app.models.product_child import ProductChild
 from app.models.product_translation import ProductTranslation
+from app.models.order import OrderItem
 from app.models.product_attribute_value import ProductAttributeValue
 from app.models.taxonomy import Taxonomy
 from app.models.language import Language
 from app.models.taxonomy_attribute import TaxonomyAttributeOption
 from app.models.taxonomy_attribute import TaxonomyAttribute
 from app.models.user import User
-from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
+from app.schemas.product import (
+    ProductCreate, ProductUpdate, ProductResponse,
+    ProductChildCreate, ProductChildUpdate, ProductChildResponse,
+    SINGLE_SIZE_VALUE,
+)
 from app.core.deps import get_current_admin_user
 from app.core.audit import log_audit_from_request
+from app.core.codegen import generate_parent_code, generate_child_code
+from app.core.config import settings
 from app.services.bulk_template import generate_xlsx, generate_csv, generate_tsv
 from app.models.product_bulk_upload import ProductBulkUpload
 from app.storage import get_storage
@@ -36,6 +44,7 @@ def _slugify(s: str) -> str:
 
 def _product_options():
     return (
+        selectinload(Product.children),
         selectinload(Product.category_rel),
         selectinload(Product.brand_rel),
         selectinload(Product.attribute_values).selectinload(ProductAttributeValue.option_rel).selectinload(TaxonomyAttributeOption.attribute),
@@ -202,7 +211,7 @@ async def create_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_admin_user),
 ):
-    data = product_in.model_dump(exclude={"attribute_option_ids", "translations"})
+    data = product_in.model_dump(exclude={"attribute_option_ids", "translations", "is_single_size", "single_size_barcode", "single_size_stock", "children"})
     base_slug = _slugify(data.get("name") or "product")
     slug = base_slug
     n = 1
@@ -213,9 +222,38 @@ async def create_product(
         slug = f"{base_slug}-{n}"
         n += 1
     data["slug"] = slug
+    data["code"] = await generate_parent_code(db)
     new_product = Product(**data)
     db.add(new_product)
     await db.flush()
+
+    # At least one child required
+    if product_in.is_single_size:
+        child_code = await generate_child_code(db, new_product.id)
+        child = ProductChild(
+            product_id=new_product.id,
+            code=child_code,
+            barcode=product_in.single_size_barcode,
+            size_value=settings.SINGLE_SIZE_VALUE,
+            stock_quantity=product_in.single_size_stock or 0,
+        )
+        db.add(child)
+    elif product_in.children:
+        for ch_in in product_in.children:
+            child_code = await generate_child_code(db, new_product.id)
+            db.add(ProductChild(
+                product_id=new_product.id,
+                code=child_code,
+                barcode=ch_in.barcode,
+                size_value=ch_in.size_value,
+                stock_quantity=ch_in.stock_quantity or 0,
+            ))
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide is_single_size with single_size_barcode, or children list (at least one child required)",
+        )
+
     for opt_id in product_in.attribute_option_ids or []:
         db.add(ProductAttributeValue(product_id=new_product.id, option_id=opt_id))
     if product_in.translations:
@@ -286,6 +324,114 @@ async def update_product(
         select(Product).where(Product.id == product.id).options(*_product_options())
     )
     return result.scalar_one_or_none()
+
+
+@router.get("/{id}/children", response_model=List[ProductChildResponse])
+async def list_product_children(
+    id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """List children (variants/sizes) for a product."""
+    result = await db.execute(
+        select(ProductChild).where(ProductChild.product_id == id).order_by(ProductChild.size_value)
+    )
+    return result.scalars().all()
+
+
+@router.post("/{id}/children", response_model=ProductChildResponse, status_code=status.HTTP_201_CREATED)
+async def add_product_child(
+    id: str,
+    child_in: ProductChildCreate,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """Add a child (variant/size). For single-sized product only one child with size_value single_size is allowed."""
+    prod = await db.execute(select(Product).where(Product.id == id))
+    product = prod.scalar_one_or_none()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+    existing = await db.execute(select(ProductChild).where(ProductChild.product_id == id))
+    children = existing.scalars().all()
+    if children and len(children) == 1 and getattr(children[0], "size_value", None) == settings.SINGLE_SIZE_VALUE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Product is single-sized; only one child with size_value single_size is allowed",
+        )
+    # Unique (product_id, size_value)
+    for c in children:
+        if (c.size_value or "").strip().lower() == (child_in.size_value or "").strip().lower():
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Duplicate size_value for this product")
+    code = await generate_child_code(db, id)
+    child = ProductChild(
+        product_id=id,
+        code=code,
+        barcode=child_in.barcode,
+        size_value=child_in.size_value.strip(),
+        stock_quantity=child_in.stock_quantity or 0,
+    )
+    db.add(child)
+    await db.commit()
+    await db.refresh(child)
+    await log_audit_from_request(db, request, "product_child.create", "product_child", str(child.id), current_user.id, 201)
+    return child
+
+
+@router.put("/{id}/children/{child_id}", response_model=ProductChildResponse)
+async def update_product_child(
+    id: str,
+    child_id: int,
+    child_update: ProductChildUpdate,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    result = await db.execute(
+        select(ProductChild).where(ProductChild.id == child_id, ProductChild.product_id == id)
+    )
+    child = result.scalar_one_or_none()
+    if not child:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child not found")
+    data = child_update.model_dump(exclude_unset=True)
+    for k, v in data.items():
+        setattr(child, k, v)
+    await db.commit()
+    await db.refresh(child)
+    await log_audit_from_request(db, request, "product_child.update", "product_child", str(child_id), current_user.id, 200)
+    return child
+
+
+@router.delete("/{id}/children/{child_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product_child(
+    id: str,
+    child_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    from sqlalchemy import text
+    result = await db.execute(
+        select(ProductChild).where(ProductChild.id == child_id, ProductChild.product_id == id)
+    )
+    child = result.scalar_one_or_none()
+    if not child:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child not found")
+    siblings = await db.execute(select(ProductChild).where(ProductChild.product_id == id))
+    if len(siblings.scalars().all()) <= 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Product must have at least one child. Add another size before removing this one.",
+        )
+    cart_use = await db.execute(text("SELECT 1 FROM cart_items WHERE product_child_id = :cid LIMIT 1"), {"cid": child_id})
+    if cart_use.scalar():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Child is in a cart; remove cart items first")
+    order_use = await db.execute(select(OrderItem.id).where(OrderItem.product_child_id == child_id).limit(1))
+    if order_use.scalar_one_or_none():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Child is in an order; cannot delete")
+    await db.delete(child)
+    await db.commit()
+    await log_audit_from_request(db, request, "product_child.delete", "product_child", str(child_id), current_user.id, 204)
 
 
 @router.get("/{id}/translations")

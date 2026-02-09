@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/api";
+import { TableSkeleton } from "../components/TableSkeleton";
 import { Plus, Pencil, Trash2, X, Globe, Upload, Download } from "lucide-react";
 
 interface Taxonomy {
@@ -28,8 +29,20 @@ interface Brand {
   logo_url?: string | null;
 }
 
+interface ProductChild {
+  id: number;
+  product_id: string;
+  code: string;
+  barcode?: string | null;
+  size_value: string;
+  stock_quantity: number;
+  stock_reserved: number;
+  stock_net: number;
+}
+
 interface Product {
   id: string;
+  code?: string | null;
   name: string;
   description?: string;
   price: number;
@@ -41,6 +54,7 @@ interface Product {
   brand_name?: string | null;
   attributes?: { attribute_name: string; value: string }[];
   is_active: boolean;
+  children?: ProductChild[];
 }
 
 const emptyProduct = {
@@ -54,6 +68,10 @@ const emptyProduct = {
   attribute_option_ids: [] as number[],
   is_active: true,
   translations: {} as Record<string, { name: string; description: string }>,
+  is_single_size: true,
+  single_size_barcode: "" as string,
+  single_size_stock: 0 as number,
+  children: [] as { size_value: string; barcode: string; stock_quantity: number }[],
 };
 
 interface Language {
@@ -76,6 +94,9 @@ export function ProductsPage() {
   const bulkFileRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyProduct);
+  const [children, setChildren] = useState<ProductChild[]>([]);
+  const [childForm, setChildForm] = useState<{ size_value: string; barcode: string; stock_quantity: number } | null>(null);
+  const [editingChildId, setEditingChildId] = useState<number | null>(null);
 
   const fetchTaxonomies = () => api.get("/taxonomies/").then((r) => setTaxonomies(r.data));
   const fetchBrands = () => api.get("/brands/").then((r) => setBrands(r.data));
@@ -109,7 +130,7 @@ export function ProductsPage() {
         name: form.name,
         description: form.description || undefined,
         price: form.price,
-        stock_quantity: form.stock_quantity,
+        stock_quantity: 0,
         image_url: form.image_url || undefined,
         category_id: form.category_id || undefined,
         brand_id: form.brand_id || undefined,
@@ -118,6 +139,16 @@ export function ProductsPage() {
       };
       if (Object.keys(form.translations || {}).length > 0) {
         payload.translations = form.translations;
+      }
+      if (form.is_single_size) {
+        payload.is_single_size = true;
+        payload.single_size_barcode = form.single_size_barcode || undefined;
+        payload.single_size_stock = form.single_size_stock ?? 0;
+      } else {
+        payload.is_single_size = false;
+        payload.children = form.children?.length
+          ? form.children.map((c) => ({ size_value: c.size_value, barcode: c.barcode || undefined, stock_quantity: c.stock_quantity ?? 0 }))
+          : [{ size_value: "S", barcode: "", stock_quantity: 0 }];
       }
       await api.post("/products/", payload);
       setForm(emptyProduct);
@@ -165,6 +196,9 @@ export function ProductsPage() {
 
   const openEdit = async (p: Product) => {
     setEditing(p);
+    setChildren(p.children || []);
+    setChildForm(null);
+    setEditingChildId(null);
     fetchAttributesForCategory(p.category_id ?? null);
     let translations: Record<string, { name: string; description: string }> = {};
     try {
@@ -186,6 +220,48 @@ export function ProductsPage() {
       attribute_option_ids: [],
       translations,
     });
+  };
+
+  const fetchChildren = (productId: string) => {
+    api.get(`/products/${productId}/children`).then((r) => setChildren(r.data));
+  };
+
+  const handleAddChild = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editing || !childForm || !childForm.size_value.trim()) return;
+    try {
+      await api.post(`/products/${editing.id}/children`, { size_value: childForm.size_value.trim(), barcode: childForm.barcode || undefined, stock_quantity: childForm.stock_quantity ?? 0 });
+      setChildForm(null);
+      fetchChildren(editing.id);
+      fetchProducts();
+    } catch (err: unknown) {
+      alert((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? "Failed");
+    }
+  };
+
+  const handleUpdateChild = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editing || editingChildId == null || !childForm) return;
+    try {
+      await api.put(`/products/${editing.id}/children/${editingChildId}`, { size_value: childForm.size_value.trim(), barcode: childForm.barcode || undefined, stock_quantity: childForm.stock_quantity ?? 0 });
+      setEditingChildId(null);
+      setChildForm(null);
+      fetchChildren(editing.id);
+      fetchProducts();
+    } catch (err: unknown) {
+      alert((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? "Failed");
+    }
+  };
+
+  const handleDeleteChild = async (childId: number) => {
+    if (!editing || !confirm("Remove this size? Product must have at least one child.")) return;
+    try {
+      await api.delete(`/products/${editing.id}/children/${childId}`);
+      fetchChildren(editing.id);
+      fetchProducts();
+    } catch (err: unknown) {
+      alert((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? "Failed");
+    }
   };
 
   useEffect(() => {
@@ -332,13 +408,59 @@ export function ProductsPage() {
               className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
-            <input
-              type="number"
-              placeholder="Stock"
-              value={form.stock_quantity || ""}
-              onChange={(e) => setForm({ ...form, stock_quantity: parseInt(e.target.value, 10) || 0 })}
-              className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary"
-            />
+            <div className="md:col-span-2 border border-sand-divider rounded-xl p-4 bg-background-light/50 space-y-3">
+              <h4 className="text-sm font-medium text-text-primary">Sizes (at least one required)</h4>
+              <label className="flex items-center gap-2 text-text-primary">
+                <input
+                  type="radio"
+                  name="sizeMode"
+                  checked={form.is_single_size}
+                  onChange={() => setForm((prev) => ({ ...prev, is_single_size: true, children: [] }))}
+                  className="text-primary focus:ring-primary"
+                />
+                Single size (e.g. electronics)
+              </label>
+              {form.is_single_size && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-6">
+                  <input
+                    placeholder="Barcode (optional)"
+                    value={form.single_size_barcode}
+                    onChange={(e) => setForm({ ...form, single_size_barcode: e.target.value })}
+                    className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Stock"
+                    value={form.single_size_stock ?? ""}
+                    onChange={(e) => setForm({ ...form, single_size_stock: parseInt(e.target.value, 10) || 0 })}
+                    className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+              )}
+              <label className="flex items-center gap-2 text-text-primary">
+                <input
+                  type="radio"
+                  name="sizeMode"
+                  checked={!form.is_single_size}
+                  onChange={() => setForm((prev) => ({ ...prev, is_single_size: false, single_size_barcode: "", single_size_stock: 0, children: prev.children?.length ? prev.children : [{ size_value: "S", barcode: "", stock_quantity: 0 }] }))}
+                  className="text-primary focus:ring-primary"
+                />
+                Multiple sizes
+              </label>
+              {!form.is_single_size && (
+                <div className="pl-6 space-y-2">
+                  {(form.children || []).map((ch, idx) => (
+                    <div key={idx} className="flex flex-wrap items-center gap-2">
+                      <input placeholder="Size (e.g. S, M, L)" value={ch.size_value} onChange={(e) => setForm((prev) => ({ ...prev, children: (prev.children || []).map((c, i) => i === idx ? { ...c, size_value: e.target.value } : c) }))} className="w-24 px-3 py-2 border border-sand-divider rounded-xl bg-white text-text-primary" />
+                      <input placeholder="Barcode" value={ch.barcode} onChange={(e) => setForm((prev) => ({ ...prev, children: (prev.children || []).map((c, i) => i === idx ? { ...c, barcode: e.target.value } : c) }))} className="w-28 px-3 py-2 border border-sand-divider rounded-xl bg-white text-text-primary" />
+                      <input type="number" placeholder="Stock" value={ch.stock_quantity ?? ""} onChange={(e) => setForm((prev) => ({ ...prev, children: (prev.children || []).map((c, i) => i === idx ? { ...c, stock_quantity: parseInt(e.target.value, 10) || 0 } : c) }))} className="w-20 px-3 py-2 border border-sand-divider rounded-xl bg-white text-text-primary" />
+                      <button type="button" onClick={() => setForm((prev) => ({ ...prev, children: (prev.children || []).filter((_, i) => i !== idx) }))} className="p-1.5 text-red-600 hover:bg-red-50 rounded"> <Trash2 className="h-4 w-4" /> </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setForm((prev) => ({ ...prev, children: [...(prev.children || []), { size_value: "", barcode: "", stock_quantity: 0 }] }))} className="text-sm text-primary font-medium hover:underline">+ Add size</button>
+                </div>
+              )}
+            </div>
             <select
               value={form.category_id ?? ""}
               onChange={(e) => setForm({ ...form, category_id: e.target.value ? parseInt(e.target.value, 10) : null, attribute_option_ids: [] })}
@@ -443,7 +565,42 @@ export function ProductsPage() {
             <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary" required />
               <input type="number" step="0.01" placeholder="Price" value={form.price || ""} onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary" required />
-              <input type="number" placeholder="Stock" value={form.stock_quantity || ""} onChange={(e) => setForm({ ...form, stock_quantity: parseInt(e.target.value, 10) || 0 })} className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary" />
+              {editing.code && <div className="text-sm text-text-muted">Code: {editing.code}</div>}
+              <div className="md:col-span-2 border border-sand-divider rounded-xl p-4 bg-background-light/50">
+                <h4 className="text-sm font-medium text-text-primary mb-3">Sizes / variants</h4>
+                <table className="w-full text-sm">
+                  <thead><tr><th className="text-left py-1 text-text-muted">Code</th><th className="text-left py-1 text-text-muted">Size</th><th className="text-left py-1 text-text-muted">Barcode</th><th className="text-left py-1 text-text-muted">Stock</th><th></th></tr></thead>
+                  <tbody>
+                    {children.map((ch) => (
+                      <tr key={ch.id}>
+                        <td className="py-1 font-mono text-text-muted">{ch.code}</td>
+                        <td className="py-1">{ch.size_value}</td>
+                        <td className="py-1">{ch.barcode || "—"}</td>
+                        <td className="py-1">{ch.stock_net}</td>
+                        <td className="py-1">
+                          {editingChildId === ch.id ? null : (
+                            <>
+                              <button type="button" onClick={() => { setEditingChildId(ch.id); setChildForm({ size_value: ch.size_value, barcode: ch.barcode || "", stock_quantity: ch.stock_quantity }); }} className="text-primary hover:underline mr-2">Edit</button>
+                              <button type="button" onClick={() => handleDeleteChild(ch.id)} className="text-red-600 hover:underline">Delete</button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {childForm ? (
+                  <form onSubmit={editingChildId != null ? handleUpdateChild : handleAddChild} className="mt-3 flex flex-wrap items-center gap-2">
+                    <input placeholder="Size (e.g. S, M, L)" value={childForm.size_value} onChange={(e) => setChildForm((prev) => prev ? { ...prev, size_value: e.target.value } : null)} className="w-24 px-3 py-2 border border-sand-divider rounded-xl bg-white" required />
+                    <input placeholder="Barcode" value={childForm.barcode} onChange={(e) => setChildForm((prev) => prev ? { ...prev, barcode: e.target.value } : null)} className="w-28 px-3 py-2 border border-sand-divider rounded-xl bg-white" />
+                    <input type="number" placeholder="Stock" value={childForm.stock_quantity ?? ""} onChange={(e) => setChildForm((prev) => prev ? { ...prev, stock_quantity: parseInt(e.target.value, 10) || 0 } : null)} className="w-20 px-3 py-2 border border-sand-divider rounded-xl bg-white" />
+                    <button type="submit" className="px-3 py-2 bg-primary text-white rounded-xl text-sm">Save</button>
+                    <button type="button" onClick={() => { setChildForm(null); setEditingChildId(null); }} className="px-3 py-2 border border-sand-divider rounded-xl text-sm">Cancel</button>
+                  </form>
+                ) : (
+                  <button type="button" onClick={() => setChildForm({ size_value: "", barcode: "", stock_quantity: 0 })} className="mt-3 text-sm text-primary font-medium hover:underline">+ Add size</button>
+                )}
+              </div>
               <select value={form.category_id ?? ""} onChange={(e) => setForm({ ...form, category_id: e.target.value ? parseInt(e.target.value, 10) : null, attribute_option_ids: [] })} className="px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary">
                 <option value="">— No category —</option>
                 {taxonomies.map((t) => <option key={t.id} value={t.id}>{t.name}{t.is_active === false ? " (Inactive)" : ""}</option>)}
@@ -529,6 +686,7 @@ export function ProductsPage() {
               <tr>
                 <th className="py-3 px-4 text-left text-sm font-medium text-text-muted">Image</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-text-muted">Name</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-text-muted">Code</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-text-muted">Price</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-text-muted">Stock</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-text-muted">Category</th>
@@ -539,7 +697,7 @@ export function ProductsPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} className="py-10 text-center text-text-muted">Loading...</td></tr>
+                <TableSkeleton rows={5} cols={8} />
               ) : (
                 products.map((p) => (
                   <tr key={p.id} className="border-b border-sand-divider last:border-0">
@@ -549,8 +707,9 @@ export function ProductsPage() {
                       </div>
                     </td>
                     <td className="py-4 px-4 font-medium text-text-primary">{p.name}</td>
+                    <td className="py-4 px-4 font-mono text-sm text-text-muted">{p.code || "—"}</td>
                     <td className="py-4 px-4 text-text-primary">AED {p.price.toFixed(2)}</td>
-                    <td className="py-4 px-4 text-text-muted">{p.stock_quantity}</td>
+                    <td className="py-4 px-4 text-text-muted">{p.children?.reduce((s, c) => s + (c.stock_net ?? 0), 0) ?? p.stock_quantity}</td>
                     <td className="py-4 px-4 text-text-muted truncate max-w-[150px]" title={p.category_path ?? undefined}>{p.category_path || "—"}</td>
                     <td className="py-4 px-4 text-text-muted">{p.brand_name || "—"}</td>
                     <td className="py-4 px-4"><span className={`px-2.5 py-1 rounded-full text-xs font-medium ${p.is_active ? "bg-green-100 text-green-800" : "bg-sand-divider/50 text-text-muted"}`}>{p.is_active ? "Active" : "Inactive"}</span></td>

@@ -193,15 +193,34 @@ async def build_product_response(
             "value": ot if ot else opt.value,
         })
 
-    stock_net = max(0, (product.stock_quantity or 0) - (product.stock_reserved or 0))
+    # Stock and children: aggregate from product.children; single_sized when one child with size_value "single_size"
+    children = getattr(product, "children", None) or []
+    stock_net = sum(c.stock_net for c in children) if children else 0
+    single_sized = (
+        len(children) == 1
+        and getattr(children[0], "size_value", None) == "single_size"
+    )
+    child_list = [
+        {
+            "id": c.id,
+            "code": c.code,
+            "barcode": c.barcode,
+            "size_value": c.size_value if not single_sized else c.size_value,  # can mask for display
+            "stock_quantity": c.stock_quantity,
+            "stock_reserved": c.stock_reserved,
+            "stock_net": c.stock_net,
+        }
+        for c in sorted(children, key=lambda x: (x.size_value or ""))
+    ]
     avg_rating, rating_count = await _get_product_ratings(db, product.id)
     return {
         "id": product.id,
         "slug": getattr(product, "slug", None),
+        "code": getattr(product, "code", None),
         "name": name,
         "description": description,
         "price": product.price,
-        "stock_quantity": product.stock_quantity,
+        "stock_quantity": sum(c.stock_quantity for c in children) if children else 0,
         "stock_reserved": product.stock_reserved or 0,
         "stock_net": stock_net,
         "image_url": product.image_url,
@@ -210,6 +229,8 @@ async def build_product_response(
         "brand_name": brand_name,
         "attributes": attributes,
         "is_active": product.is_active,
+        "children": child_list,
+        "single_sized": single_sized,
         "avg_rating": avg_rating,
         "rating_count": rating_count,
     }

@@ -19,6 +19,13 @@ class Settings(BaseSettings):
     STORAGE_BACKEND: str = "local"
     STORAGE_PATH: str = "./uploads"
 
+    # Product/parent-child code generation
+    PARENT_CODE_PREFIX: str = "P-"
+    PARENT_CODE_SUFFIX: str = ""
+    CHILD_CODE_PREFIX: str = "C-"
+    CHILD_CODE_SUFFIX: str = ""
+    SINGLE_SIZE_VALUE: str = "single_size"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

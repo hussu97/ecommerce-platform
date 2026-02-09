@@ -1,10 +1,11 @@
 """Product listing service: products + filters with counts."""
 from typing import Optional, List, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, exists
 from sqlalchemy.orm import selectinload
 
 from app.models.product import Product
+from app.models.product_child import ProductChild
 from app.models.taxonomy import Taxonomy
 from app.models.brand import Brand
 from app.models.taxonomy_attribute import TaxonomyAttribute, TaxonomyAttributeOption
@@ -27,7 +28,18 @@ def _base_product_query(
     max_price: Optional[float] = None,
 ):
     """Build base product subquery/conditions for filtering."""
-    conditions = [Product.is_active == True]
+    has_stock = exists(
+        select(1)
+        .select_from(ProductChild)
+        .where(
+            ProductChild.product_id == Product.id,
+            (ProductChild.stock_quantity - ProductChild.stock_reserved) > 0,
+        )
+    )
+    conditions = [
+        Product.is_active == True,
+        has_stock,
+    ]
     if search and search.strip():
         conditions.append(Product.name.ilike(f"%{search.strip()}%"))
     if category_slug:
@@ -83,6 +95,7 @@ async def list_products_with_filters(
         search, category_slug, brand_slug, option_ids, min_price, max_price
     )
     product_options = (
+        selectinload(Product.children),
         selectinload(Product.category_rel),
         selectinload(Product.brand_rel),
         selectinload(Product.attribute_values).selectinload(

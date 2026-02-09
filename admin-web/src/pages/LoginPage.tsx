@@ -56,7 +56,7 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-primary text-white font-medium rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="w-full py-2.5 px-4 bg-primary text-white font-medium rounded-xl hover:opacity-90 disabled:opacity-50 active:scale-[0.98] transition-transform"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>

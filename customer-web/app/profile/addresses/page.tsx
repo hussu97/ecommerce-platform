@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
+import { PageLoader } from "@/components/PageLoader";
 import { Home, Building2, MapPin, ChevronLeft, Pencil, MoreHorizontal } from "lucide-react";
 
 export interface SavedAddress {
@@ -106,9 +107,7 @@ export default function AddressesPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="size-8 border-2 border-[#ec9213] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <PageLoader className="py-12 min-h-[200px]" />
         ) : (
           addresses.map((addr) => (
             <div

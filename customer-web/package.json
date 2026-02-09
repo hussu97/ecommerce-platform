@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ecommerce/design-tokens": "*",
     "@stripe/react-stripe-js": "^5.6.0",
     "@stripe/stripe-js": "^8.7.0",
     "axios": "^1.13.4",

@@ -1,0 +1,24 @@
+{
+  "name": "@ecommerce/design-tokens",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./theme.css": "./dist/theme.css"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "dist/theme.css"
+  ],
+  "scripts": {
+    "build": "node scripts/generate-theme-css.js"
+  },
+  "prepare": "npm run build"
+}

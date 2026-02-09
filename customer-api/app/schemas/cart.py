@@ -4,6 +4,7 @@ from typing import Optional
 
 class CartItemAdd(BaseModel):
     product_slug: str = Field(..., max_length=255)
+    child_code: str = Field(..., max_length=64)  # product child code (required; every product has children)
     quantity: int = Field(1, ge=1, le=100)
 
 
@@ -24,11 +25,24 @@ class CartItemProduct(BaseModel):
         from_attributes = True
 
 
+class CartItemChildSchema(BaseModel):
+    """Child (size) info for cart line."""
+    id: int
+    code: str
+    size_value: Optional[str] = None
+    stock_net: int = 0
+
+    class Config:
+        from_attributes = True
+
+
 class CartItemResponse(BaseModel):
     id: int
     product_id: str
+    product_child_id: int
     quantity: int
     product: CartItemProduct
+    child: Optional[CartItemChildSchema] = None  # code, size_value, stock_net
 
     class Config:
         from_attributes = True

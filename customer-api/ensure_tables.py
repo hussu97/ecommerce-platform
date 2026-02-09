@@ -3,7 +3,7 @@ import asyncio
 from app.db.session import engine
 from app.db.base import Base
 from app.models import (
-    taxonomy, product, brand, taxonomy_attribute, product_attribute_value,
+    taxonomy, product, product_child, brand, taxonomy_attribute, product_attribute_value,
     user, order, cart, stock_reservation, customer_address,
     language, product_translation, taxonomy_translation, brand_translation,
     taxonomy_attribute_translation, ui_string, visitor_preference,
