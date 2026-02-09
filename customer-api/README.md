@@ -5,15 +5,22 @@ FastAPI backend for the customer-facing e-commerce flow: auth, products (read), 
 ## Setup
 
 ```bash
+cd customer-api
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-python3 reset_and_seed.py  # Fresh DB, or python3 ensure_admin.py for existing DB
+cp .env.example .env       # optional; defaults use sqlite+aiosqlite:///./ecommerce.db
+```
+
+**Database:** For a fresh DB with sample data (admin, customers, products, etc.) run `python3 reset_and_seed.py`. For an existing DB, ensure an admin user with `python3 ensure_admin.py`. To create tables only (no seed), run `python3 ensure_tables.py`.
+
+## Run
+
+```bash
 python3 -m uvicorn app.main:app --reload
 ```
 
-API: http://localhost:8000
+API: http://localhost:8000 (docs: http://localhost:8000/docs). The API is mounted at `/v1`; frontends use `http://localhost:8000/v1` as the base URL.
 
 ## API docs
 

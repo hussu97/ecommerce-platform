@@ -5,22 +5,22 @@ FastAPI backend for admin: products CRUD, orders management, taxonomies. Uses th
 ## Setup
 
 ```bash
+cd admin-api
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**Database**: Set `DATABASE_URL` in `.env` to the same DB as `customer-api`. Example:
+**Database:** Set `DATABASE_URL` in `.env` to the same DB as `customer-api`. Example:
 
 ```
 DATABASE_URL=sqlite+aiosqlite:///../customer-api/ecommerce.db
 ```
 
-Ensure admin user exists (run from `customer-api` or set `DATABASE_URL` first):
+Ensure the admin user exists (run once from `customer-api` or with `admin-api`’s `DATABASE_URL` set):
 
 ```bash
-cd ../customer-api && python3 ensure_admin.py
-# or, with DATABASE_URL set: python3 ensure_admin.py
+cd customer-api && python3 ensure_admin.py
 ```
 
 ## Run
@@ -29,7 +29,7 @@ cd ../customer-api && python3 ensure_admin.py
 python3 -m uvicorn app.main:app --reload --port 8001
 ```
 
-API docs: http://localhost:8001/docs
+API: http://localhost:8001 (docs: http://localhost:8001/docs). Base path is `/v1`; admin-web proxies `/api` to this.
 
 ## Bulk Import Worker
 

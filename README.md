@@ -22,6 +22,8 @@ Monorepo for the e-commerce platform: customer-facing and admin apps, with share
 
 ## Quick start
 
+Run **Customer API** first (required for customer-web and shop). Run **Admin API** first if you use admin-web. Each app can be run from its folder as below.
+
 ### 1. Customer API (port 8000)
 
 ```bash
@@ -40,7 +42,7 @@ cd admin-api
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-# Set DATABASE_URL in .env to same DB as customer-api (see admin-api/README.md)
+# Set DATABASE_URL in .env to the same DB as customer-api (e.g. sqlite+aiosqlite:///../customer-api/ecommerce.db)
 python3 -m uvicorn app.main:app --reload --port 8001
 ```
 
@@ -109,6 +111,7 @@ Then open http://localhost:3000 (customer) and http://localhost:5173 (admin). Th
 ## Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) – Architecture overview
+- [CHANGELOG.md](CHANGELOG.md) – Release history
 - [docs/DOCKER.md](docs/DOCKER.md) – Docker Compose
 - [PRODUCTION.md](PRODUCTION.md) – Production deployment guide
 - [customer-api/README.md](customer-api/README.md) – Customer API
@@ -182,21 +185,5 @@ Design tokens (used across customer-web, admin-web, shop): **primary** `#ec9213`
 
 ## Changelog
 
-| Date | Change |
-|------|--------|
-| 2025-02-09 | **Loading and transition consistency:** Unified skeleton vs spinner rules; PageLoader, ProductCardSkeleton, PdpSkeleton (customer-web); TableSkeleton (admin-web); FullScreenLoader (shop). Transitions aligned with design_template. (customer-web, admin-web, shop) |
-| 2025-02-09 | **Design tokens single source:** `packages/design-tokens` with tokens.json, generated theme.css, and JS export. customer-web and admin-web import theme; shop uses package in Colors. Rule: token changes only in packages/design-tokens. |
-| 2025-02-09 | **Taxonomy & Attributes Admin:** Admin-web can create, update, and deactivate taxonomies (Taxonomies page); create, update, and deactivate taxonomy attributes and options (Attributes page). Added `is_active` to Taxonomy, TaxonomyAttribute, TaxonomyAttributeOption. Customer-facing endpoints filter by `is_active`. Run `reset_and_seed.py` to add new columns to existing DB. |
-| 2025-02-08 | Cleanup: removed unused Address model (use CustomerAddress); removed outdated planning docs (implementation_plan, prompts_plan, walkthrough); updated READMEs and ARCHITECTURE |
-| 2025-02-08 | Consolidated apps into monorepo: renamed `frontend`→`customer-web`, `backend`→`customer-api`; moved `admin-api`, `admin-web`, `shop` into repo; added global README |
-| 2025-02-08 | Updated docs to use `python3` and `python3 -m uvicorn` for macOS/Linux compatibility |
-| 2025-02-08 | Stock reservation: reservations on order, released on shipped/cancelled; stock_net = gross - reserved |
-| 2025-02-08 | High-level taxonomy, taxonomy attributes (select with options), Brand table, product attributes; admin brands CRUD; customer filters; 10 sample products |
-| 2025-02-08 | Multi-language: languages table, translation tables (products, taxonomies, brands, attributes, UI strings); language resolution; visitor/user preference; customer language switcher |
-| 2025-02-08 | **Shop app UI:** Product cards redesigned (brand header, product name subheader, 4:5 image, design-template alignment). Full-screen Filters modal (sort, category grid, price range, brand, attributes; “Show Products”). Cart tab restyled (cards, sand border, rounded-full qty, primary CTA). PDP redesigned: image full-width at top, content panel overlaps on scroll with parallax; Specifications section (attributes); delivery row; fixed bottom Add to Cart + qty; “Add to Cart” label. Design-token audit on PDP, Checkout, Login, Signup, Orders, Order detail. |
-| 2025-02-08 | **Customer-web PDP:** Specifications section (product attributes grid); delivery block with complimentary_delivery + delivery_expected_uae; “Add to Cart” instead of “Add to Sanctuary”; product_not_found and specs/delivery i18n keys. Mobile content panel shadow/transition. |
-| 2025-02-08 | **Docs:** Added FRONTEND_REDESIGN_PROMPTS.md, SHOP_APP_UI_PROMPTS.md; design_template.html and design system section in README. |
+See [CHANGELOG.md](CHANGELOG.md) for release history. When you change apps or structure, update this README, the relevant app-specific README, and add an entry to CHANGELOG.md.
 
----
-
-**Keeping docs up to date:** When you change apps or structure, update this README, the relevant app-specific README, and add an entry to the Changelog above.

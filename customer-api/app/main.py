@@ -40,9 +40,17 @@ app = FastAPI(
 app.add_middleware(StructuredLoggingMiddleware)
 app.add_middleware(RequestIdMiddleware)
 app.add_middleware(SecurityHeadersMiddleware, csp=settings.SECURITY_HEADERS_CSP)
+# In development, allow any localhost/127.0.0.1 origin (any port) so CORS preflight (OPTIONS) succeeds
+_cors_origins = list(settings.BACKEND_CORS_ORIGINS)
+_cors_origin_regex = (
+    r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+    if settings.DEBUG
+    else None
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origins=_cors_origins,
+    allow_origin_regex=_cors_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

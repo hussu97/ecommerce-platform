@@ -8,24 +8,28 @@ Cross-platform shopping app (Web, iOS, Android) built with React Native + Expo.
 npm install
 ```
 
-Set `EXPO_PUBLIC_API_URL` in `.env` if Customer API runs elsewhere (default: `http://localhost:8000`).
+Optional: set `EXPO_PUBLIC_API_URL` in `.env` (default: `http://localhost:8000/v1`). Must point at the Customer API base URL including the `/v1` prefix.
 
 ## Run
 
-Start Customer API first:
+1. Start **Customer API** first (from repo root or `customer-api/`):
 
-```bash
-cd ../customer-api && python3 -m uvicorn app.main:app --reload
-```
+   ```bash
+   cd customer-api
+   source venv/bin/activate   # or venv\Scripts\activate on Windows
+   python3 -m uvicorn app.main:app --reload
+   ```
 
-Then:
+2. Start the app:
 
-```bash
-npm start         # Expo dev server
-npm run web       # Web only
-npm run ios       # iOS simulator
-npm run android   # Android emulator
-```
+   ```bash
+   cd shop
+   npm install
+   npm start         # Expo dev server (then choose web / iOS / Android)
+   npm run web       # Web only
+   npm run ios       # iOS simulator
+   npm run android   # Android emulator
+   ```
 
 ## Features
 

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   View,
+  RefreshControl,
 } from "react-native";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
@@ -35,31 +36,40 @@ export default function OrdersScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
+  const fetchOrders = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const r = await api.get<Order[]>("/orders/my-orders");
+      setOrders(r.data);
+    } catch {
+      setOrders([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login");
       return;
     }
-    (async () => {
-      try {
-        const r = await api.get<Order[]>("/orders/my-orders");
-        setOrders(r.data);
-      } catch {
-        setOrders([]);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [isAuthenticated, router]);
+    fetchOrders();
+  }, [isAuthenticated, router, fetchOrders]);
 
   if (!isAuthenticated) return null;
 
-  if (isLoading) {
+  if (isLoading && orders.length === 0) {
     return <FullScreenLoader />;
   }
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl refreshing={isLoading} onRefresh={fetchOrders} tintColor={colors.primary} colors={[colors.primary]} />
+      }
+    >
       <Text style={[styles.title, { fontFamily: FontFamily.serif, color: colors.text }]}>{t("returns_and_orders")}</Text>
       <Text style={[styles.subtitle, { color: colors.textMuted }]}>{t("view_and_track_orders")}</Text>
 

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   View,
+  RefreshControl,
 } from "react-native";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
@@ -29,7 +30,7 @@ export default function CartScreen() {
     fetchCart();
   }, []);
 
-  if (isLoading) {
+  if (isLoading && items.length === 0) {
     return <FullScreenLoader />;
   }
 
@@ -55,6 +56,9 @@ export default function CartScreen() {
         data={items}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={fetchCart} tintColor={colors.primary} colors={[colors.primary]} />
+        }
         renderItem={({ item }) => (
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.sandDivider }]}>
             <View style={styles.imageWrap}>

@@ -106,7 +106,8 @@ BRANDS = [
     ("Bose", "بوز"),
 ]
 
-# Products: (name_en, desc_en, name_ar, desc_ar, price, stock, image_url, taxonomy_name, brand_name, attr_pairs)
+# Products: (name_en, desc_en, name_ar, desc_ar, price, stock, image_url, taxonomy_name, brand_name, attr_pairs[, children_spec])
+# children_spec omitted or None = single-sized (one child with size_value single_size). children_spec = [(size_value, barcode, stock), ...] = multi-sized.
 PRODUCTS = [
     (
         "Wireless Noise-Canceling Headphones",
@@ -157,6 +158,62 @@ PRODUCTS = [
         "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?auto=format&fit=crop&w=800&q=80",
         "Smart Devices & Accessories", "Sony",
         [("Connectivity", "Wi-Fi")],
+    ),
+    # 5 multi-sized products (Fashion / Outdoors with Size variants)
+    (
+        "Cotton T-Shirt",
+        "Soft cotton crew neck t-shirt, perfect for everyday wear.",
+        "تيشيرت قطني",
+        "تيشيرت قطني طري برقبة دائرية، مثالي للارتداء اليومي.",
+        49.99, 0,
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
+        "Men & Women's Fashion", "Nike",
+        [("Color", "Navy"), ("Material", "Cotton")],
+        [("S", "TEE-NV-S", 8), ("M", "TEE-NV-M", 12), ("L", "TEE-NV-L", 10), ("XL", "TEE-NV-XL", 5)],
+    ),
+    (
+        "Classic Hoodie",
+        "Comfortable pullover hoodie with kangaroo pocket.",
+        "هودي كلاسيكي",
+        "هودي مريح مع جيب كنغارو.",
+        89.99, 0,
+        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80",
+        "Men & Women's Fashion", "Nike",
+        [("Color", "Gray"), ("Material", "Cotton")],
+        [("S", "HOD-GR-S", 6), ("M", "HOD-GR-M", 14), ("L", "HOD-GR-L", 11), ("XL", "HOD-GR-XL", 4)],
+    ),
+    (
+        "Running Shorts",
+        "Lightweight breathable shorts for running and training.",
+        "شورت جري",
+        "شورت خفيف تنفس للجري والتدريب.",
+        39.99, 0,
+        "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80",
+        "Outdoors, Fitness & Sports", "Nike",
+        [("Activity", "Running")],
+        [("S", "SHT-RUN-S", 9), ("M", "SHT-RUN-M", 15), ("L", "SHT-RUN-L", 12)],
+    ),
+    (
+        "Yoga Pants",
+        "High-waist stretch yoga pants for comfort and flexibility.",
+        "بنطلون يوغا",
+        "بنطلون يوغا عالي الخصر مريح ومرن.",
+        59.99, 0,
+        "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=800&q=80",
+        "Outdoors, Fitness & Sports", "Nike",
+        [("Activity", "Gym")],
+        [("S", "YOG-GY-S", 7), ("M", "YOG-GY-M", 13), ("L", "YOG-GY-L", 10), ("XL", "YOG-GY-XL", 6)],
+    ),
+    (
+        "Training Jacket",
+        "Lightweight windbreaker jacket for outdoor training.",
+        "جاكيت تدريب",
+        "جاكيت خفيف مضاد للرياح للتدريب الخارجي.",
+        79.99, 0,
+        "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=800&q=80",
+        "Outdoors, Fitness & Sports", "Nike",
+        [("Activity", "Running")],
+        [("S", "JKT-RUN-S", 5), ("M", "JKT-RUN-M", 11), ("L", "JKT-RUN-L", 9)],
     ),
 ]
 
@@ -458,11 +515,13 @@ async def reset_and_seed():
             session.add(BrandTranslation(brand_id=b.id, language_id=langs["ar"].id, name=name_ar))
         await session.commit()
 
-        # 6. Products + code + children (single child per product with size_value single_size) + translations
+        # 6. Products + code + children (single or multi-sized) + translations
         print("Seeding products...")
         product_ids: list[str] = []
         product_id_to_first_child_id: dict[str, int] = {}
-        for name_en, desc_en, name_ar, desc_ar, price, stock, img, tax_name, brand_name, attr_pairs in PRODUCTS:
+        for row in PRODUCTS:
+            name_en, desc_en, name_ar, desc_ar, price, stock, img, tax_name, brand_name, attr_pairs = row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]
+            children_spec = row[10] if len(row) >= 11 else None
             tax = tax_by_name.get(tax_name)
             brand_obj = brand_by_name.get(brand_name)
             cat_id = tax.id if tax else None
@@ -495,18 +554,35 @@ async def reset_and_seed():
             session.add(p)
             await session.flush()
             product_ids.append(p.id)
-            child_code = f"{settings.CHILD_CODE_PREFIX}{p.id[:8].upper()}-1{settings.CHILD_CODE_SUFFIX}"
-            child = ProductChild(
-                product_id=p.id,
-                code=child_code,
-                barcode=None,
-                size_value=settings.SINGLE_SIZE_VALUE,
-                stock_quantity=stock,
-                stock_reserved=0,
-            )
-            session.add(child)
-            await session.flush()
-            product_id_to_first_child_id[p.id] = child.id
+            p_id_snippet = p.id[:8].upper() if len(p.id) >= 8 else p.id.upper()
+            if children_spec is None:
+                child_code = f"{settings.CHILD_CODE_PREFIX}{p_id_snippet}-1{settings.CHILD_CODE_SUFFIX}"
+                child = ProductChild(
+                    product_id=p.id,
+                    code=child_code,
+                    barcode=None,
+                    size_value=settings.SINGLE_SIZE_VALUE,
+                    stock_quantity=stock,
+                    stock_reserved=0,
+                )
+                session.add(child)
+                await session.flush()
+                product_id_to_first_child_id[p.id] = child.id
+            else:
+                for idx, (size_value, barcode, qty) in enumerate(children_spec):
+                    child_code = f"{settings.CHILD_CODE_PREFIX}{p_id_snippet}-{idx + 1}{settings.CHILD_CODE_SUFFIX}"
+                    child = ProductChild(
+                        product_id=p.id,
+                        code=child_code,
+                        barcode=barcode,
+                        size_value=size_value,
+                        stock_quantity=qty,
+                        stock_reserved=0,
+                    )
+                    session.add(child)
+                    await session.flush()
+                    if idx == 0:
+                        product_id_to_first_child_id[p.id] = child.id
             session.add(ProductTranslation(product_id=p.id, language_id=langs["ar"].id, name=name_ar, description=desc_ar))
 
             # Attribute options

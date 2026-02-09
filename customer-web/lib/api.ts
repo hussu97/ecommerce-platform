@@ -2,11 +2,20 @@ import axios from "axios";
 import { getVisitorId } from "./visitor";
 
 // Use relative /api path - Next.js rewrites proxy to backend (avoids CORS)
-// Override with NEXT_PUBLIC_API_URL for production or different backend (must include /v1)
-const baseURL =
-  typeof window !== "undefined"
-    ? process.env.NEXT_PUBLIC_API_URL || "/api"
-    : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/v1";
+// Override with NEXT_PUBLIC_API_URL for production or different backend.
+// When using a full URL (http...), normalize to end with /v1 so backend routes resolve.
+function getBaseURL(): string {
+  const raw =
+    typeof window !== "undefined"
+      ? process.env.NEXT_PUBLIC_API_URL || "/api"
+      : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/v1";
+  if (raw.startsWith("http") && !raw.replace(/\/$/, "").endsWith("/v1")) {
+    return raw.replace(/\/?$/, "") + "/v1";
+  }
+  return raw;
+}
+
+const baseURL = getBaseURL();
 
 const api = axios.create({
   baseURL,

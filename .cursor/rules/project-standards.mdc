@@ -11,6 +11,8 @@ alwaysApply: true
 - **APIs: use code/slug, not DB ID**: Prefer stable identifiers: language **code** (e.g. `en`, `ar`), taxonomy **slug**, brand **slug**, product **slug**. Avoid exposing or requiring auto-generated DB IDs in API contracts where a code/slug exists. Cart uses `product_slug`; product URLs are slug-based.
 - **Consistency**: Match existing patterns (customer-api, admin-api, customer-web, admin-web, shop). Reuse existing helpers, schemas, and naming.
 - **Architecture docs**: When changes impact the architecture (new services, ports, DB, APIs, or deployment), update [ARCHITECTURE.md](ecommerce-platform/ARCHITECTURE.md) so the overview table and “Running” sections stay accurate.
+- **README and launch instructions**: Keep README files up to date with accurate steps to launch each app. The root [README.md](ecommerce-platform/README.md) must list all apps and how to run them (Quick start); each app directory (e.g. `customer-api/`, `admin-web/`) must have its own README with setup and run instructions, including any dependencies (e.g. "Start Customer API first") and required environment variables (e.g. API base URL with `/v1`). When run steps or ports change, update the affected README(s).
+- **New apps**: When a new app (backend or frontend) is added to the repo, create an app-specific README in that app's folder (setup, run, env vars, and how it fits in the stack) and update the root [README.md](ecommerce-platform/README.md) (repository structure table, Quick start section, Environment variables, and Docs links).
 - **Frontend design**: When making frontend changes (customer-web, admin-web, or shop UI), take inspiration from [design_template.html](ecommerce-platform/design_template.html) for layout, tokens, and patterns so the app stays aligned with the design system.
 - **Loading and transitions**: Use skeleton for known layouts (product grid, PDP, admin tables); use spinner for full-page or inline actions. Follow design_template transition patterns (active:scale, duration-200/500, transition-colors). See [DESIGN_TEMPLATE.md](ecommerce-platform/DESIGN_TEMPLATE.md) “Loading and transitions.”
 - **Design tokens**: Colors, spacing, radius, and typography values are defined only in the single source (`packages/design-tokens`). When adding or changing any design token, update that package (e.g. `tokens.json` and run `npm run tokens:build` to regenerate `theme.css`); do not define or hardcode token values in customer-web, admin-web, or shop. Each app may use tokens differently to achieve platform-appropriate UI (desktop web, mobile web, native app).
@@ -47,11 +49,11 @@ Feature checklist (keep in sync): Search, category & brand & attribute filters w
 3. **Architecture**: If the change added or changed services, ports, DB, or run instructions, update [ARCHITECTURE.md](ecommerce-platform/ARCHITECTURE.md).
 4. **NEXT_TODO.md**: When changes implement or partially implement a feature or task listed in [NEXT_TODO.md](ecommerce-platform/NEXT_TODO.md), update that task’s status in the file: set status to ✅ (Implemented) or 🔶 (Partial), and if partial, add or adjust the *Current:* note to describe what exists. If the change completes a previously partial item, upgrade to ✅ and remove the *Current:* note. Optionally add a one-line entry to the “Changelog (Implemented)” table at the bottom of NEXT_TODO.md.
 5. **Design tokens**: If the change added or modified design tokens (colors, spacing, radius, typography), confirm they were updated in `packages/design-tokens` only and that consuming apps use the package (no new local token definitions).
-6. **Changelog**: Append a short entry to the project changelog (e.g. `CHANGELOG.md` at repo root): what changed and which area (admin-api, admin-web, customer-web, shop, etc.). One to two lines per entry.
+6. **Changelog**: Log all notable changes in [CHANGELOG.md](ecommerce-platform/CHANGELOG.md) at the repo root only. Do not maintain a separate or duplicate changelog in other files (e.g. README, NEXT_TODO). Use the format: date section `## YYYY-MM-DD` and entries as `- **Topic:** Short description. (scope).` One to two lines per entry; include the area(s) affected (e.g. admin-api, customer-web, shop).
 
-Example changelog entry:
+Example CHANGELOG.md entry:
 
 ```markdown
-## [Unreleased]
-- Bulk upload: template and worker use category_name/brand_name (no IDs). (admin-api, bulk-import-worker)
+## 2025-02-09
+- **Bulk upload:** Template and worker use category_name/brand_name (no IDs). (admin-api, bulk-import-worker)
 ```

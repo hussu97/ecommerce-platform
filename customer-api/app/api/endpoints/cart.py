@@ -153,14 +153,19 @@ async def add_cart_item(
         cart_item.quantity = new_qty
         await db.commit()
         await db.refresh(cart_item)
-        await db.refresh(cart_item.product)
         await db.refresh(cart_item.product_child)
+        # Eager-load product.category_rel so category_path is available (no lazy load in async)
+        product_for_resp = (
+            await db.execute(
+                select(Product).where(Product.id == cart_item.product_id).options(selectinload(Product.category_rel))
+            )
+        ).scalar_one()
         return CartItemResponse(
             id=cart_item.id,
             product_id=cart_item.product_id,
             product_child_id=cart_item.product_child_id,
             quantity=cart_item.quantity,
-            product=cart_item.product,
+            product=product_for_resp,
             child={"id": cart_item.product_child.id, "code": cart_item.product_child.code, "size_value": cart_item.product_child.size_value, "stock_net": cart_item.product_child.stock_net},
         )
 
@@ -174,17 +179,19 @@ async def add_cart_item(
     db.add(cart_item)
     await db.commit()
     await db.refresh(cart_item)
-    await db.refresh(cart_item.product)
     await db.refresh(cart_item.product_child)
-    product_loaded = await db.execute(
-        select(Product).where(Product.id == cart_item.product_id).options(selectinload(Product.category_rel))
-    )
+    # Eager-load product.category_rel so category_path is available (no lazy load in async)
+    product_for_resp = (
+        await db.execute(
+            select(Product).where(Product.id == cart_item.product_id).options(selectinload(Product.category_rel))
+        )
+    ).scalar_one()
     return CartItemResponse(
         id=cart_item.id,
         product_id=cart_item.product_id,
         product_child_id=cart_item.product_child_id,
         quantity=cart_item.quantity,
-        product=product_loaded.scalar_one_or_none() or cart_item.product,
+        product=product_for_resp,
         child={"id": child.id, "code": child.code, "size_value": child.size_value, "stock_net": child.stock_net},
     )
 
@@ -216,7 +223,10 @@ async def update_cart_item(
     if user_id is not None:
         result = await db.execute(
             select(CartItem)
-            .options(selectinload(CartItem.product), selectinload(CartItem.product_child))
+            .options(
+                selectinload(CartItem.product).selectinload(Product.category_rel),
+                selectinload(CartItem.product_child),
+            )
             .where(
                 CartItem.user_id == user_id,
                 CartItem.product_id == product.id,
@@ -226,7 +236,10 @@ async def update_cart_item(
     else:
         result = await db.execute(
             select(CartItem)
-            .options(selectinload(CartItem.product), selectinload(CartItem.product_child))
+            .options(
+                selectinload(CartItem.product).selectinload(Product.category_rel),
+                selectinload(CartItem.product_child),
+            )
             .where(
                 CartItem.visitor_id == visitor_id,
                 CartItem.product_id == product.id,
@@ -243,12 +256,19 @@ async def update_cart_item(
     cart_item.quantity = item_update.quantity
     await db.commit()
     await db.refresh(cart_item)
+    await db.refresh(cart_item.product_child)
+    # Eager-load product.category_rel so category_path is available (no lazy load in async)
+    product_for_resp = (
+        await db.execute(
+            select(Product).where(Product.id == cart_item.product_id).options(selectinload(Product.category_rel))
+        )
+    ).scalar_one()
     return CartItemResponse(
         id=cart_item.id,
         product_id=cart_item.product_id,
         product_child_id=cart_item.product_child_id,
         quantity=cart_item.quantity,
-        product=cart_item.product,
+        product=product_for_resp,
         child={"id": cart_item.product_child.id, "code": cart_item.product_child.code, "size_value": cart_item.product_child.size_value, "stock_net": cart_item.product_child.stock_net},
     )
 

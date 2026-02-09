@@ -91,36 +91,38 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm font-semibold text-primary">
           AED {product.price.toFixed(2)}
         </p>
-        {isSingleSized && singleChild && (quantity > 0 ? (
-          <div className="flex items-center justify-center w-full rounded-full border border-sand-divider bg-background-light overflow-hidden mt-2">
-            <button
-              className="p-2 hover:bg-white/50 disabled:opacity-50"
-              onClick={handleDecrease}
-              disabled={isUpdating || quantity <= 1 || stockNet <= 0}
+        {isSingleSized && singleChild ? (
+          quantity > 0 ? (
+            <div className="flex items-center justify-center w-full rounded-full border border-sand-divider bg-background-light overflow-hidden mt-2">
+              <button
+                className="p-2 hover:bg-white/50 disabled:opacity-50"
+                onClick={handleDecrease}
+                disabled={isUpdating || quantity <= 1 || stockNet <= 0}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="px-4 text-sm font-medium min-w-[2rem] text-center">
+                {quantity}
+              </span>
+              <button
+                className="p-2 hover:bg-white/50 disabled:opacity-50"
+                onClick={handleIncrease}
+                disabled={isUpdating || quantity >= stockNet || stockNet <= 0}
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <Button
+              className="w-full rounded-full mt-2 bg-primary text-white hover:bg-primary/90 border-none shadow-md shadow-primary/20 active:scale-[0.98] transition-transform"
+              size="sm"
+              onClick={handleAdd}
+              disabled={isUpdating || stockNet <= 0}
+              isLoading={isUpdating}
             >
-              <Minus className="h-4 w-4" />
-            </button>
-            <span className="px-4 text-sm font-medium min-w-[2rem] text-center">
-              {quantity}
-            </span>
-            <button
-              className="p-2 hover:bg-white/50 disabled:opacity-50"
-              onClick={handleIncrease}
-              disabled={isUpdating || quantity >= stockNet || stockNet <= 0}
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
-        ) : isSingleSized && singleChild ? (
-          <Button
-            className="w-full rounded-full mt-2 bg-primary text-white hover:bg-primary/90 border-none shadow-md shadow-primary/20 active:scale-[0.98] transition-transform"
-            size="sm"
-            onClick={handleAdd}
-            disabled={isUpdating || stockNet <= 0}
-            isLoading={isUpdating}
-          >
-            {t("add_to_cart")}
-          </Button>
+              {t("add_to_cart")}
+            </Button>
+          )
         ) : (
           <Link href={`/products/${productSlug}`} className="block mt-2">
             <Button

@@ -8,23 +8,27 @@ Next.js customer web app. Browsing, cart, checkout, orders, profile.
 npm install
 ```
 
-Set `NEXT_PUBLIC_API_URL=http://localhost:8000` in `.env.local` (talks directly to Customer API so auth headers are sent).
+Optional: set `NEXT_PUBLIC_API_URL` in `.env.local`. Unset = `/api` (Next.js rewrites to the backend). If you use a full URL (e.g. `http://localhost:8000`), it must include `/v1` or the app will append it. The app talks to the Customer API; auth headers are sent from the same origin.
 
 ## Run
 
-Start Customer API first:
+1. Start **Customer API** first (from repo root or `customer-api/`):
 
-```bash
-cd ../customer-api && python3 -m uvicorn app.main:app --reload
-```
+   ```bash
+   cd customer-api
+   source venv/bin/activate   # or venv\Scripts\activate on Windows
+   python3 -m uvicorn app.main:app --reload
+   ```
 
-Then:
+2. Start the app:
 
-```bash
-npm run dev
-```
+   ```bash
+   cd customer-web
+   npm install
+   npm run dev
+   ```
 
-Open http://localhost:3000
+3. Open http://localhost:3000
 
 ## Features
 

@@ -7,6 +7,7 @@ import {
   Platform,
   TextInput,
   ScrollView,
+  RefreshControl,
   Alert,
   View,
   Dimensions,
@@ -338,6 +339,9 @@ export default function ShopScreen() {
         style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.skeletonGrid}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={fetchProducts} tintColor={colors.primary} colors={[colors.primary]} />
+        }
       >
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <View key={i} style={styles.skeletonCardWrap}>
@@ -353,6 +357,9 @@ export default function ShopScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={fetchProducts} tintColor={colors.primary} colors={[colors.primary]} />
+      }
     >
       <View style={styles.greeting}>
         <Text style={[styles.greetingTitle, { fontFamily: FontFamily.serif, color: colors.text }]}>
