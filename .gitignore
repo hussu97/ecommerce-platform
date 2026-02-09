@@ -23,3 +23,5 @@ uploads/
 # IDE / misc
 .idea/
 .DS_Store
+
+test_data/
