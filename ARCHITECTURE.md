@@ -12,7 +12,7 @@
 
 ## Design tokens
 
-Design tokens (colors, radius, typography) are defined in a single source: `packages/design-tokens`. The package exposes `tokens.json`, a generated `dist/theme.css` (Tailwind v4 `@theme`), and a JS export for React Native. **customer-web** and **admin-web** import `@ecommerce/design-tokens/theme.css`; **shop** imports the package and uses it in `constants/Colors.ts`. Token changes must be made only in `packages/design-tokens` (see `.cursor/rules/project-standards.mdc`). Each app may apply tokens differently for platform-appropriate UI (web vs mobile web vs app).
+Design tokens (colors, radius, typography) are defined in a single source: `packages/design-tokens`. The package exposes `tokens.json`, a generated `dist/theme.css` (Tailwind v4 `@theme`), and a JS export for React Native. **customer-web** and **admin-web** import `@ecommerce/design-tokens/theme.css`; **shop** imports the package and uses it in `constants/Colors.ts`. Token changes must be made only in `packages/design-tokens` (see `.cursor/rules/project-standards.mdc`). Each app may apply tokens differently for platform-appropriate UI (web vs mobile web vs app). For Docker, **customer-web** and **admin-web** images are built with the **repository root** as build context so the `packages/design-tokens` workspace package is available.
 
 ## Shared Database
 

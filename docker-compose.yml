@@ -57,7 +57,9 @@ services:
     restart: "no"
 
   customer-web:
-    build: ./customer-web
+    build:
+      context: .
+      dockerfile: customer-web/Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -67,7 +69,9 @@ services:
         condition: service_healthy
 
   admin-web:
-    build: ./admin-web
+    build:
+      context: .
+      dockerfile: admin-web/Dockerfile
     ports:
       - "5173:5173"
     environment:

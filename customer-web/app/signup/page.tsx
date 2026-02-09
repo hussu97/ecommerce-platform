@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useI18nStore } from "@/stores/useI18nStore";
-import api from "@/lib/api";
+import api, { getApiErrorDetail } from "@/lib/api";
 import { Sparkles } from "lucide-react";
 
 export default function SignupPage() {
@@ -43,7 +43,7 @@ export default function SignupPage() {
       });
       router.push("/login");
     } catch (err: unknown) {
-      setError((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t("failed_to_create_account"));
+      setError(getApiErrorDetail(err, t("failed_to_create_account")));
       console.error(err);
     } finally {
       setIsLoading(false);

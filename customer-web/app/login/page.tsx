@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
-import api from "@/lib/api";
+import api, { getApiErrorDetail } from "@/lib/api";
 import { Sparkles } from "lucide-react";
 
 export default function LoginPage() {
@@ -36,10 +36,7 @@ export default function LoginPage() {
       await login(response.data.access_token);
       router.push(redirect);
     } catch (err: unknown) {
-      setError(
-        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
-          t("failed_to_login")
-      );
+      setError(getApiErrorDetail(err, t("failed_to_login")));
       console.error(err);
     } finally {
       setIsLoading(false);

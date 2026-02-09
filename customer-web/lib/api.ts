@@ -1,18 +1,37 @@
 import axios from "axios";
 import { getVisitorId } from "./visitor";
 
-// Use relative /api path - Next.js rewrites proxy to backend (avoids CORS)
-// Override with NEXT_PUBLIC_API_URL for production or different backend.
-// When using a full URL (http...), normalize to end with /v1 so backend routes resolve.
+// Browser: use /api (Next.js rewrites to backend). Server (SSR): use BACKEND_ORIGIN in Docker or localhost.
+// NEXT_PUBLIC_API_URL overrides when set (must end with /v1 for full URL).
 function getBaseURL(): string {
-  const raw =
-    typeof window !== "undefined"
-      ? process.env.NEXT_PUBLIC_API_URL || "/api"
-      : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/v1";
+  const isBrowser = typeof window !== "undefined";
+  const backendOrigin = process.env.BACKEND_ORIGIN;
+  const publicUrl = process.env.NEXT_PUBLIC_API_URL;
+  let raw: string;
+  if (publicUrl) {
+    raw = publicUrl;
+  } else if (isBrowser) {
+    raw = "/api";
+  } else {
+    raw = backendOrigin ? `${backendOrigin}/v1` : "http://localhost:8000/v1";
+  }
   if (raw.startsWith("http") && !raw.replace(/\/$/, "").endsWith("/v1")) {
     return raw.replace(/\/?$/, "") + "/v1";
   }
   return raw;
+}
+
+/** Normalize API error response detail to a string (avoids rendering 422 validation array as React child). */
+export function getApiErrorDetail(err: unknown, fallback: string): string {
+  const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
+  if (detail == null) return fallback;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0];
+    if (typeof first === "object" && first !== null && "msg" in first) return String((first as { msg?: unknown }).msg ?? fallback);
+  }
+  if (typeof detail === "object" && detail !== null && "msg" in detail) return String((detail as { msg?: unknown }).msg ?? fallback);
+  return fallback;
 }
 
 const baseURL = getBaseURL();

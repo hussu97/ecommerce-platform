@@ -75,8 +75,13 @@ app.include_router(cart_endpoints.router, prefix=f"{v1_prefix}/cart", tags=["Car
 async def startup_event():
     """Create database tables and configure logging on startup"""
     setup_structlog()
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        if "already exists" not in str(e).lower():
+            raise
+        # Shared DB (e.g. Docker): other service may have created tables first
 
 
 @app.get("/health")

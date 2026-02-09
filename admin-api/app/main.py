@@ -52,8 +52,13 @@ app.include_router(i18n_endpoints.router, prefix=f"{v1_prefix}/i18n", tags=["i18
 @app.on_event("startup")
 async def startup_event():
     setup_structlog()
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        if "already exists" not in str(e).lower():
+            raise
+        # Shared DB (e.g. Docker): customer-api or init may have created tables first
 
 
 @app.get("/health")

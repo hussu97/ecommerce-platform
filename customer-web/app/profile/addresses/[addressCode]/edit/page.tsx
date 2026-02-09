@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
-import api from "@/lib/api";
+import api, { getApiErrorDetail } from "@/lib/api";
 import { PageLoader } from "@/components/PageLoader";
 import { ChevronLeft } from "lucide-react";
 import type { SavedAddress } from "../../page";
@@ -102,7 +102,7 @@ export default function EditAddressPage() {
       });
       router.push("/profile/addresses");
     } catch (err: unknown) {
-      setError((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t("failed_to_save_address"));
+      setError(getApiErrorDetail(err, t("failed_to_save_address")));
     } finally {
       setSaving(false);
     }

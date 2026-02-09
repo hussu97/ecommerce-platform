@@ -1,0 +1,14 @@
+# Used when building from repo root (customer-web, admin-web Dockerfiles).
+# Keeps build context small; backends and heavy dirs excluded.
+.git
+**/node_modules
+**/.next
+**/dist
+customer-api
+admin-api
+docs
+*.md
+.gitignore
+.dockerignore
+.env
+.env.*
