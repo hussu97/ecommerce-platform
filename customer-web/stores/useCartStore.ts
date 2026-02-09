@@ -11,7 +11,7 @@ export interface Product {
   category_path?: string | null;
   brand_name?: string | null;
   attributes?: { attribute_name: string; value: string }[];
-  stock_quantity: number;
+  stock_quantity?: number;
   stock_net?: number;
   avg_rating?: number | null;
   rating_count?: number;
@@ -46,7 +46,6 @@ interface CartState {
   clearCart: () => Promise<void>;
   getCartTotal: () => number;
   getItemCount: () => number;
-  getQuantityForProduct: (productId: string) => number;
   getQuantityForProductAndChild: (productSlug: string, childCode: string) => number;
 }
 
@@ -136,11 +135,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   getItemCount: () => {
     const { items } = get();
     return items.reduce((count, item) => count + item.quantity, 0);
-  },
-
-  getQuantityForProduct: (productId: string) => {
-    const { items } = get();
-    return items.filter((i) => i.product_id === productId).reduce((s, i) => s + i.quantity, 0);
   },
 
   getQuantityForProductAndChild: (productSlug: string, childCode: string) => {

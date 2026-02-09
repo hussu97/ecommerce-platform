@@ -121,7 +121,7 @@ export default function ProductDetailScreen() {
     }
   };
 
-  const stockNet = selectedChild?.stock_net ?? product?.stock_net ?? product?.stock_quantity ?? 0;
+  const stockNet = selectedChild?.stock_net ?? product?.stock_net ?? 0;
 
   const handleWishlistPress = async () => {
     if (!slug) return;

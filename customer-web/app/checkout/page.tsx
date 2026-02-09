@@ -107,6 +107,8 @@ interface SavedAddress {
   state_province?: string | null;
   postal_code?: string | null;
   is_default: boolean;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export default function CheckoutPage() {

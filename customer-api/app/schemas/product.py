@@ -22,7 +22,6 @@ class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    stock_quantity: int = 0
     image_url: Optional[str] = None
     category_id: Optional[int] = None
     is_active: bool = True
@@ -57,7 +56,6 @@ class ProductResponse(ProductBase):
     category_path: Optional[str] = None
     brand_name: Optional[str] = None
     attributes: List[ProductAttributeResponse] = []
-    stock_reserved: int = 0
     stock_net: int = 0  # aggregated from children
     children: List[ProductChildResponse] = []
     single_sized: bool = False  # true when exactly one child with size_value == SINGLE_SIZE_VALUE

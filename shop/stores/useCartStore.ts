@@ -8,7 +8,7 @@ export interface Product {
   price: number;
   image_url?: string;
   description?: string;
-  stock_quantity: number;
+  stock_quantity?: number;
   stock_net?: number;
   category_path?: string | null;
   brand_name?: string | null;
@@ -44,7 +44,6 @@ interface CartState {
   updateQuantity: (productSlug: string, childCode: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   getItemCount: () => number;
-  getQuantityForProduct: (productId: string) => number;
   getQuantityForProductAndChild: (productSlug: string, childCode: string) => number;
 }
 
@@ -95,11 +94,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     set({ items: [] });
   },
   getItemCount: () => get().items.reduce((c, i) => c + i.quantity, 0),
-  getQuantityForProduct: (productId) => {
-    return get().items
-      .filter((i) => i.product_id === productId || (i.product?.slug ?? i.product_id) === productId)
-      .reduce((s, i) => s + i.quantity, 0);
-  },
   getQuantityForProductAndChild: (productSlug, childCode) => {
     const item = get().items.find(
       (i) => (i.product?.slug ?? i.product_id) === productSlug && i.child?.code === childCode

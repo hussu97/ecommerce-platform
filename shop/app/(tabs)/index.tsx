@@ -217,7 +217,7 @@ export default function ShopScreen() {
     const singleChild = isSingleSized ? item.children?.[0] : null;
     const childCode = singleChild?.code ?? "";
     const qty = singleChild ? getQuantityForProductAndChild(slug, childCode) : 0;
-    const stockNet = singleChild?.stock_net ?? item.stock_net ?? item.stock_quantity ?? 0;
+    const stockNet = singleChild?.stock_net ?? item.stock_net ?? 0;
     const isUpdating = addingSlug === slug;
     const hasRating = item.avg_rating != null || (item.rating_count ?? 0) > 0;
     const headerText = item.brand_name || item.name;

@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const childCode = singleChild?.code ?? "";
   const quantity = singleChild ? getQuantityForProductAndChild(productSlug, childCode) : 0;
   const [isUpdating, setIsUpdating] = useState(false);
-  const stockNet = singleChild?.stock_net ?? product.stock_net ?? product.stock_quantity ?? 0;
+  const stockNet = singleChild?.stock_net ?? product.stock_net ?? 0;
 
   const handleAdd = async () => {
     if (!singleChild) return;

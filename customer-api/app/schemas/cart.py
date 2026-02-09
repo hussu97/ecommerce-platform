@@ -19,7 +19,6 @@ class CartItemProduct(BaseModel):
     price: float
     image_url: Optional[str] = None
     category_path: Optional[str] = None
-    stock_quantity: int
 
     class Config:
         from_attributes = True

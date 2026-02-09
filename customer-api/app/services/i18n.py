@@ -220,8 +220,6 @@ async def build_product_response(
         "name": name,
         "description": description,
         "price": product.price,
-        "stock_quantity": sum(c.stock_quantity for c in children) if children else 0,
-        "stock_reserved": product.stock_reserved or 0,
         "stock_net": stock_net,
         "image_url": product.image_url,
         "category_id": product.category_id,

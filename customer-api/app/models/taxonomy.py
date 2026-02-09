@@ -17,5 +17,5 @@ class Taxonomy(Base):
 
     @property
     def path(self) -> str:
-        """For backward compat with Product.category_path."""
+        """Display path for Product.category_path; currently the category name."""
         return self.name

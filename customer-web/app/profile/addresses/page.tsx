@@ -24,6 +24,8 @@ export interface SavedAddress {
   building_name?: string | null;
   floor_office?: string | null;
   is_default: boolean;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 function AddressIcon({ type }: { type: string }) {

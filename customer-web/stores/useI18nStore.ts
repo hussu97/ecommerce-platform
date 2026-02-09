@@ -144,7 +144,6 @@ const DEFAULT_STRINGS: Record<string, string> = {
   new_to_site: "New to 7alaa?",
   create_an_account: "Create an account",
   already_have_account: "Already have an account?",
-  sign_in: "Sign In",
   thank_you_order_message: "Your payment has been successfully processed and your order has been placed. We will send you an email confirmation shortly.",
   thank_you_desert_message: "Your piece of the desert is being prepared with care and will be with you shortly.",
   order_status: "Order Status",

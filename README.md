@@ -127,10 +127,12 @@ Then open http://127.0.0.1:3002 (customer) and http://127.0.0.1:5174 (admin). Th
 
 ## Stock reservation
 
-- **Order created (paid)**: Creates `StockReservation` per item, increments `product.stock_reserved`
-- **Order shipped**: Deactivates reservations, decrements `product.stock_quantity` and `product.stock_reserved`
-- **Order cancelled**: Deactivates reservations, decrements `product.stock_reserved` only
-- **stock_net** = `stock_quantity` (gross) − `stock_reserved` (available to sell)
+Stock lives on **ProductChild** (variant/size), not on the parent product.
+
+- **Order created (paid)**: Creates `StockReservation` per item, increments the **child’s** `stock_reserved`
+- **Order shipped**: Deactivates reservations, decrements the **child’s** `stock_quantity` and `stock_reserved`
+- **Order cancelled**: Deactivates reservations, decrements the **child’s** `stock_reserved` only
+- **stock_net** = `stock_quantity` (gross) − `stock_reserved` (available to sell), per child
 
 ---
 
