@@ -8,7 +8,7 @@ Cross-platform shopping app (Web, iOS, Android) built with React Native + Expo.
 npm install
 ```
 
-Optional: set `EXPO_PUBLIC_API_URL` in `.env` (default: `http://localhost:8000/v1`). Must point at the Customer API base URL including the `/v1` prefix.
+Optional: set `EXPO_PUBLIC_API_URL` in `.env` (default: `http://127.0.0.1:8000/v1`). Must point at the Customer API base URL including the `/v1` prefix. **Use `127.0.0.1` only—not `localhost`** (localhost can resolve to IPv6 on macOS and break connections). The app normalizes localhost to 127.0.0.1 at runtime if needed.
 
 ## Run
 

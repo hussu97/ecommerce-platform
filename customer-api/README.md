@@ -20,12 +20,12 @@ cp .env.example .env       # optional; defaults use sqlite+aiosqlite:///./ecomme
 python3 -m uvicorn app.main:app --reload
 ```
 
-API: http://localhost:8000 (docs: http://localhost:8000/docs). The API is mounted at `/v1`; frontends use `http://localhost:8000/v1` as the base URL.
+API: http://127.0.0.1:8000 (docs: http://127.0.0.1:8000/docs). The API is mounted at `/v1`; frontends use `http://127.0.0.1:8000/v1` as the base URL. Use 127.0.0.1 if localhost fails (e.g. IPv6 on macOS).
 
 ## API docs
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
 ## Endpoints
 

@@ -3,20 +3,33 @@ import { getVisitorId } from "./visitor";
 
 // Browser: use /api (Next.js rewrites to backend). Server (SSR): use BACKEND_ORIGIN in Docker or localhost.
 // NEXT_PUBLIC_API_URL overrides when set (must end with /v1 for full URL).
+// Avoid mixed content: if page is HTTPS and API URL is HTTP, use /api so the request goes same-origin.
 function getBaseURL(): string {
   const isBrowser = typeof window !== "undefined";
   const backendOrigin = process.env.BACKEND_ORIGIN;
   const publicUrl = process.env.NEXT_PUBLIC_API_URL;
   let raw: string;
-  if (publicUrl) {
+  if (publicUrl && isBrowser) {
+    const pageProto = typeof window !== "undefined" ? window.location?.protocol?.toLowerCase() : "";
+    const apiIsHttp = publicUrl.toLowerCase().startsWith("http://");
+    if (pageProto === "https:" && apiIsHttp) {
+      raw = "/api";
+    } else {
+      raw = publicUrl;
+    }
+  } else if (publicUrl) {
     raw = publicUrl;
   } else if (isBrowser) {
     raw = "/api";
   } else {
-    raw = backendOrigin ? `${backendOrigin}/v1` : "http://localhost:8000/v1";
+    raw = backendOrigin ? `${backendOrigin}/v1` : "http://127.0.0.1:8000/v1";
   }
   if (raw.startsWith("http") && !raw.replace(/\/$/, "").endsWith("/v1")) {
-    return raw.replace(/\/?$/, "") + "/v1";
+    raw = raw.replace(/\/?$/, "") + "/v1";
+  }
+  // Avoid localhost resolving to IPv6 (::1) on macOS; use 127.0.0.1 for connection URLs
+  if (raw.startsWith("http") && raw.includes("localhost")) {
+    raw = raw.replace(/localhost/g, "127.0.0.1");
   }
   return raw;
 }

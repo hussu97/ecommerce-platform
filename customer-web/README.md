@@ -8,7 +8,7 @@ Next.js customer web app. Browsing, cart, checkout, orders, profile.
 npm install
 ```
 
-Optional: set `NEXT_PUBLIC_API_URL` in `.env.local`. Unset = `/api` (Next.js rewrites to the backend). If you use a full URL (e.g. `http://localhost:8000`), it must include `/v1` or the app will append it. The app talks to the Customer API; auth headers are sent from the same origin.
+Optional: set `NEXT_PUBLIC_API_URL` in `.env.local`. Unset = `/api` (Next.js rewrites to the backend). If you use a full URL (e.g. `http://127.0.0.1:8000`), it must include `/v1` or the app will append it. **Use `127.0.0.1` only—not `localhost`** (localhost can resolve to IPv6 on macOS and break connections). Restart the dev server after changing `.env.local`. The app talks to the Customer API; auth headers are sent from the same origin.
 
 ## Run
 
@@ -28,7 +28,7 @@ Optional: set `NEXT_PUBLIC_API_URL` in `.env.local`. Unset = `/api` (Next.js rew
    npm run dev
    ```
 
-3. Open http://localhost:3000
+3. Open http://127.0.0.1:3000
 
 ## Features
 

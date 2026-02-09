@@ -89,22 +89,22 @@ npm run android     # Android emulator
 | customer-api | `SECRET_KEY` | (change in production) |
 | admin-api | `DATABASE_URL` | Same as customer-api |
 | admin-api | `SECRET_KEY` | Same as customer-api |
-| customer-web | `NEXT_PUBLIC_API_URL` | `http://localhost:8000/v1` |
-| customer-web | `NEXT_PUBLIC_ADMIN_URL` | `http://localhost:5173` |
+| customer-web | `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8000/v1` (or unset to use `/api` rewrites) |
+| customer-web | `NEXT_PUBLIC_ADMIN_URL` | `http://127.0.0.1:5173` |
 | admin-web | `VITE_API_URL` | `/api` (proxied to 8001/v1) |
-| shop | `EXPO_PUBLIC_API_URL` | `http://localhost:8000/v1` |
+| shop | `EXPO_PUBLIC_API_URL` | `http://127.0.0.1:8000/v1` |
 
 ---
 
 ## Docker Compose
 
-Run the full stack (APIs, customer-web, admin-web, bulk-import worker) in containers:
+Run the full stack (APIs, customer-web, admin-web, bulk-import worker) in containers. Docker uses **different host ports** (3002, 5174, 8002, 8003) so local dev (3000, 5173, 8000, 8001) can run in parallel—see [ARCHITECTURE.md](ARCHITECTURE.md) “Ports”.
 
 ```bash
 docker compose up --build
 ```
 
-Then open http://localhost:3000 (customer) and http://localhost:5173 (admin). The **Shop** app runs on the host: `cd shop && npm start`. See [docs/DOCKER.md](docs/DOCKER.md).
+Then open http://127.0.0.1:3002 (customer) and http://127.0.0.1:5174 (admin). The **Shop** app runs on the host: `cd shop && npm start` and should use `EXPO_PUBLIC_API_URL=http://127.0.0.1:8002/v1` to reach the Docker customer-api. See [docs/DOCKER.md](docs/DOCKER.md). For local vs Docker and macOS/Windows, see [ARCHITECTURE.md](ARCHITECTURE.md) (“Running: local vs Docker”).
 
 ---
 

@@ -2,7 +2,17 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getVisitorId } from "./visitor";
 
-const baseURL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000/v1";
+// Use 127.0.0.1 so connections hit IPv4; localhost can resolve to ::1 and fail on macOS.
+// Normalize at runtime so even if .env sets EXPO_PUBLIC_API_URL to localhost, we use 127.0.0.1.
+function getBaseURL(): string {
+  const raw = process.env.EXPO_PUBLIC_API_URL || "http://127.0.0.1:8000/v1";
+  if (raw.includes("localhost")) {
+    return raw.replace(/localhost/g, "127.0.0.1");
+  }
+  return raw;
+}
+
+const baseURL = getBaseURL();
 
 const api = axios.create({
   baseURL,

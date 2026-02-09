@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:5173";
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || "http://127.0.0.1:5173";
 
 export default function AdminRedirect() {
   useEffect(() => {

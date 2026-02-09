@@ -29,7 +29,7 @@ cd customer-api && python3 ensure_admin.py
 python3 -m uvicorn app.main:app --reload --port 8001
 ```
 
-API: http://localhost:8001 (docs: http://localhost:8001/docs). Base path is `/v1`; admin-web proxies `/api` to this.
+API: http://127.0.0.1:8001 (docs: http://127.0.0.1:8001/docs). Base path is `/v1`; admin-web proxies `/api` to this. Use 127.0.0.1 if localhost fails (e.g. IPv6 on macOS).
 
 ## Bulk Import Worker
 

@@ -1,6 +1,6 @@
 # Running with Docker Compose
 
-Run the full stack (APIs, frontends, bulk-import worker) in containers with a shared SQLite DB and uploads volume.
+Run the full stack (APIs, frontends, bulk-import worker) in containers with a shared SQLite DB and uploads volume. **Host ports are chosen so local dev and Docker can run in parallel** (see [ARCHITECTURE.md](../ARCHITECTURE.md) “Ports”).
 
 ## Prerequisites
 
@@ -13,22 +13,32 @@ Run the full stack (APIs, frontends, bulk-import worker) in containers with a sh
 docker compose up --build
 ```
 
-- **Customer Web**: http://localhost:3000 (proxies `/api` to customer-api)
-- **Admin Web**: http://localhost:5173 (proxies `/api` to admin-api)
-- **Customer API**: http://localhost:8000 (docs: http://localhost:8000/docs)
-- **Admin API**: http://localhost:8001 (docs: http://localhost:8001/docs)
+- **Customer Web**: http://127.0.0.1:3002 (proxies `/api` to customer-api)
+- **Admin Web**: http://127.0.0.1:5174 (proxies `/api` to admin-api)
+- **Customer API**: http://127.0.0.1:8002 (docs: http://127.0.0.1:8002/docs)
+- **Admin API**: http://127.0.0.1:8003 (docs: http://127.0.0.1:8003/docs)
+
+## Ports (Docker published)
+
+| Service | Host port | Container port | Notes |
+|---------|-----------|----------------|-------|
+| customer-api | 8002 | 8000 | Local dev uses 8000 |
+| admin-api | 8003 | 8001 | Local dev uses 8001 |
+| customer-web | 3002 | 3000 | Local dev uses 3000 |
+| admin-web | 5174 | 5173 | Local dev uses 5173 |
+| redis | 6379 | 6379 | Optional (profile `with-redis`) |
 
 ## Services
 
-| Service | Image | Port | Description |
-|---------|--------|------|-------------|
-| customer-api | build ./customer-api | 8000 | Customer-facing API |
-| admin-api | build ./admin-api | 8001 | Admin API (products, orders, taxonomies, bulk upload) |
-| bulk-import-worker | same as admin-api | - | Polls for bulk uploads, processes xlsx/csv/tsv |
-| init | same as customer-api | - | One-time: seeds DB (admin + sample data); exits |
-| customer-web | build ./customer-web | 3000 | Next.js customer app |
-| admin-web | build ./admin-web | 5173 | Vite admin dashboard |
-| redis | redis:7-alpine | 6379 | Optional (profile `with-redis`) |
+| Service | Image | Description |
+|---------|--------|-------------|
+| customer-api | build ./customer-api | Customer-facing API |
+| admin-api | build ./admin-api | Admin API (products, orders, taxonomies, bulk upload) |
+| bulk-import-worker | same as admin-api | Polls for bulk uploads, processes xlsx/csv/tsv |
+| init | same as customer-api | One-time: seeds DB (admin + sample data); exits |
+| customer-web | build ./customer-web | Next.js customer app |
+| admin-web | build ./admin-web | Vite admin dashboard |
+| redis | redis:7-alpine | Optional (profile `with-redis`) |
 
 ## Database and volumes
 
@@ -62,9 +72,11 @@ npm install
 npm start
 ```
 
-Point `EXPO_PUBLIC_API_URL` to `http://localhost:8000/v1` so it talks to the customer-api running in Docker.
+Point `EXPO_PUBLIC_API_URL` to `http://127.0.0.1:8002/v1` so it talks to the customer-api running in Docker (Docker publishes customer-api on host port 8002).
 
 ## Environment overrides
+
+For customer-web in Docker, the "Admin" link points to the default admin URL (port 5173). If you use only the Docker stack, set `NEXT_PUBLIC_ADMIN_URL=http://127.0.0.1:5174` so the link opens the Docker admin-web (host port 5174).
 
 Copy `.env.docker.example` to `.env` and set any overrides. Then:
 
@@ -74,6 +86,7 @@ docker compose --env-file .env up --build
 
 ## Troubleshooting
 
-- **Frontend can’t reach API**: Ensure you open the app at http://localhost:3000 (customer-web) or http://localhost:5173 (admin-web). The browser sends requests to those origins; the Next/Vite servers inside the container proxy `/api` to the backend service.
+- **Frontend can’t reach API**: Open the app at http://127.0.0.1:3002 (customer-web) or http://127.0.0.1:5174 (admin-web). The Next/Vite servers inside the container proxy `/api` to the backend. If requests fail when using localhost, use `127.0.0.1` in env vars and in the browser (macOS may resolve localhost to IPv6).
+- **Port already in use**: Docker uses host ports 8002, 8003, 3002, 5174 so local dev (8000, 8001, 3000, 5173) can run at the same time. If you see “address already in use”, another process is using that port; stop it or see ARCHITECTURE.md “Ports”.
 - **Init fails**: Check logs with `docker compose logs init`. Ensure customer-api is healthy first (`docker compose ps`).
 - **Re-seed**: Run `docker compose down -v` to remove volumes, then `docker compose up --build` to start fresh and run init again.

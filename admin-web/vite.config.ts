@@ -2,7 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-const proxyTarget = process.env.VITE_PROXY_TARGET || "http://localhost:8001";
+// Use 127.0.0.1 so proxy works when localhost resolves to IPv6 (e.g. macOS)
+const proxyTarget = process.env.VITE_PROXY_TARGET || "http://127.0.0.1:8001";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

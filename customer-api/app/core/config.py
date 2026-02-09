@@ -24,14 +24,20 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     
-    # CORS (allow localhost and 127.0.0.1 - browsers treat these as different origins)
+    # CORS (allow localhost and 127.0.0.1 - http and https so dev with HTTPS works)
     BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://localhost:3000",
+        "https://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "https://localhost:3001",
+        "https://127.0.0.1:3001",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://localhost:5173",
+        "https://127.0.0.1:5173",
     ]
     
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")

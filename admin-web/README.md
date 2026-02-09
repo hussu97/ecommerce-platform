@@ -8,7 +8,7 @@ Desktop-only admin dashboard (React + Vite + Tailwind). Manages products, orders
 npm install
 ```
 
-Optional: set `VITE_API_URL` in `.env`. When running locally, the dev server proxies `/api` to `http://localhost:8001/v1` by default (see `vite.config.ts`).
+Optional: set `VITE_API_URL` in `.env`. When running locally, the dev server proxies `/api` to `http://127.0.0.1:8001/v1` by default (see `vite.config.ts`).
 
 ## Run
 
@@ -29,4 +29,4 @@ Optional: set `VITE_API_URL` in `.env`. When running locally, the dev server pro
    npm run dev
    ```
 
-3. Open http://localhost:5173 and log in with admin credentials (e.g. `admin@example.com` / `admin123`).
+3. Open http://127.0.0.1:5173 and log in with admin credentials (e.g. `admin@example.com` / `admin123`).
