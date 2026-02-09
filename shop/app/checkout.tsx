@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, View, ActivityIndicator } from "react-native";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
@@ -39,8 +39,13 @@ export default function CheckoutScreen() {
   const [contactName, setContactName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const idempotencyKeyRef = useRef<string | null>(null);
 
   const total = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
+
+  function generateIdempotencyKey(): string {
+    return `idem-${Date.now()}-${Math.random().toString(36).slice(2, 15)}`;
+  }
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -93,16 +98,23 @@ export default function CheckoutScreen() {
     }
     setLoading(true);
     try {
-      const { data: order } = await api.post<{ id: number }>("/orders/", {
-        items: items.map((i) => ({
-          product_slug: i.product.slug ?? i.product.id,
-          child_code: i.child?.code ?? "",
-          quantity: i.quantity,
-          price_at_purchase: i.product.price,
-        })),
-        total_amount: total,
-        address_code: addressCodeToUse,
-      });
+      if (!idempotencyKeyRef.current) idempotencyKeyRef.current = generateIdempotencyKey();
+      const key = idempotencyKeyRef.current;
+      const { data: order } = await api.post<{ id: number }>(
+        "/orders/",
+        {
+          items: items.map((i) => ({
+            product_slug: i.product.slug ?? i.product.id,
+            child_code: i.child?.code ?? "",
+            quantity: i.quantity,
+            price_at_purchase: i.product.price,
+          })),
+          total_amount: total,
+          address_code: addressCodeToUse,
+        },
+        { headers: { "Idempotency-Key": key } }
+      );
+      idempotencyKeyRef.current = null;
       await clearCart();
       router.replace(`/order-confirmation?id=${order.id}`);
     } catch (err: unknown) {

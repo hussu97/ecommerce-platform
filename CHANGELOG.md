@@ -6,6 +6,7 @@ All notable changes are recorded here only. Use format: `## YYYY-MM-DD` for the 
 
 ## [Unreleased]
 
+- **Idempotency, retries, timeouts:** Idempotency keys for order creation and payment intents (customer-api: `idempotency_keys` table, Idempotency-Key header; customer-web and shop send key on checkout). Structured retries with backoff for Stripe (tenacity, customer-api). Request timeouts: DB connect timeout (customer-api, admin-api), Stripe call timeout (customer-api), axios 30s (customer-web, admin-web; shop already had it). (customer-api, admin-api, customer-web, admin-web, shop)
 - **Shop pull-to-refresh:** Home, Cart, and Orders screens support pull-from-top refresh on iOS/Android via RefreshControl; full-screen loader only on initial load when list is empty. (shop)
 - **Seed: 5 single-sized + 5 multi-sized products:** PRODUCTS extended with optional 11th element `children_spec`; single-sized keep one child with `single_size`; 5 new multi-sized products (Fashion/Outdoors) have multiple ProductChild rows with size_value S/M/L/XL, barcode, and stock. (customer-api)
 - **customer-web API 404 fix:** Normalize `NEXT_PUBLIC_API_URL` so full URLs (e.g. `http://localhost:8000`) get `/v1` appended; requests then hit `/v1/i18n`, `/v1/products`, `/v1/cart` correctly. Updated .env.example and README for API URL. (customer-web)

@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./ecommerce.db"
     # For PostgreSQL, use: postgresql+asyncpg://user:password@localhost/dbname
+    DB_CONNECT_TIMEOUT: int = 30  # seconds (SQLite busy timeout; asyncpg: use connection_timeout in connect_args)
+    
+    # Outbound request timeouts
+    STRIPE_REQUEST_TIMEOUT: int = 30  # seconds per Stripe API call
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-this-in-production"

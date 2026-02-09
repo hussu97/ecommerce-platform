@@ -1,5 +1,5 @@
 ---
-description: Conventions, frontend parity (customer-web & shop), post-task checks (incl. NEXT_TODO status updates), and changelog.
+description: Conventions, frontend parity (customer-web & shop), post-task checks (incl. commit, NEXT_TODO, changelog).
 alwaysApply: true
 ---
 
@@ -50,6 +50,17 @@ Feature checklist (keep in sync): Search, category & brand & attribute filters w
 4. **NEXT_TODO.md**: When changes implement or partially implement a feature or task listed in [NEXT_TODO.md](ecommerce-platform/NEXT_TODO.md), update that task’s status in the file: set status to ✅ (Implemented) or 🔶 (Partial), and if partial, add or adjust the *Current:* note to describe what exists. If the change completes a previously partial item, upgrade to ✅ and remove the *Current:* note. Optionally add a one-line entry to the “Changelog (Implemented)” table at the bottom of NEXT_TODO.md.
 5. **Design tokens**: If the change added or modified design tokens (colors, spacing, radius, typography), confirm they were updated in `packages/design-tokens` only and that consuming apps use the package (no new local token definitions).
 6. **Changelog**: Log all notable changes in [CHANGELOG.md](ecommerce-platform/CHANGELOG.md) at the repo root only. Do not maintain a separate or duplicate changelog in other files (e.g. README, NEXT_TODO). Use the format: date section `## YYYY-MM-DD` and entries as `- **Topic:** Short description. (scope).` One to two lines per entry; include the area(s) affected (e.g. admin-api, customer-web, shop).
+7. **Commit**: Whenever changes are made to the system, commit them with a well-written commit message. Use a short subject line (about 50 chars); optionally add a blank line and a body that briefly explains what changed and why. Group related changes in one commit; mention the main areas (e.g. shop, customer-api) so the history stays clear.
+
+Example commit message:
+
+```
+Shop pull-to-refresh, cart API fix, seed 5+5 products
+
+- Shop: pull-to-refresh on Home, Cart, Orders
+- Customer-api: cart eager-load category_rel; seed 5 single + 5 multi-sized products
+- Changelog and README updates
+```
 
 Example CHANGELOG.md entry:
 

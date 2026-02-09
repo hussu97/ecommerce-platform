@@ -28,6 +28,7 @@ Both `customer-api` and `admin-api` use the same SQLite database. Set `admin-api
 - **ProductReview** – Reviews linked to order items
 - **CartItem** – Guest (X-Visitor-ID) or logged-in; required product_child_id (cart always references a child)
 - **StockReservation** – Required product_child_id; reservations target a child
+- **IdempotencyKey** – (idempotency_key, user_id) → order_id for idempotent order creation (optional header `Idempotency-Key` on POST `/orders/`)
 
 ## API Endpoints (Customer API)
 

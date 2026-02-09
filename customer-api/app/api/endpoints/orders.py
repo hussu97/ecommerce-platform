@@ -1,9 +1,10 @@
+import asyncio
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from typing import List
+from typing import List, Optional
 from app.db.session import get_db
 from app.core.config import settings
 from app.core.deps import get_current_active_user
@@ -14,20 +15,29 @@ from app.models.product import Product
 from app.models.product_child import ProductChild
 from app.models.customer_address import CustomerAddress
 from app.models.stock_reservation import StockReservation
+from app.models.idempotency_key import IdempotencyKey
 from app.schemas.order import OrderCreate, OrderResponse, OrderItemResponse, OrderItemProductSchema, OrderItemReviewSchema, PaymentIntentCreate
 from app.schemas.review import ReviewCreate, ReviewResponse
+from app.core.retry import stripe_create_with_retry
 
 router = APIRouter()
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
+def _get_idempotency_key(request: Request) -> Optional[str]:
+    """Read Idempotency-Key or X-Idempotency-Key header."""
+    key = request.headers.get("Idempotency-Key") or request.headers.get("X-Idempotency-Key")
+    return key.strip() if key and isinstance(key, str) else None
+
+
 @router.post("/create-payment-intent")
 async def create_payment_intent(
     payment_data: PaymentIntentCreate,
+    request: Request,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Create a Stripe Payment Intent."""
+    """Create a Stripe Payment Intent. Accepts Idempotency-Key header for idempotent creation."""
     try:
         if payment_data.amount <= 0:
             raise HTTPException(status_code=400, detail="Amount must be positive")
@@ -35,13 +45,25 @@ async def create_payment_intent(
         if settings.STRIPE_SECRET_KEY.startswith("sk_test_4eC39") or "placeholder" in settings.STRIPE_SECRET_KEY:
             return {"client_secret": "mock_secret_for_testing"}
 
-        intent = stripe.PaymentIntent.create(
-            amount=int(payment_data.amount * 100),
-            currency="usd",
-            automatic_payment_methods={"enabled": True},
-            metadata={"user_id": current_user.id, "email": current_user.email}
+        idem_key = _get_idempotency_key(request)
+
+        def _create_intent():
+            kwargs = {
+                "amount": int(payment_data.amount * 100),
+                "currency": "usd",
+                "automatic_payment_methods": {"enabled": True},
+                "metadata": {"user_id": current_user.id, "email": current_user.email},
+            }
+            if idem_key:
+                kwargs["idempotency_key"] = idem_key
+            return stripe.PaymentIntent.create(**kwargs)
+        intent = await asyncio.wait_for(
+            asyncio.to_thread(lambda: stripe_create_with_retry(_create_intent)),
+            timeout=settings.STRIPE_REQUEST_TIMEOUT,
         )
         return {"client_secret": intent.client_secret}
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Payment service request timed out")
     except Exception as e:
         print(f"Stripe Error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -54,7 +76,38 @@ async def create_order(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    """Create a new order and reserve stock. Each item requires child_code (product variant)."""
+    """Create a new order and reserve stock. Each item requires child_code (product variant). Accepts Idempotency-Key header."""
+    idem_key = _get_idempotency_key(request)
+    if idem_key:
+        existing = await db.execute(
+            select(IdempotencyKey).where(
+                IdempotencyKey.idempotency_key == idem_key,
+                IdempotencyKey.user_id == current_user.id,
+            )
+        )
+        row = existing.scalar_one_or_none()
+        if row:
+            # Return existing order (idempotent)
+            from app.models.product_review import ProductReview
+            result = await db.execute(
+                select(Order)
+                .where(Order.id == row.order_id)
+                .options(
+                    selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.category_rel),
+                    selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.brand_rel),
+                )
+            )
+            order = result.scalar_one_or_none()
+            if order:
+                items_with_product = {order.id: [(oi, oi.product) for oi in (order.items or [])]}
+                oi_ids = [oi.id for oi in (order.items or [])]
+                reviews_result = await db.execute(
+                    select(ProductReview).where(ProductReview.order_item_id.in_(oi_ids))
+                )
+                review_map = {r.order_item_id: r for r in reviews_result.scalars().all()}
+                return _build_order_response(order, items_with_product, review_map)
+            raise HTTPException(status_code=409, detail="Order was previously created but is no longer available")
+
     # 1. Resolve products and children, validate stock on child
     products_by_slug = {}
     children_by_key = {}  # (product_id, child_code) -> ProductChild
@@ -150,6 +203,12 @@ async def create_order(
         db.add(reservation)
         child.stock_reserved = (child.stock_reserved or 0) + item.quantity
 
+    if idem_key:
+        db.add(IdempotencyKey(
+            idempotency_key=idem_key,
+            user_id=current_user.id,
+            order_id=new_order.id,
+        ))
     await log_audit_from_request(db, request, "order.create", "order", str(new_order.id), current_user.id, 201)
     await db.commit()
     # Re-fetch with relationships loaded so response serialization doesn't trigger lazy load

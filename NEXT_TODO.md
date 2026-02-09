@@ -113,10 +113,10 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
-| ⬜ | **Idempotency for Orders / Payment** | Idempotency keys for order creation and payment intent to avoid duplicates on retry. | Medium |
+| ✅ | **Idempotency for Orders / Payment** | Idempotency keys for order creation and payment intent to avoid duplicates on retry. | Medium |
 | ⬜ | **Health & Readiness Probes** | Differentiate liveness vs readiness (e.g. DB connectivity); use in Docker/Kubernetes. | Low |
-| ⬜ | **Structured Retries** | Retry with backoff for DB and external calls (e.g. payment, email). | Low–Medium |
-| ⬜ | **Request Timeouts** | Consistent timeouts on outbound HTTP and DB calls. | Low |
+| ✅ | **Structured Retries** | Retry with backoff for DB and external calls (e.g. payment, email). | Low–Medium |
+| ✅ | **Request Timeouts** | Consistent timeouts on outbound HTTP and DB calls. | Low |
 | ⬜ | **Circuit Breaker (Optional)** | For external services (payment, email) to fail fast when unhealthy. | Medium |
 
 ---
@@ -170,6 +170,7 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 
 | Date | Change |
 |------|--------|
+| 2025-02-09 | **Idempotency, retries, timeouts:** Idempotency keys for orders and payment intents (table, header); Stripe retries with tenacity; DB and Stripe timeouts; frontend axios 30s. |
 | 2025-02-09 | **Loading and transition consistency:** PageLoader, ProductCardSkeleton, PdpSkeleton (customer-web); TableSkeleton, PageLoader (admin-web); FullScreenLoader, ProductCardSkeleton (shop). Skeleton for product grid, PDP, tables; spinner for full-page/inline. Button/card transitions (active:scale, duration-500). DESIGN_TEMPLATE.md and rules updated. |
 | 2025-02-09 | **Design tokens single source:** Added `packages/design-tokens` with `tokens.json`, codegen for `dist/theme.css`, and JS export. Root npm workspaces; customer-web and admin-web import theme CSS; shop uses package in `constants/Colors.ts`. Rule added: token changes only in `packages/design-tokens`. |
 | 2025-02-09 | **NEXT_TODO audit:** Added implementation status (✅/🔶/⬜) to all existing items. Classified: Product Search (partial – name ILIKE), Order Tracking (partial – status only), Dashboard (partial – counts only), Bulk Ops (partial – import done), Order Fulfillment (partial – status + stock), Background Jobs (partial – bulk worker), a11y (partial), Error Boundaries (partial – Shop only), Docker Compose (done). Expanded list with new sections: Additional Features, Optimizations, Scalability & Reliability, Security Hardening, Design System & UI/UX, Architectural. |

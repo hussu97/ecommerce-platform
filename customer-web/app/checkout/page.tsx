@@ -19,10 +19,12 @@ function CheckoutForm({
   clientSecret,
   addressCode,
   total,
+  idempotencyKey,
 }: {
   clientSecret: string;
   addressCode: string;
   total: number;
+  idempotencyKey: string;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -47,16 +49,21 @@ function CheckoutForm({
       setProcessing(false);
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
       try {
-        const orderRes = await api.post("/orders/", {
-          items: items.map((item) => ({
-            product_slug: item.product.slug ?? item.product.id,
-            child_code: item.child?.code ?? "",
-            quantity: item.quantity,
-            price_at_purchase: item.product.price,
-          })),
-          total_amount: total,
-          address_code: addressCode,
-        });
+        const headers = idempotencyKey ? { "Idempotency-Key": idempotencyKey } : undefined;
+        const orderRes = await api.post(
+          "/orders/",
+          {
+            items: items.map((item) => ({
+              product_slug: item.product.slug ?? item.product.id,
+              child_code: item.child?.code ?? "",
+              quantity: item.quantity,
+              price_at_purchase: item.product.price,
+            })),
+            total_amount: total,
+            address_code: addressCode,
+          },
+          headers ? { headers } : {}
+        );
 
         await clearCart();
         const orderId = orderRes?.data?.id;
@@ -107,6 +114,7 @@ export default function CheckoutPage() {
   const t = useI18nStore((s) => s.t);
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
+  const [idempotencyKey, setIdempotencyKey] = useState<string>("");
   const [step, setStep] = useState(1);
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
   const [addressesLoading, setAddressesLoading] = useState(true);
@@ -175,10 +183,14 @@ export default function CheckoutPage() {
     if (!addressCodeToUse) return;
 
     try {
+      const key = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "";
+      setIdempotencyKey(key);
       const totalAmount = getCartTotal() + (addresses.find((a) => a.address_code === addressCodeToUse)?.country === "United Arab Emirates" || inlineAddress.country === "United Arab Emirates" ? 0 : shippingCost);
-      const response = await api.post("/orders/create-payment-intent", {
-        amount: totalAmount,
-      });
+      const response = await api.post(
+        "/orders/create-payment-intent",
+        { amount: totalAmount },
+        key ? { headers: { "Idempotency-Key": key } } : {}
+      );
       const secret = response.data?.client_secret ?? "mock_secret_for_testing";
       setClientSecret(secret);
       setSelectedAddressCode(addressCodeToUse);
@@ -430,17 +442,22 @@ export default function CheckoutPage() {
                   onClick={async () => {
                     if (!selectedAddressCode) return;
                     try {
+                      const key = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "";
                       const { items: cartItems, clearCart } = useCartStore.getState();
-                      const orderRes = await api.post("/orders/", {
-                        items: cartItems.map((item) => ({
-                          product_slug: item.product.slug ?? item.product.id,
-                          child_code: item.child?.code ?? "",
-                          quantity: item.quantity,
-                          price_at_purchase: item.product.price,
-                        })),
-                        total_amount: total,
-                        address_code: selectedAddressCode,
-                      });
+                      const orderRes = await api.post(
+                        "/orders/",
+                        {
+                          items: cartItems.map((item) => ({
+                            product_slug: item.product.slug ?? item.product.id,
+                            child_code: item.child?.code ?? "",
+                            quantity: item.quantity,
+                            price_at_purchase: item.product.price,
+                          })),
+                          total_amount: total,
+                          address_code: selectedAddressCode,
+                        },
+                        key ? { headers: { "Idempotency-Key": key } } : {}
+                      );
                       await clearCart();
                       const orderId = orderRes?.data?.id;
                       router.push(orderId ? `/orders/success?order_id=${orderId}` : "/orders/success");
@@ -463,6 +480,7 @@ export default function CheckoutPage() {
                     clientSecret={clientSecret}
                     addressCode={selectedAddressCode!}
                     total={total}
+                    idempotencyKey={idempotencyKey}
                   />
                 </Elements>
               </div>
