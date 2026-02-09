@@ -12,11 +12,9 @@ The monorepo is initialized and the initial commit is done. To upload to GitHub:
 
 ## 2. Add remote and push
 
-Replace `YOUR_USERNAME` with your GitHub username:
-
 ```bash
 cd /Users/hussainabbasi/Documents/GitHub/ecommerce-platform
-git remote add origin https://github.com/YOUR_USERNAME/ecommerce-platform.git
+git remote add origin https://github.com/hussu97/ecommerce-platform.git
 git branch -M main
 git push -u origin main
 ```
@@ -24,7 +22,7 @@ git push -u origin main
 If using SSH instead:
 
 ```bash
-git remote add origin git@github.com:YOUR_USERNAME/ecommerce-platform.git
+git remote add origin git@github.com:hussu97/ecommerce-platform.git
 git branch -M main
 git push -u origin main
 ```
