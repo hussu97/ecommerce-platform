@@ -31,6 +31,17 @@ python3 -m uvicorn app.main:app --reload --port 8001
 
 API docs: http://localhost:8001/docs
 
+## Bulk Import Worker
+
+For async bulk product uploads, run the worker in a separate terminal:
+
+```bash
+cd admin-api
+python -m app.workers.bulk_import
+```
+
+The worker polls for pending uploads every 5 seconds, parses xlsx/csv/tsv files, and creates products. Ensure `DATABASE_URL` and `STORAGE_PATH` (default: `./uploads`) are set.
+
 ## Endpoints
 
 - `POST /auth/login` – Admin login (requires `is_superuser`)
@@ -44,3 +55,6 @@ API docs: http://localhost:8001/docs
 - `GET /taxonomies` – List taxonomies
 - `GET /brands` – List brands
 - `GET /taxonomy-attributes` – List taxonomy attributes
+- `GET /products/bulk/template/{taxonomy_id}` – Download bulk product template (xlsx/csv/tsv)
+- `POST /products/bulk/upload` – Upload file for bulk import (multipart: file, taxonomy_id)
+- `GET /products/bulk/uploads` – List bulk upload jobs and status

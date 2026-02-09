@@ -17,6 +17,9 @@ node_modules/
 dist/
 build/
 
+# Bulk upload storage
+uploads/
+
 # IDE / misc
 .idea/
 .DS_Store

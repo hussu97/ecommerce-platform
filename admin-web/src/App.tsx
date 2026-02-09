@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ProductsPage } from "./pages/ProductsPage";
+import { BulkUploadsPage } from "./pages/BulkUploadsPage";
 import { BrandsPage } from "./pages/BrandsPage";
 import { TaxonomiesPage } from "./pages/TaxonomiesPage";
 import { TaxonomyAttributesPage } from "./pages/TaxonomyAttributesPage";
@@ -30,6 +31,7 @@ export default function App() {
         >
           <Route index element={<DashboardPage />} />
           <Route path="products" element={<ProductsPage />} />
+          <Route path="products/bulk" element={<BulkUploadsPage />} />
           <Route path="brands" element={<BrandsPage />} />
           <Route path="taxonomies" element={<TaxonomiesPage />} />
           <Route path="taxonomy-attributes" element={<TaxonomyAttributesPage />} />

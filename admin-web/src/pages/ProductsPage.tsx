@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import api from "../lib/api";
-import { Plus, Pencil, Trash2, X, Globe } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Globe, Upload, Download } from "lucide-react";
 
 interface Taxonomy {
   id: number;
@@ -69,6 +70,10 @@ export function ProductsPage() {
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
+  const [bulkTaxonomyId, setBulkTaxonomyId] = useState<number | null>(null);
+  const [bulkUploadStatus, setBulkUploadStatus] = useState<string | null>(null);
+  const bulkFileRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyProduct);
 
@@ -200,13 +205,107 @@ export function ProductsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="font-display text-3xl font-bold text-text-primary">Products</h1>
-        <button
-          onClick={() => setShowAdd(!showAdd)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
-        >
-          <Plus className="h-5 w-5" /> Add Product
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/products/bulk"
+            className="flex items-center gap-2 px-4 py-2.5 border border-sand-divider rounded-xl font-medium text-text-primary hover:bg-sand-divider/30 transition-colors"
+          >
+            <Upload className="h-5 w-5" /> Bulk uploads
+          </Link>
+          <button
+            onClick={() => { setShowBulk(false); setShowAdd(!showAdd); }}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+          >
+            <Plus className="h-5 w-5" /> Add Product
+          </button>
+          <button
+            onClick={() => { setShowAdd(false); setShowBulk(!showBulk); setBulkUploadStatus(null); }}
+            className="flex items-center gap-2 px-4 py-2.5 border border-sand-divider rounded-xl font-medium text-text-primary hover:bg-sand-divider/30 transition-colors"
+          >
+            <Upload className="h-5 w-5" /> Bulk upload
+          </button>
+        </div>
       </div>
+
+      {showBulk && (
+        <div className="mb-6 bg-white rounded-2xl border border-sand-divider p-6 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-display text-lg font-semibold text-text-primary">Bulk Upload Products</h2>
+            <button onClick={() => setShowBulk(false)} className="text-text-muted hover:text-text-primary">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-muted mb-1">Taxonomy (category)</label>
+              <select
+                value={bulkTaxonomyId ?? ""}
+                onChange={(e) => setBulkTaxonomyId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                className="w-full px-4 py-2 border border-sand-divider rounded-xl bg-white text-text-primary focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                <option value="">— Select taxonomy —</option>
+                {taxonomies.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end gap-2">
+              <button
+                disabled={!bulkTaxonomyId}
+                onClick={async () => {
+                  if (!bulkTaxonomyId) return;
+                  try {
+                    const r = await api.get(`/products/bulk/template/${bulkTaxonomyId}?format=xlsx`, { responseType: "blob" });
+                    const blob = new Blob([r.data], { type: r.headers["content-type"] });
+                    const u = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = u;
+                    a.download = `bulk_product_template_${bulkTaxonomyId}.xlsx`;
+                    a.click();
+                    URL.revokeObjectURL(u);
+                  } catch {
+                    alert("Download failed");
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 border border-sand-divider rounded-xl font-medium text-text-primary hover:bg-sand-divider/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="h-5 w-5" /> Download template
+              </button>
+            </div>
+          </div>
+          <div className="mt-4 flex items-end gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-text-muted mb-1">Upload file (xlsx, csv, tsv)</label>
+              <input
+                ref={bulkFileRef}
+                type="file"
+                accept=".xlsx,.csv,.tsv"
+                className="block w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary file:text-white file:font-medium hover:file:opacity-90"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !bulkTaxonomyId) return;
+                  try {
+                    const fd = new FormData();
+                    fd.append("file", file);
+                    fd.append("taxonomy_id", String(bulkTaxonomyId));
+                    const r = await api.post("/products/bulk/upload", fd);
+                    setBulkUploadStatus(`Upload successful. ${r.data.message} View status: `);
+                  } catch (err: unknown) {
+                    alert((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? "Upload failed");
+                  }
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          </div>
+          {bulkUploadStatus && (
+            <p className="mt-4 text-sm text-green-700">
+              {bulkUploadStatus}
+              <Link to="/products/bulk" className="font-medium underline">Bulk uploads</Link>
+            </p>
+          )}
+        </div>
+      )}
 
       {showAdd && (
         <div className="mb-6 bg-white rounded-2xl border border-sand-divider p-6 shadow-sm">

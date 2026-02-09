@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     ]
     FORCE_HTTPS_REDIRECT: bool = False
     SECURITY_HEADERS_CSP: Optional[str] = None
+    STORAGE_BACKEND: str = "local"
+    STORAGE_PATH: str = "./uploads"
 
     class Config:
         env_file = ".env"
