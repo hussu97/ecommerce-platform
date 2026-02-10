@@ -30,7 +30,7 @@ Ports are split so **local dev** and **Docker** can run in parallel without conf
 
 ## Design tokens
 
-Design tokens (colors, radius, typography) are defined in a single source: `packages/design-tokens`. The package exposes `tokens.json`, a generated `dist/theme.css` (Tailwind v4 `@theme`), and a JS export for React Native. **customer-web** and **admin-web** import `@ecommerce/design-tokens/theme.css`; **shop** imports the package and uses it in `constants/Colors.ts`. Token changes must be made only in `packages/design-tokens` (see `.cursor/rules/project-standards.mdc`). Each app may apply tokens differently for platform-appropriate UI (web vs mobile web vs app). For Docker, **customer-web** and **admin-web** images are built with the **repository root** as build context so the `packages/design-tokens` workspace package is available.
+Design tokens (colors, radius, typography) are defined in two theme files that must be kept in sync: **customer-web** `customer-web/app/theme.css` and **admin-web** `admin-web/src/theme.css`. **shop** uses the same values in `shop/constants/Colors.ts`. When changing any token, update both theme files (and shop constants if the token is used there). See `.cursor/rules/design-tokens-sync.mdc`.
 
 ## Shared Database
 

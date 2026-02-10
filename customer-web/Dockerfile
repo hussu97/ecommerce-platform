@@ -1,11 +1,10 @@
-# Build from repo root so packages/design-tokens workspace is available.
+# Build from repo root so all workspaces (customer-web, admin-web, shop) are available.
 # Use slim (Debian) instead of Alpine so Next.js sharp and other native optional deps work.
 FROM node:20-slim
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-COPY packages packages
 COPY customer-web customer-web
 COPY admin-web admin-web
 COPY shop shop

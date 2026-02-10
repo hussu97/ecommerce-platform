@@ -1,11 +1,10 @@
-# Build from repo root so packages/design-tokens workspace is available.
-# Use slim (Debian) so optional native deps in the workspace install correctly.
+# Build from repo root so all workspaces (customer-web, admin-web, shop) are available.
+# Use slim (Debian) so optional native deps install correctly.
 FROM node:20-slim
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-COPY packages packages
 COPY customer-web customer-web
 COPY admin-web admin-web
 COPY shop shop

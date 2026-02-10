@@ -1,18 +1,14 @@
-// Design tokens from single source: @ecommerce/design-tokens
-import tokens from "@ecommerce/design-tokens";
-
-const {
-  primary,
-  backgroundLight,
-  backgroundDark,
-  sandDivider,
-  textMuted,
-  surfaceLight,
-  surfaceDark,
-  borderDark,
-  textPrimary,
-  mutedDark,
-} = tokens;
+// Design tokens – keep in sync with customer-web/app/theme.css and admin-web/src/theme.css (see .cursor/rules/design-tokens-sync.mdc)
+const primary = "#ec9213";
+const backgroundLight = "#f8f7f6";
+const backgroundDark = "#221a10";
+const sandDivider = "#e5e1da";
+const textMuted = "#897961";
+const surfaceLight = "#ffffff";
+const surfaceDark = "#2d2419";
+const borderDark = "#3d3123";
+const textPrimary = "#181511";
+const mutedDark = "#c4b5a0";
 
 const tintColorLight = primary;
 const tintColorDark = primary;

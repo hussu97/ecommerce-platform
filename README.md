@@ -18,7 +18,7 @@ Monorepo for the e-commerce platform: customer-facing and admin apps, with share
 
 **Note:** `customer-web` and `shop` must stay feature-parallel. When adding frontend features, implement in both apps. See `.cursor/rules/project-standards.mdc`.
 
-**Design tokens:** Colors, spacing, radius, and typography are defined in `packages/design-tokens`. When changing any design token, update that package only (see project rules). Run `npm run tokens:build` from repo root to regenerate theme CSS.
+**Design tokens:** Colors, radius, and typography are defined in `customer-web/app/theme.css` and `admin-web/src/theme.css` (keep both in sync). When changing any token, update both files and, if used, `shop/constants/Colors.ts`. See `.cursor/rules/design-tokens-sync.mdc`.
 
 ---
 

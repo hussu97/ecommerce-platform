@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@ecommerce/design-tokens/theme.css";
+@import "./theme.css";
 
 :root {
   background-color: var(--color-background-light);

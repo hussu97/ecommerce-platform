@@ -55,8 +55,8 @@ Steps to make the ecommerce platform production-ready and deploy to a server or 
 | customer-bff | Yes (optional) | No | Yes (optional) | Proxy in front of customer-api |
 | discovery-api | Yes | Optional (Phase 9) | Yes | Own DB; see [discovery-api/README](discovery-api/README.md) for env |
 | discovery-web | Yes | Optional (Phase 9) | Yes | Points to discovery-api |
-| customer-web | Yes | Yes | Yes | Next.js; build from repo root for design-tokens |
-| admin-web | Yes | Yes | Yes | Vite; build from repo root for design-tokens |
+| customer-web | Yes | Yes | Yes | Next.js; local theme.css |
+| admin-web | Yes | Yes | Yes | Vite; local theme.css |
 | bulk-import-worker | Yes | Optional | Yes (step 13) | Uses admin-api image |
 | init | Yes | Phase 4 (seed) | Step 7 (seed) | One-time DB seed |
 | shop (iOS/Android) | EAS | EAS | EAS | Not in Docker; set EXPO_PUBLIC_API_URL |
@@ -80,8 +80,8 @@ All of these are defined in [docker-compose.yml](docker-compose.yml). To run wit
 - **admin-api** – Products CRUD, orders, taxonomies, brands, bulk upload
 - **bulk-import-worker** – Processes bulk upload jobs (uses admin-api image)
 - **init** – One-time DB seed (admin + sample data)
-- **customer-web** – Next.js customer app (build from root for design-tokens)
-- **admin-web** – Vite admin dashboard (build from root for design-tokens)
+- **customer-web** – Next.js customer app
+- **admin-web** – Vite admin dashboard
 - **discovery-api** – Product discovery pipeline (own DB; see [discovery-api/README](discovery-api/README.md) for env such as `RAPIDAPI_KEY`, `SERPAPI_API_KEY`)
 - **discovery-web** – Discovery dashboard (proxies to discovery-api)
 
@@ -210,22 +210,22 @@ If your Render plan includes Shell access: open the **customer-api** service →
 
 1. Sign in at [vercel.com](https://vercel.com). **Add New → Project**; import your GitHub repo.
 2. **Configure Project:**  
-   - **Root Directory:** click **Edit** and set to `customer-web` (override root).  
+   - **Root Directory:** click **Edit** and set to `customer-web`.  
    - **Framework Preset:** Next.js (auto-detected).
+   - customer-web uses a local `app/theme.css` for design tokens (no workspace dependency); use the default **Install Command**.
 3. **Environment Variables** → Add:
    - `NEXT_PUBLIC_API_URL` = `https://customer-api-xxxx.onrender.com/v1` (your Render customer-api URL + `/v1`).
 4. **Deploy**. After success, note the deployment URL (e.g. `https://customer-web-xxx.vercel.app`).
-   - If the build fails with **Tailwind “Cannot find native binding” / `@tailwindcss/oxide-linux-x64-gnu`**: customer-web adds that package as an optional dependency so Vercel (Linux) installs it. Ensure **Install Command** is `npm install` (not `npm ci`) so optional dependencies are installed for the build platform.
+   - If the build fails with **Tailwind “Cannot find native binding” / `@tailwindcss/oxide-linux-x64-gnu`**: customer-web adds that package as an optional dependency so Vercel (Linux) installs it. Use **Install Command** `npm install` (not `npm ci`) so optional dependencies are installed for the build platform.
 
 ---
 
 ### Phase 6: Vercel – admin-web
 
 1. **Add New → Project**; same repo.
-2. **Root Directory:** set to `admin-web`. **Framework:** Vite (Vercel usually detects it).
-3. **Build:** Vercel runs `npm run build` from the root directory. This repo uses a monorepo with `packages/design-tokens`. If your admin-web build expects the repo root (so it can resolve `@ecommerce/design-tokens`), set the project’s root to the **repository root** and set **Root Directory** to `admin-web` so the build context includes the workspace. If admin-web builds without the workspace in your setup, keep root directory as `admin-web` only.
-4. **Environment variable:** `VITE_API_URL` = `https://admin-api-xxxx.onrender.com/v1` (full admin-api base URL; the built app uses this for API calls).
-5. **Deploy**. Note the admin-web URL (e.g. `https://admin-web-xxx.vercel.app`).
+2. **Configure Project:** **Root Directory:** set to `admin-web`. **Framework:** Vite (Vercel usually detects it). admin-web uses a local `src/theme.css` (no workspace dependency); use the default **Install Command**.
+3. **Environment variable:** `VITE_API_URL` = `https://admin-api-xxxx.onrender.com/v1` (full admin-api base URL; the built app uses this for API calls).
+4. **Deploy**. Note the admin-web URL (e.g. `https://admin-web-xxx.vercel.app`).
 
 ---
 
@@ -265,7 +265,8 @@ If you want the discovery pipeline and dashboard on Path B:
 
 1. **discovery-api on Render:** **Dashboard → New + → Web Service**. Same repo; **Root Directory:** `discovery-api`. **Build:** `pip install -r requirements.txt`. **Start:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. **Environment:** `DATABASE_URL` (e.g. SQLite on ephemeral disk: leave default or set a path; or use a second Render PostgreSQL for discovery), plus `RAPIDAPI_KEY`, `RAPIDAPI_ALIEXPRESS_HOST`, `SERPAPI_API_KEY` (and any other strategy keys) per [discovery-api/README](discovery-api/README.md). Note the service URL (e.g. `https://discovery-api-xxxx.onrender.com`).
 
-2. **discovery-web on Vercel:** **Add New → Project**; same repo. **Root Directory:** `discovery-web`. Set `VITE_DISCOVERY_API_URL` (or the proxy target in Vite config) to the discovery-api URL (e.g. `https://discovery-api-xxxx.onrender.com`). Deploy.
+2. **discovery-web on Vercel:** **Add New → Project**; same repo. **Root Directory:** `discovery-web`. Set `VITE_DISCOVERY_API_URL` (or the proxy target in Vite config) to the discovery-api URL (e.g. `https://discovery-api-xxxx.onrender.com`). Deploy.  
+   - discovery-web uses the default Install Command.
 
 ---
 
@@ -295,7 +296,7 @@ Host the full stack on Google Cloud using managed services: Cloud Run (APIs and 
 
 4. **Build and push container images**  
    - (a) Build customer-api and admin-api images using [customer-api/Dockerfile](customer-api/Dockerfile) and [admin-api/Dockerfile](admin-api/Dockerfile). Ensure `asyncpg` is in admin-api requirements when using PostgreSQL.  
-   - (b) Build customer-web and admin-web with **repo root** as build context (for `packages/design-tokens`) using [customer-web/Dockerfile](customer-web/Dockerfile) and [admin-web/Dockerfile](admin-web/Dockerfile).  
+   - (b) Build customer-web and admin-web using [customer-web/Dockerfile](customer-web/Dockerfile) and [admin-web/Dockerfile](admin-web/Dockerfile).  
    - (c) Push all images to **Artifact Registry** (or Container Registry). Use a Cloud Build trigger from your repo or run builds manually.
 
 5. **Deploy customer-api to Cloud Run**  
@@ -318,7 +319,7 @@ Host the full stack on Google Cloud using managed services: Cloud Run (APIs and 
    Set CORS and env (e.g. `NEXT_PUBLIC_API_URL`) at build time for the chosen approach.
 
 9. **Deploy admin-web**  
-   - (a) Run `npm run build` from repo root (with admin-web and design-tokens). Set `VITE_API_URL` to the admin-api Cloud Run URL when building.  
+   - (a) Run `npm run build` from admin-web. Set `VITE_API_URL` to the admin-api Cloud Run URL when building.  
    - (b) Upload the built static files to a **Cloud Storage** bucket. Configure the bucket for static website hosting, or put a **Load Balancer** or **Firebase Hosting** in front.
 
 10. **CORS and frontend env**  

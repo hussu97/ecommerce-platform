@@ -1,0 +1,25 @@
+---
+description: Keep design token theme files in sync across customer-web, admin-web, and shop.
+alwaysApply: true
+---
+
+# Design tokens – keep theme files in sync
+
+Design token values (colors, radius, typography) are defined in **two canonical theme files** that must be kept identical:
+
+- **customer-web:** `customer-web/app/theme.css`
+- **admin-web:** `admin-web/src/theme.css`
+
+**shop** uses the same values in `shop/constants/Colors.ts` (and optionally `Typography.ts`); when you change the theme CSS variables, update the corresponding values in shop so light/dark themes stay aligned.
+
+## Rule
+
+When adding or changing any design token (e.g. a new `--color-*`, `--radius-*`, or `--font-*` in the `@theme` block):
+
+1. **Update both theme files** – Apply the same change to:
+   - `customer-web/app/theme.css`
+   - `admin-web/src/theme.css`
+2. **Update shop if the token is used there** – In `shop/constants/Colors.ts` (and related files), keep color and typography values in sync with the theme files (same hex codes and font names).
+3. **Do not** introduce a single “source” package or generated file for these tokens; the two theme files and shop constants are the source. Keep them in sync by editing both/sometimes all three when tokens change.
+
+The comment at the top of each theme file points to the other and to this rule.

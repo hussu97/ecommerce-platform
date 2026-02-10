@@ -50,7 +50,7 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 | ⬜ | **Health with DB check (discovery-api)** | GET /health verifies DB connectivity; return app, version, checks (like admin-api). | Low |
 | ⬜ | **Pagination metadata (discovery-api)** | GET /v1/products returns total count or next cursor. | Low |
 | ⬜ | **Strategy enable/disable from DB (discovery-api)** | Use strategies table for enable/disable; replace hardcoded list. | Low |
-| ⬜ | **Design system parity (discovery-web)** | Use @ecommerce/design-tokens and Tailwind so discovery-web matches admin-web/customer-web. | Low–Medium |
+| ⬜ | **Design system parity (discovery-web)** | Use theme.css-style tokens and Tailwind so discovery-web matches admin-web/customer-web (see customer-web/app/theme.css). | Low–Medium |
 | ⬜ | **Layout and navigation (discovery-web)** | Layout with nav (Products, Strategies, Run history) and Outlet for future pages. | Low |
 | ⬜ | **Skeleton loading (discovery-web)** | Product-grid skeleton instead of "Loading products…"; match project loading rules. | Low |
 | ⬜ | **Empty and error states (discovery-web)** | Consistent empty-state and error-state UI; align with Design System section. | Low |
@@ -174,7 +174,7 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
-| 🔶 | **Design Tokens as Single Source** | Single source (packages/design-tokens); consume in apps. Done: customer-web, admin-web, shop. Pending: discovery-web. | — |
+| ✅ | **Design tokens (theme.css sync)** | customer-web/app/theme.css and admin-web/src/theme.css kept in sync; shop/constants/Colors.ts aligned. See .cursor/rules/design-tokens-sync.mdc. Pending: discovery-web. | — |
 | ⬜ | **Dark Mode** | Full dark theme. customer-web, shop; optionally admin-web, discovery-web. | Medium |
 | ⬜ | **Mobile-First Admin** | Responsive or dedicated mobile view for admin. admin-web. | Medium |
 | ⬜ | **Empty & Error States** | Consistent empty-state and error-state illustrations/copy. customer-web, admin-web, shop, discovery-web. | Low |
@@ -211,7 +211,7 @@ Reference only (not a task list). Use for parity work.
 
 | Aspect | Admin-web | Discovery-web | Suggested improvement |
 |--------|-----------|---------------|------------------------|
-| **Design system** | @ecommerce/design-tokens, Tailwind, theme.css | Plain CSS, inline styles | Add design-tokens + Tailwind (Section 3). |
+| **Design system** | theme.css (customer-web, admin-web), Tailwind | Plain CSS, inline styles | Add theme.css + Tailwind (Section 3). |
 | **Layout** | Layout with sidebar nav, Outlet | Single full-page | Add Layout + nav. |
 | **Auth** | Login, ProtectedRoute, useAuthStore | None | Optional when API is protected. |
 | **HTTP client** | axios (timeout, interceptors) | fetch in api.ts | Consider axios for consistency. |
