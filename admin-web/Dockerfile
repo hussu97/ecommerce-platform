@@ -1,5 +1,6 @@
 # Build from repo root so packages/design-tokens workspace is available.
-FROM node:20-alpine
+# Use slim (Debian) so optional native deps in the workspace install correctly.
+FROM node:20-slim
 
 WORKDIR /app
 

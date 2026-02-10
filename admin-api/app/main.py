@@ -9,6 +9,14 @@ from app.core.middleware.security import (
 )
 from app.core.middleware.logging_middleware import StructuredLoggingMiddleware
 from sqlalchemy import text
+
+try:
+    from app.core.telemetry import init_telemetry
+    _TELEMETRY_AVAILABLE = True
+except ImportError:
+    _TELEMETRY_AVAILABLE = False
+    def init_telemetry(app):  # noqa: ANN001
+        pass
 from app.db.session import engine
 from app.db.base import Base
 from app.models import (
@@ -47,6 +55,9 @@ app.include_router(taxonomy_endpoints.router, prefix=f"{v1_prefix}/taxonomies", 
 app.include_router(brands.router, prefix=f"{v1_prefix}/brands", tags=["Brands"])
 app.include_router(taxonomy_attributes.router, prefix=f"{v1_prefix}/taxonomy-attributes", tags=["Taxonomy Attributes"])
 app.include_router(i18n_endpoints.router, prefix=f"{v1_prefix}/i18n", tags=["i18n"])
+
+if _TELEMETRY_AVAILABLE:
+    init_telemetry(app)
 
 
 @app.on_event("startup")

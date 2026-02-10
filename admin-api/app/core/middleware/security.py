@@ -1,6 +1,7 @@
 """HTTPS redirect and security headers middleware."""
 from typing import Optional
 import uuid
+import structlog
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -53,11 +54,15 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
-    """Generate and attach X-Request-ID to each request and response."""
+    """Generate and attach X-Request-ID to each request and response; bind to structlog context."""
 
     async def dispatch(self, request: Request, call_next):
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
         request.state.request_id = request_id
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = request_id
-        return response
+        structlog.contextvars.bind_contextvars(request_id=request_id)
+        try:
+            response = await call_next(request)
+            response.headers["X-Request-ID"] = request_id
+            return response
+        finally:
+            structlog.contextvars.unbind_contextvars("request_id")

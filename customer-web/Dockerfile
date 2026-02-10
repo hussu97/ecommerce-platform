@@ -1,5 +1,6 @@
 # Build from repo root so packages/design-tokens workspace is available.
-FROM node:20-alpine
+# Use slim (Debian) instead of Alpine so Next.js sharp and other native optional deps work.
+FROM node:20-slim
 
 WORKDIR /app
 

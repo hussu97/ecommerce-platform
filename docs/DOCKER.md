@@ -15,6 +15,7 @@ docker compose up --build
 
 - **Customer Web**: http://127.0.0.1:3002 (proxies `/api` to customer-api)
 - **Admin Web**: http://127.0.0.1:5174 (proxies `/api` to admin-api)
+- **Customer BFF**: http://127.0.0.1:8012 (optional; proxy + rate limit + aggregation in front of customer-api)
 - **Customer API**: http://127.0.0.1:8002 (docs: http://127.0.0.1:8002/docs)
 - **Admin API**: http://127.0.0.1:8003 (docs: http://127.0.0.1:8003/docs)
 
@@ -22,6 +23,7 @@ docker compose up --build
 
 | Service | Host port | Container port | Notes |
 |---------|-----------|----------------|-------|
+| customer-bff | 8012 | 8010 | Optional; local dev uses 8010 |
 | customer-api | 8002 | 8000 | Local dev uses 8000 |
 | admin-api | 8003 | 8001 | Local dev uses 8001 |
 | customer-web | 3002 | 3000 | Local dev uses 3000 |
@@ -32,6 +34,7 @@ docker compose up --build
 
 | Service | Image | Description |
 |---------|--------|-------------|
+| customer-bff | build ./customer-bff | Proxy to customer-api, rate limiting, GET /v1/checkout-context aggregation |
 | customer-api | build ./customer-api | Customer-facing API |
 | admin-api | build ./admin-api | Admin API (products, orders, taxonomies, bulk upload) |
 | bulk-import-worker | same as admin-api | Polls for bulk uploads, processes xlsx/csv/tsv |
@@ -72,7 +75,7 @@ npm install
 npm start
 ```
 
-Point `EXPO_PUBLIC_API_URL` to `http://127.0.0.1:8002/v1` so it talks to the customer-api running in Docker (Docker publishes customer-api on host port 8002).
+Point `EXPO_PUBLIC_API_URL` to `http://127.0.0.1:8002/v1` (customer-api) or `http://127.0.0.1:8012/v1` (customer-bff) so it talks to the API or BFF running in Docker.
 
 ## Environment overrides
 
@@ -90,3 +93,4 @@ docker compose --env-file .env up --build
 - **Port already in use**: Docker uses host ports 8002, 8003, 3002, 5174 so local dev (8000, 8001, 3000, 5173) can run at the same time. If you see “address already in use”, another process is using that port; stop it or see ARCHITECTURE.md “Ports”.
 - **Init fails**: Check logs with `docker compose logs init`. Ensure customer-api is healthy first (`docker compose ps`).
 - **Re-seed**: Run `docker compose down -v` to remove volumes, then `docker compose up --build` to start fresh and run init again.
+- **"Cannot find native binding" / ERR_CONNECTION_REFUSED on admin-web**: The frontend images use `node:20-slim` (Debian) so optional native deps (e.g. Next.js sharp) install correctly. Rebuild: `docker compose build --no-cache customer-web admin-web && docker compose up -d`. If you see the native binding error when running **locally** (not Docker), from the repo root run: `rm -rf node_modules customer-web/node_modules admin-web/node_modules shop/node_modules packages/*/node_modules` then `npm install` (see [npm#4828](https://github.com/npm/cli/issues/4828)).
