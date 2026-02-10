@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/api";
 import { TableSkeleton } from "../components/TableSkeleton";
-import { ChevronDown, ChevronRight, Upload, ArrowLeft } from "lucide-react";
+import { ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
 
 interface BulkUpload {
   id: string;

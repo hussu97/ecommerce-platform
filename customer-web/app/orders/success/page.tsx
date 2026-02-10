@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -37,7 +37,7 @@ function formatExpectedDelivery(createdAt: string): string {
   return `${fmt(d)} - ${fmt(d2)}`;
 }
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
   const t = useI18nStore((s) => s.t);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const searchParams = useSearchParams();
@@ -173,5 +173,13 @@ export default function OrderSuccessPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={<PageLoader className="min-h-[60vh]" />}>
+      <OrderSuccessContent />
+    </Suspense>
   );
 }
