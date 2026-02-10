@@ -8,7 +8,7 @@ Cross-platform shopping app (Web, iOS, Android) built with React Native + Expo.
 npm install
 ```
 
-Optional: set `EXPO_PUBLIC_API_URL` in `.env` (default: `http://127.0.0.1:8000/v1`). Must point at the Customer API base URL including the `/v1` prefix. **Use `127.0.0.1` only—not `localhost`** (localhost can resolve to IPv6 on macOS and break connections). The app normalizes localhost to 127.0.0.1 at runtime if needed.
+**Environment:** Optional. Create a `.env` file in the `shop/` directory. Set `EXPO_PUBLIC_API_URL` to the Customer API base URL including `/v1` (e.g. `http://127.0.0.1:8000/v1`). **Use `127.0.0.1` only—not `localhost`** (localhost can resolve to IPv6 on macOS). The app normalizes localhost to 127.0.0.1 at runtime if needed. Restart Expo after changing `.env`.
 
 ## Run
 
@@ -30,6 +30,14 @@ Optional: set `EXPO_PUBLIC_API_URL` in `.env` (default: `http://127.0.0.1:8000/v
    npm run ios       # iOS simulator
    npm run android   # Android emulator
    ```
+
+## Environment (reference)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EXPO_PUBLIC_API_URL` | `http://127.0.0.1:8000/v1` | Customer API base URL including `/v1`. |
+
+Set in `.env`; restart Expo after changes.
 
 ## Features
 

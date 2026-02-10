@@ -105,6 +105,8 @@ npm run android     # Android emulator
 
 ## Environment variables
 
+**How to set them:** For each app, create a `.env` (or `.env.local` for Next.js) file in that app’s directory and add `VARIABLE=value` lines. Python APIs (customer-api, admin-api, discovery-api) load `.env` automatically; restart uvicorn after changes. Frontends (customer-web, admin-web, discovery-web, shop) need a restart of the dev server after changing env; for Vite/Expo, `VITE_*` / `EXPO_PUBLIC_*` are read at build/start. See each app’s README for the exact file name and variables.
+
 | App | Variable | Default |
 |-----|----------|---------|
 | customer-api | `DATABASE_URL` | `sqlite+aiosqlite:///./ecommerce.db` |

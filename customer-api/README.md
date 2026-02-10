@@ -22,6 +22,15 @@ python3 -m uvicorn app.main:app --reload
 
 API: http://127.0.0.1:8000 (docs: http://127.0.0.1:8000/docs). The API is mounted at `/v1`; frontends use `http://127.0.0.1:8000/v1` as the base URL. Use 127.0.0.1 if localhost fails (e.g. IPv6 on macOS).
 
+## Environment
+
+**How to set variables:** Create a `.env` file in the `customer-api/` directory. Copy from `.env.example` if present (`cp .env.example .env`), then edit. The app loads `.env` automatically (pydantic-settings). Restart uvicorn after changing variables.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `sqlite+aiosqlite:///./ecommerce.db` | Database URL (same DB as admin-api for shared data). |
+| `SECRET_KEY` | (set in production) | Used for JWT; change in production. |
+
 ## API docs
 
 - Swagger UI: http://127.0.0.1:8000/docs

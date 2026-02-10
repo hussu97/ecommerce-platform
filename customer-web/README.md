@@ -8,7 +8,7 @@ Next.js customer web app. Browsing, cart, checkout, orders, profile.
 npm install
 ```
 
-Optional: set `NEXT_PUBLIC_API_URL` in `.env.local`. Unset = `/api` (Next.js rewrites to the backend). If you use a full URL (e.g. `http://127.0.0.1:8000`), it must include `/v1` or the app will append it. **Use `127.0.0.1` only—not `localhost`** (localhost can resolve to IPv6 on macOS and break connections). Restart the dev server after changing `.env.local`. The app talks to the Customer API; auth headers are sent from the same origin.
+**Environment:** Optional. Create a `.env.local` file in the `customer-web/` directory and add variables (e.g. `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/v1`). Unset = `/api` (Next.js rewrites to the backend). If you use a full URL, it must include `/v1` or the app will append it. **Use `127.0.0.1` only—not `localhost`** (localhost can resolve to IPv6 on macOS). Restart the dev server after changing `.env.local`.
 
 ## Run
 
@@ -29,6 +29,15 @@ Optional: set `NEXT_PUBLIC_API_URL` in `.env.local`. Unset = `/api` (Next.js rew
    ```
 
 3. Open http://127.0.0.1:3000
+
+## Environment (reference)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXT_PUBLIC_API_URL` | (unset → `/api` rewrites) | Customer API base URL including `/v1` (e.g. `http://127.0.0.1:8000/v1`). |
+| `NEXT_PUBLIC_ADMIN_URL` | `http://127.0.0.1:5173` | Admin Web URL for dashboard link. |
+
+Set in `.env.local`; restart the dev server after changes.
 
 ## Features
 

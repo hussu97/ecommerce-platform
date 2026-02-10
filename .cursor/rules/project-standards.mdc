@@ -1,5 +1,5 @@
 ---
-description: Conventions, frontend parity (customer-web & shop), post-task checks (incl. commit, NEXT_TODO, changelog).
+description: Conventions, frontend parity (customer-web & shop), post-task checks (incl. ARCHITECTURE, PRODUCTION, NEXT_TODO, changelog, commit).
 alwaysApply: true
 ---
 
@@ -48,10 +48,11 @@ Feature checklist (keep in sync): Search, category & brand & attribute filters w
 1. **Translations**: Any new user-facing text is backed by backend i18n or translation tables; no new hardcoded copy. For customer-web/shop, same keys in all three places above.
 2. **Identifiers**: New or changed APIs use code/slug (or existing ID pattern) consistently; no new reliance on raw DB IDs where a code/slug exists.
 3. **Architecture**: If the change added or changed services, ports, DB, or run instructions, update [ARCHITECTURE.md](ecommerce-platform/ARCHITECTURE.md).
-4. **NEXT_TODO.md**: When changes implement or partially implement a feature or task listed in [NEXT_TODO.md](ecommerce-platform/NEXT_TODO.md), update that task’s status in the file: set status to ✅ (Implemented) or 🔶 (Partial), and if partial, add or adjust the *Current:* note to describe what exists. If the change completes a previously partial item, upgrade to ✅ and remove the *Current:* note. Optionally add a one-line entry to the “Changelog (Implemented)” table at the bottom of NEXT_TODO.md.
-5. **Design tokens**: If the change added or modified design tokens (colors, spacing, radius, typography), confirm they were updated in `packages/design-tokens` only and that consuming apps use the package (no new local token definitions).
-6. **Changelog**: Log all notable changes in [CHANGELOG.md](ecommerce-platform/CHANGELOG.md) at the repo root only. Do not maintain a separate or duplicate changelog in other files (e.g. README, NEXT_TODO). Use the format: date section `## YYYY-MM-DD` and entries as `- **Topic:** Short description. (scope).` One to two lines per entry; include the area(s) affected (e.g. admin-api, customer-web, shop).
-7. **Commit**: Whenever changes are made to the system, commit them with a well-written commit message. Use a short subject line (about 50 chars); optionally add a blank line and a body that briefly explains what changed and why. Group related changes in one commit; mention the main areas (e.g. shop, customer-api) so the history stays clear.
+4. **Production**: If the change affects deployment, production setup, environment variables used in production, or adds/changes services described in production paths, update [PRODUCTION.md](ecommerce-platform/PRODUCTION.md) so deployment options, steps, and env/config remain accurate.
+5. **NEXT_TODO.md**: When changes implement or partially implement a feature or task listed in [NEXT_TODO.md](ecommerce-platform/NEXT_TODO.md), update that task’s status in the file: set status to ✅ (Implemented) or 🔶 (Partial), and if partial, add or adjust the *Current:* note to describe what exists. If the change completes a previously partial item, upgrade to ✅ and remove the *Current:* note. Optionally add a one-line entry to the “Changelog (Implemented)” table at the bottom of NEXT_TODO.md.
+6. **Design tokens**: If the change added or modified design tokens (colors, spacing, radius, typography), confirm they were updated in `packages/design-tokens` only and that consuming apps use the package (no new local token definitions).
+7. **Changelog**: Log all notable changes in [CHANGELOG.md](ecommerce-platform/CHANGELOG.md) at the repo root only. Do not maintain a separate or duplicate changelog in other files (e.g. README, NEXT_TODO). Use the format: date section `## YYYY-MM-DD` and entries as `- **Topic:** Short description. (scope).` One to two lines per entry; include the area(s) affected (e.g. admin-api, customer-web, shop).
+8. **Commit**: Whenever changes are made to the system, commit them with a well-written commit message. Use a short subject line (about 50 chars); optionally add a blank line and a body that briefly explains what changed and why. Group related changes in one commit; mention the main areas (e.g. shop, customer-api) so the history stays clear.
 
 Example commit message:
 

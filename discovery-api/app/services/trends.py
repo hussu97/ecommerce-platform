@@ -23,6 +23,10 @@ def _serpapi_get(params: Dict[str, Any]) -> Optional[dict]:
             r = client.get(SERPAPI_BASE, params=params)
             r.raise_for_status()
             return r.json()
+    except httpx.HTTPStatusError as e:
+        # 400 often means invalid params (e.g. geo must be uppercase: US, AE)
+        logger.warning("SerpApi request failed: %s %s", e.response.status_code, e.response.text[:200] if e.response.text else "")
+        return None
     except Exception as e:
         logger.warning("SerpApi request failed: %s", e)
         return None
@@ -38,8 +42,11 @@ def fetch_trending_searches(
     Fetch trending search queries from Google Trends (SerpApi engine=google_trends_trending_now).
     Returns list of query strings; empty if no key or on error.
     """
-    geo = geo or getattr(settings, "DISCOVERY_TRENDS_GEO", "ae") or "ae"
+    geo = (geo or getattr(settings, "DISCOVERY_TRENDS_GEO", "ae") or "ae").strip().upper()
     hours = hours if hours is not None else 24
+    # SerpApi expects geo in uppercase (e.g. US, AE) and hours as 4, 24, 48, or 168
+    if hours not in (4, 24, 48, 168):
+        hours = 24
     params: Dict[str, Any] = {
         "engine": "google_trends_trending_now",
         "geo": geo,
@@ -76,7 +83,7 @@ def fetch_interest_by_region(
     """
     if not q or not q.strip():
         return []
-    geo = geo or getattr(settings, "DISCOVERY_TRENDS_GEO", "ae") or "ae"
+    geo = (geo or getattr(settings, "DISCOVERY_TRENDS_GEO", "ae") or "ae").strip().upper()
     params: Dict[str, Any] = {
         "engine": "google_trends",
         "data_type": "GEO_MAP_0",

@@ -13,7 +13,7 @@ from app.strategies.base import BaseStrategy
 logger = logging.getLogger(__name__)
 
 # AliExpress free tier is tight; cap queries per run
-ALIEXPRESS_MAX_QUERIES = 5
+ALIEXPRESS_MAX_QUERIES = 3
 HOT_PRODUCTS_PAGE_SIZE = 30
 
 

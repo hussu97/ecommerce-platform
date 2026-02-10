@@ -7,50 +7,19 @@ import httpx
 
 from app.core.config import settings
 from app.services.discovery_filters import filter_by_max_asp, exclude_keywords_in_title
+from app.services.query_source import get_queries
 from app.strategies.base import BaseStrategy
 
 logger = logging.getLogger(__name__)
 SERPAPI_BASE = "https://serpapi.com/search"
 
-# Default query list when DISCOVERY_QUERY_LIST is not set (generic, low-ASP friendly)
-DEFAULT_QUERIES = [
-    "wireless earbuds",
-    "phone stand",
-    "yoga mat",
-    "desk organizer",
-    "led desk lamp",
-    "usb cable",
-    "phone case",
-    "kitchen utensils set",
-]
+# Cap queries per run for rate limits
+SERPAPI_MAX_QUERIES = 10
 
 
 def _get_queries() -> List[str]:
-    """Resolve query list: static from config/file, or trending when DISCOVERY_QUERY_SOURCE=trending."""
-    source = (getattr(settings, "DISCOVERY_QUERY_SOURCE", None) or "static").lower()
-    if source == "trending":
-        from app.services.trends import fetch_trending_searches
-        queries = fetch_trending_searches(
-            geo=getattr(settings, "DISCOVERY_TRENDS_GEO", "ae"),
-            hours=24,
-        )
-        if queries:
-            return queries[:10]  # cap for rate limits
-        # fallback to default if trending returns nothing
-    raw = getattr(settings, "DISCOVERY_QUERY_LIST", None) or ""
-    raw = (raw or "").strip()
-    if raw:
-        # Optional: treat as file path if it looks like a path
-        if "\n" not in raw and "," not in raw and raw.count(" ") == 0:
-            try:
-                with open(raw, "r") as f:
-                    lines = [line.strip() for line in f if line.strip()]
-                if lines:
-                    return lines
-            except OSError:
-                pass
-        return [q.strip() for q in raw.split(",") if q.strip()]
-    return DEFAULT_QUERIES
+    """Resolve query list from DISCOVERY_QUERY_SOURCE (static, trending, reddit, tokinsight)."""
+    return get_queries(max_queries=SERPAPI_MAX_QUERIES)
 
 
 def _normalize_item(item: dict, query: str) -> Optional[dict]:

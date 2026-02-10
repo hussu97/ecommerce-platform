@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.db.session import engine
+from app.db.session import engine, AsyncSessionLocal
 from app.db.base import Base
+from app.db.seed import seed_strategies
 from app.models import DiscoveredProduct, Strategy
 from app.api.endpoints import products, strategies, runs, trends
 
@@ -38,3 +39,5 @@ async def health():
 async def startup_event():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    async with AsyncSessionLocal() as session:
+        await seed_strategies(session)

@@ -1,0 +1,22 @@
+# Example query list for discovery (one search term per line).
+# Use as: DISCOVERY_QUERY_LIST=data/queries_example.txt
+# Lines starting with # are ignored. Blank lines are skipped.
+
+# Electronics & accessories
+wireless earbuds
+phone stand
+usb c cable
+phone case
+led desk lamp
+
+# Home & office
+desk organizer
+yoga mat
+kitchen utensils set
+storage baskets
+
+# Lifestyle
+cotton tote bag
+water bottle
+slim wallet
+travel pillow

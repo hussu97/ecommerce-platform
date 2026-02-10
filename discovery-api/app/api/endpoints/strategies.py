@@ -1,20 +1,17 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.session import get_db
+from app.models.strategy import Strategy
 from app.schemas.product import StrategyResponse
 
 router = APIRouter()
 
-# Hardcoded list for scaffold; includes mock strategy for UI and runs.
-STRATEGIES_HARDCODED = [
-    StrategyResponse(
-        id="mock_trending",
-        name="Mock Trending",
-        description="Returns sample products for testing the pipeline.",
-        enabled=True,
-    ),
-]
-
 
 @router.get("", response_model=list[StrategyResponse])
-async def list_strategies():
-    """List registered discovery strategies."""
-    return STRATEGIES_HARDCODED
+async def list_strategies(session: AsyncSession = Depends(get_db)):
+    """List discovery strategies (from DB, seeded from code registry on startup)."""
+    result = await session.execute(select(Strategy).order_by(Strategy.id))
+    strategies = result.scalars().all()
+    return list(strategies)

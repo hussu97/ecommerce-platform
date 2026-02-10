@@ -42,7 +42,7 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
 | ✅ | **Discovery pipeline (scaffold)** | API + DB + mock strategy, list products, list strategies, POST runs. Done: discovery-api, discovery-web (list, filters, run trigger). | — |
-| ⬜ | **Real strategies (discovery-api)** | Document or implement one real source (Apify, SerpApi, or custom scraper); keep mock for tests. | Medium |
+| 🔶 | **Real strategies (discovery-api)** | Partial: SerpApi Google Shopping (UAE), AliExpress RapidAPI, Amazon best-seller (SellerMagnet), query sources (static, trending, Reddit, TokInsight). Remaining: Pinterest as query source; Etsy/Apify optional. | Medium |
 | ⬜ | **Scheduled runs (discovery-api)** | Cron or worker calling POST /v1/runs periodically (e.g. daily). | Low–Medium |
 | ⬜ | **Import to catalog (discovery-api + admin-api)** | "Import to catalog" action: discovery-api or discovery-web calls admin-api to create product from discovered item. | Medium |
 | ⬜ | **Auth for discovery API** | API key or admin JWT so only authorized clients can trigger runs or read data. discovery-api, optionally discovery-web. | Low–Medium |
@@ -57,6 +57,19 @@ A prioritized list of features, architecture improvements, and e-commerce enhanc
 | ⬜ | **Run history view (discovery-api + discovery-web)** | Backend: endpoint for recent runs; frontend: page or section listing run_id, strategy_id, count, timestamp. | Medium |
 | ⬜ | **Strategies page (discovery-web)** | Dedicated page for strategy list and enable/disable when backend supports it. | Low |
 | ⬜ | **Optional auth (discovery-web)** | Login or API-key gate when discovery-api has auth. | Medium |
+
+### 3a. Product scraping improvements & enhancements
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| ⬜ | **Query source cache (discovery-api)** | TTL cache for trending/Reddit/TokInsight query results to reduce external API calls per run; configurable TTL (e.g. 1–24h). | Low |
+| ⬜ | **Strategy retries & resilience (discovery-api)** | Retry with backoff for SerpApi, AliExpress, SellerMagnet; optional circuit breaker or skip-after-failure to avoid cascading failures. | Low–Medium |
+| ⬜ | **Title/brand blocklist (discovery-api)** | Configurable exclude keywords (e.g. warranty, high-ASP brands); filter in discovery_filters or per-strategy so irrelevant products are dropped. | Low |
+| ⬜ | **Cross-strategy deduplication (discovery-api)** | Option to deduplicate by normalized source_url or title+price before persist; reduce duplicate rows from multiple strategies. | Low–Medium |
+| ⬜ | **Run history persistence (discovery-api)** | Persist each run (run_id, strategy_id, count, status, started_at, finished_at) in DB; GET /v1/runs or /v1/runs/history for run history view. | Low–Medium |
+| ⬜ | **Export discovered products (discovery-api + discovery-web)** | GET /v1/products?format=csv or export endpoint; discovery-web "Export CSV" button for current filter view. | Low |
+| ⬜ | **Pinterest as query source (discovery-api)** | Optional DISCOVERY_QUERY_SOURCE=pinterest: manual list or ScrapeCreators (100 free calls); feed keywords into Shopping/AliExpress. | Medium |
+| ⬜ | **Show strategy per product (discovery-web)** | Display strategy_id or strategy name on each product card/row; filter by strategy in UI. | Low |
 
 ---
 
@@ -234,7 +247,7 @@ flowchart LR
 1. **Quick wins:** Recently viewed, low-stock admin alerts, health/readiness refinement, rate limiting, error boundaries (customer-web, admin-web, discovery-web).
 2. **High impact:** Promotions, email notifications, dashboard analytics, tracking number + fulfillment UX.
 3. **Foundation:** Database migrations, caching, background jobs.
-4. **Discovery:** Design parity (tokens, layout, skeleton) and backend parity (logging, health, CORS) for discovery; then real strategies, run history, import to catalog.
+4. **Discovery:** Design parity (tokens, layout, skeleton) and backend parity (logging, health, CORS) for discovery; then scraping improvements (query cache, run history persistence, retries, blocklist, export CSV); run history view, import to catalog.
 5. **Scale:** Full-text search (FTS5 or Elasticsearch/Meilisearch), event-driven design.
 6. **Polish:** Returns/refunds, push notifications, a11y, analytics, dark mode.
 
@@ -244,6 +257,7 @@ flowchart LR
 
 | Date | Change |
 |------|--------|
+| 2025-02-10 | **NEXT_TODO – product scraping:** Section 3 "Real strategies" set to 🔶 (SerpApi, AliExpress, Amazon, query sources done). Added Section 3a "Product scraping improvements & enhancements" (query cache, retries/blocklist, deduplication, run history persistence, export CSV, Pinterest query source, show strategy in UI). Updated Suggested Priority for discovery. |
 | 2025-02-10 | **NEXT_TODO rewrite:** Full document restructure. Single table per section; Discovery (Section 3) same format as others. Deduplicated tasks with explicit app scope (customer-web, admin-web, shop, customer-api, admin-api, discovery-api, discovery-web). Status clarified: ✅ fully completed (all relevant apps), 🔶 partial (some apps or parts), ⬜ not started. Section 14 kept as comparison reference only. |
 | 2025-02-10 | **NEXT_TODO:** Added Section 13 (Discovery backend/frontend features), Section 14 (Discovery vs Admin/Customer comparison); updated Suggested Priority and intro. |
 | 2025-02-09 | **API Gateway/BFF and structured logging & tracing:** customer-bff (proxy to customer-api, rate limiting, GET /v1/checkout-context). Request ID in structlog context; optional OpenTelemetry in customer-api and admin-api; BFF forwards X-Request-ID. ARCHITECTURE, docs/DOCKER, docker-compose updated. |
