@@ -27,6 +27,14 @@ API: http://127.0.0.1:8004 (docs: http://127.0.0.1:8004/docs).
 |----------|---------|-------------|
 | `DATABASE_URL` | `sqlite+aiosqlite:///./discovery.db` | SQLite path (or PostgreSQL with asyncpg for production) |
 | `DEBUG` | `True` | Enable SQL echo and debug mode |
+| `SERPAPI_API_KEY` | — | SerpApi key for Google Shopping (UAE) and Google Trends. Get one at [serpapi.com](https://serpapi.com). Optional; strategies that need it return no results if unset. |
+| `RAPIDAPI_KEY` | — | RapidAPI key for AliExpress strategy. Get one at [rapidapi.com](https://rapidapi.com). Optional. |
+| `RAPIDAPI_ALIEXPRESS_HOST` | — | RapidAPI host for the AliExpress API (e.g. `aliexpress-api2.p.rapidapi.com` from your chosen API’s docs). Required for AliExpress strategy. |
+| `DISCOVERY_MAX_ASP_AED` | `500` | Max product price (AED) for inclusion; products above this are filtered out. |
+| `DISCOVERY_QUERY_LIST` | — | Comma-separated search queries (e.g. `wireless earbuds, yoga mat`) or path to a file with one query per line. If unset, a small default list is used. |
+| `DISCOVERY_TRENDS_GEO` | `ae` | Default geo for Google Trends (e.g. `ae` for UAE). |
+| `DISCOVERY_QUERY_SOURCE` | `static` | `static` = use DISCOVERY_QUERY_LIST (or default); `trending` = use Google Trends trending searches as queries for the Google Shopping strategy. |
+| `USD_TO_AED` | `3.67` | Conversion factor for AliExpress (USD) to AED when applying DISCOVERY_MAX_ASP_AED. |
 
 ## Endpoints
 
@@ -36,7 +44,9 @@ API: http://127.0.0.1:8004 (docs: http://127.0.0.1:8004/docs).
 | GET | `/v1/products` | List discovered products (query: strategy_id, delivers_to_uae, limit, offset) |
 | GET | `/v1/products/{id}` | Single product detail |
 | GET | `/v1/strategies` | List registered strategies |
-| POST | `/v1/runs` | Trigger a run (body: `{"strategy_id": "mock_trending"}` or `"all"`) |
+| POST | `/v1/runs` | Trigger a run (body: `{"strategy_id": "mock_trending"}` or `"serpapi_google_shopping_uae"` or `"aliexpress_trending_uae"` or `"all"`) |
+| GET | `/v1/trends/trending-searches` | Google Trends trending searches (query: geo, hours, category_id, hl). Requires SERPAPI_API_KEY. |
+| GET | `/v1/trends/interest-by-region` | Google Trends interest by region (query: q, geo, region, date, hl). Requires SERPAPI_API_KEY. |
 
 ## Adding a strategy
 

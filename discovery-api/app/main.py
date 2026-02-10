@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.db.session import engine
 from app.db.base import Base
 from app.models import DiscoveredProduct, Strategy
-from app.api.endpoints import products, strategies, runs
+from app.api.endpoints import products, strategies, runs, trends
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -25,6 +25,7 @@ app.add_middleware(
 app.include_router(products.router, prefix="/v1/products", tags=["Products"])
 app.include_router(strategies.router, prefix="/v1/strategies", tags=["Strategies"])
 app.include_router(runs.router, prefix="/v1/runs", tags=["Runs"])
+app.include_router(trends.router, prefix="/v1/trends", tags=["Trends"])
 
 
 @app.get("/health")
