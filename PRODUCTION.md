@@ -226,6 +226,7 @@ If your Render plan includes Shell access: open the **customer-api** service →
 2. **Configure Project:** **Root Directory:** set to `admin-web`. **Framework:** Vite (Vercel usually detects it). admin-web uses a local `src/theme.css` (no workspace dependency); use the default **Install Command**.
 3. **Environment variable:** `VITE_API_URL` = `https://admin-api-xxxx.onrender.com/v1` (full admin-api base URL; the built app uses this for API calls).
 4. **Deploy**. Note the admin-web URL (e.g. `https://admin-web-xxx.vercel.app`).
+   - If the build fails with **Cannot find module @rollup/rollup-linux-x64-gnu**: admin-web adds that package as an optional dependency so Vercel (Linux) installs it. Use **Install Command** `npm install` (not `npm ci`) so optional dependencies are installed for the build platform.
 
 ---
 
