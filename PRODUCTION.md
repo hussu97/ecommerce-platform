@@ -171,7 +171,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
    - `DATABASE_URL` = (Internal Database URL with `postgresql+asyncpg://` as the scheme).
    - `SECRET_KEY` = (generate a strong key, e.g. `openssl rand -hex 32`).
    - `BACKEND_CORS_ORIGINS` = leave empty for now; set after Vercel deploys (see Phase 7).
-10. **Python version (avoid wheel build failures):** Render defaults to Python 3.13; `asyncpg` and `greenlet` may fail to build wheels. The repo has `customer-api/.python-version` set to `3.11` so Render uses Python 3.11 (pre-built wheels available). If you still see "Failed to build wheels for asyncpg/greenlet", set **Environment** → `PYTHON_VERSION` = `3.11.9` (or use the same Python 3.11.x in your service).
+10. **Python version:** The stack uses `asyncpg>=0.31` and `greenlet>=3.0.3,<4`, which provide pre-built wheels for Python 3.13, so Render’s default (Python 3.13) should work. If you see "Failed to build wheels for asyncpg/greenlet", set **Environment** → `PYTHON_VERSION` = `3.11.9` or ensure `customer-api/.python-version` contains `3.11`.
 11. **Create Web Service**. Wait for the first deploy to succeed.
 12. Note the service URL (e.g. `https://customer-api-xxxx.onrender.com`). Frontends will use this base URL and append `/v1` (e.g. `https://customer-api-xxxx.onrender.com/v1`).
 
