@@ -171,8 +171,9 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
    - `DATABASE_URL` = (Internal Database URL with `postgresql+asyncpg://` as the scheme).
    - `SECRET_KEY` = (generate a strong key, e.g. `openssl rand -hex 32`).
    - `BACKEND_CORS_ORIGINS` = leave empty for now; set after Vercel deploys (see Phase 7).
-10. **Create Web Service**. Wait for the first deploy to succeed.
-11. Note the service URL (e.g. `https://customer-api-xxxx.onrender.com`). Frontends will use this base URL and append `/v1` (e.g. `https://customer-api-xxxx.onrender.com/v1`).
+10. **Python version (avoid wheel build failures):** Render defaults to Python 3.13; `asyncpg` and `greenlet` may fail to build wheels. The repo has `customer-api/.python-version` set to `3.11` so Render uses Python 3.11 (pre-built wheels available). If you still see "Failed to build wheels for asyncpg/greenlet", set **Environment** → `PYTHON_VERSION` = `3.11.9` (or use the same Python 3.11.x in your service).
+11. **Create Web Service**. Wait for the first deploy to succeed.
+12. Note the service URL (e.g. `https://customer-api-xxxx.onrender.com`). Frontends will use this base URL and append `/v1` (e.g. `https://customer-api-xxxx.onrender.com/v1`).
 
 ---
 
@@ -185,7 +186,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 5. **Environment:**
    - `DATABASE_URL` = (same value as customer-api; `postgresql+asyncpg://...`).
    - `STORAGE_PATH` = `/tmp/uploads` (Render’s disk is ephemeral; for beta this is acceptable; for persistent uploads you’d need a volume or external storage).
-6. **Note:** [admin-api/requirements.txt](admin-api/requirements.txt) does not include `asyncpg`. For PostgreSQL you must add `asyncpg==0.29.0` to admin-api’s `requirements.txt` (same as customer-api), then redeploy.
+6. **Python version:** As with customer-api, use Python 3.11 to avoid asyncpg/greenlet wheel build failures. Add `admin-api/.python-version` with `3.11` or set **Environment** → `PYTHON_VERSION` = `3.11.9`.
 7. **Create Web Service**. Note the admin-api URL (e.g. `https://admin-api-xxxx.onrender.com`).
 
 ---
