@@ -114,7 +114,6 @@ npm run android     # Android emulator
 | admin-api | `DATABASE_URL` | Same as customer-api |
 | admin-api | `SECRET_KEY` | Same as customer-api |
 | customer-web | `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8000/v1` (or unset to use `/api` rewrites) |
-| customer-web | `NEXT_PUBLIC_ADMIN_URL` | `http://127.0.0.1:5173` |
 | admin-web | `VITE_API_URL` | `/api` (proxied to 8001/v1) |
 | discovery-api | `DATABASE_URL` | `sqlite+aiosqlite:///./discovery.db` |
 | discovery-web | `VITE_DISCOVERY_API_URL` or proxy | `/api` (proxied to 8004) |

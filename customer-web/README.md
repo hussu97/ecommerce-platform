@@ -35,7 +35,6 @@ npm install
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NEXT_PUBLIC_API_URL` | (unset → `/api` rewrites) | Customer API base URL including `/v1` (e.g. `http://127.0.0.1:8000/v1`). |
-| `NEXT_PUBLIC_ADMIN_URL` | `http://127.0.0.1:5173` | Admin Web URL for dashboard link. |
 
 Set in `.env.local`; restart the dev server after changes.
 
@@ -48,4 +47,3 @@ Set in `.env.local`; restart the dev server after changes.
 - Orders history and order detail
 - Profile and saved addresses (CRUD)
 - Multi-language (EN/AR)
-- Admin Dashboard link (opens Admin Web in new tab)

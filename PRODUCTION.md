@@ -24,7 +24,7 @@ Steps to make the ecommerce platform production-ready and deploy to a server or 
 - [ ] Use HTTPS in production (reverse proxy or platform handles SSL)
 
 ### Frontend URLs (production)
-- [ ] **customer-web:** `NEXT_PUBLIC_API_URL` → production customer-api URL; `NEXT_PUBLIC_ADMIN_URL` → admin-web URL if needed
+- [ ] **customer-web:** `NEXT_PUBLIC_API_URL` → production customer-api URL
 - [ ] **admin-web:** API base URL (e.g. `VITE_API_URL` or proxy target) → production admin-api URL
 - [ ] **shop:** `EXPO_PUBLIC_API_URL` → production customer-api URL (for EAS / web builds)
 
@@ -214,8 +214,8 @@ If your Render plan includes Shell access: open the **customer-api** service →
    - **Framework Preset:** Next.js (auto-detected).
 3. **Environment Variables** → Add:
    - `NEXT_PUBLIC_API_URL` = `https://customer-api-xxxx.onrender.com/v1` (your Render customer-api URL + `/v1`).
-   - `NEXT_PUBLIC_ADMIN_URL` = (admin-web URL; you can add this after deploying admin-web in Phase 6, or leave default).
 4. **Deploy**. After success, note the deployment URL (e.g. `https://customer-web-xxx.vercel.app`).
+   - If the build fails with **Tailwind “Cannot find native binding” / `@tailwindcss/oxide-linux-x64-gnu`**: customer-web adds that package as an optional dependency so Vercel (Linux) installs it. Ensure **Install Command** is `npm install` (not `npm ci`) so optional dependencies are installed for the build platform.
 
 ---
 

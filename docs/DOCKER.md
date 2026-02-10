@@ -86,8 +86,6 @@ Point `EXPO_PUBLIC_API_URL` to `http://127.0.0.1:8002/v1` (customer-api) or `htt
 
 ## Environment overrides
 
-For customer-web in Docker, the "Admin" link points to the default admin URL (port 5173). If you use only the Docker stack, set `NEXT_PUBLIC_ADMIN_URL=http://127.0.0.1:5174` so the link opens the Docker admin-web (host port 5174).
-
 Copy `.env.docker.example` to `.env` and set any overrides. Then:
 
 ```bash
