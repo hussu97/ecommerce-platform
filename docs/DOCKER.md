@@ -15,9 +15,11 @@ docker compose up --build
 
 - **Customer Web**: http://127.0.0.1:3002 (proxies `/api` to customer-api)
 - **Admin Web**: http://127.0.0.1:5174 (proxies `/api` to admin-api)
+- **Discovery Web**: http://127.0.0.1:5176 (proxies `/api` to discovery-api)
 - **Customer BFF**: http://127.0.0.1:8012 (optional; proxy + rate limit + aggregation in front of customer-api)
 - **Customer API**: http://127.0.0.1:8002 (docs: http://127.0.0.1:8002/docs)
 - **Admin API**: http://127.0.0.1:8003 (docs: http://127.0.0.1:8003/docs)
+- **Discovery API**: http://127.0.0.1:8006 (docs: http://127.0.0.1:8006/docs)
 
 ## Ports (Docker published)
 
@@ -28,6 +30,8 @@ docker compose up --build
 | admin-api | 8003 | 8001 | Local dev uses 8001 |
 | customer-web | 3002 | 3000 | Local dev uses 3000 |
 | admin-web | 5174 | 5173 | Local dev uses 5173 |
+| discovery-api | 8006 | 8004 | Local dev uses 8004 |
+| discovery-web | 5176 | 5175 | Local dev uses 5175 |
 | redis | 6379 | 6379 | Optional (profile `with-redis`) |
 
 ## Services
@@ -41,12 +45,15 @@ docker compose up --build
 | init | same as customer-api | One-time: seeds DB (admin + sample data); exits |
 | customer-web | build ./customer-web | Next.js customer app |
 | admin-web | build ./admin-web | Vite admin dashboard |
+| discovery-api | build ./discovery-api | Product discovery pipeline (own DB) |
+| discovery-web | build ./discovery-web | Discovery dashboard (view products, trigger runs) |
 | redis | redis:7-alpine | Optional (profile `with-redis`) |
 
 ## Database and volumes
 
 - **dbdata**: SQLite file at `/data/ecommerce.db` inside containers. Shared by customer-api, admin-api, bulk-import-worker, and init.
 - **uploaddata**: Bulk upload files at `/app/uploads`. Shared by admin-api and bulk-import-worker.
+- **discoverydata**: Discovery API’s SQLite at `/data/discovery.db`. Used only by discovery-api.
 
 The **init** service runs after customer-api is healthy: it runs `ensure_admin.py` and `reset_and_seed.py` once, then creates `/data/.seeded` so it skips on future restarts. To re-seed, remove the volume and start again:
 

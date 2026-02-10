@@ -7,8 +7,10 @@
 | **Customer BFF** | `customer-bff/` | Optional layer in front of customer-api: proxy, rate limiting, aggregation (e.g. checkout-context). Used by customer-web and shop when configured. |
 | **Customer API** | `customer-api/` | Auth, products (read), cart, orders, addresses, i18n |
 | **Admin API** | `admin-api/` | Admin-only: products CRUD, orders management, taxonomies, brands |
+| **Discovery API** | `discovery-api/` | Product discovery pipeline: strategies, runs, list/filter discovered products (own DB) |
 | **Customer Web** | `customer-web/` | Next.js customer web app |
 | **Admin Web** | `admin-web/` | Desktop admin dashboard (React + Vite) |
+| **Discovery Web** | `discovery-web/` | Discovery dashboard: view products, filters, trigger runs |
 | **Shop** | `shop/` | Cross-platform app (React Native + Expo) |
 
 ## Ports
@@ -20,8 +22,10 @@ Ports are split so **local dev** and **Docker** can run in parallel without conf
 | Customer BFF | 8010 | 8012 |
 | Customer API | 8000 | 8002 |
 | Admin API | 8001 | 8003 |
+| Discovery API | 8004 | 8006 |
 | Customer Web | 3000 | 3002 |
 | Admin Web | 5173 | 5174 |
+| Discovery Web | 5175 | 5176 |
 | Redis (optional) | 6379 | 6379 (profile `with-redis`) |
 
 ## Design tokens
@@ -87,9 +91,11 @@ docker compose up --build
 
 - Customer Web: http://127.0.0.1:3002
 - Admin Web: http://127.0.0.1:5174
+- Discovery Web: http://127.0.0.1:5176
 - Customer BFF: http://127.0.0.1:8012 (optional; when used, point customer-web/shop API URL here)
 - Customer API: http://127.0.0.1:8002 (docs: http://127.0.0.1:8002/docs)
 - Admin API: http://127.0.0.1:8003 (docs: http://127.0.0.1:8003/docs)
+- Discovery API: http://127.0.0.1:8006 (docs: http://127.0.0.1:8006/docs)
 
 An **init** service seeds the DB once (admin + sample data). **Shop** is not in Docker; run `cd shop && npm start` on the host and set `EXPO_PUBLIC_API_URL=http://127.0.0.1:8002/v1` to talk to the Docker-exposed customer-api. See [docs/DOCKER.md](docs/DOCKER.md).
 
@@ -104,9 +110,11 @@ An **init** service seeds the DB once (admin + sample data). **Shop** is not in 
 
 1. **Customer API** (8000): `cd customer-api && python3 -m uvicorn app.main:app --reload`
 2. **Admin API** (8001): `cd admin-api && python3 -m uvicorn app.main:app --reload --port 8001`
-3. **Customer Web** (3000): `cd customer-web && npm run dev`
-4. **Admin Web** (5173): `cd admin-web && npm run dev`
-5. **Shop**: `cd shop && npm start`
+3. **Discovery API** (8004): `cd discovery-api && python3 -m uvicorn app.main:app --reload --port 8004`
+4. **Customer Web** (3000): `cd customer-web && npm run dev`
+5. **Admin Web** (5173): `cd admin-web && npm run dev`
+6. **Discovery Web** (5175): `cd discovery-web && npm run dev`
+7. **Shop**: `cd shop && npm start`
 
 ## Admin User
 

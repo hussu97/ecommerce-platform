@@ -10,8 +10,10 @@ Monorepo for the e-commerce platform: customer-facing and admin apps, with share
 |-----|--------|------|-------------|
 | **Customer API** | `customer-api/` | 8000 | FastAPI – auth, products (read), cart, orders (create + user history) |
 | **Admin API** | `admin-api/` | 8001 | FastAPI – admin-only: products CRUD, orders management, taxonomies |
+| **Discovery API** | `discovery-api/` | 8004 | FastAPI – product discovery pipeline (own DB); strategies, runs, list products |
 | **Customer Web** | `customer-web/` | 3000 | Next.js – customer web app (browser) |
 | **Admin Web** | `admin-web/` | 5173 | React + Vite – desktop admin dashboard |
+| **Discovery Web** | `discovery-web/` | 5175 | React + Vite – discovery dashboard (view/filter products, trigger runs) |
 | **Shop** | `shop/` | - | React Native + Expo – cross-platform (Web, iOS, Android); feature-parallel to customer-web |
 
 **Note:** `customer-web` and `shop` must stay feature-parallel. When adding frontend features, implement in both apps. See `.cursor/rules/project-standards.mdc`.
@@ -62,7 +64,27 @@ npm install
 npm run dev
 ```
 
-### 5. Shop (Web / iOS / Android)
+### 5. Discovery API (port 8004)
+
+```bash
+cd discovery-api
+python3 -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python3 -m uvicorn app.main:app --reload --port 8004
+```
+
+### 6. Discovery Web (port 5175)
+
+```bash
+cd discovery-web
+npm install
+npm run dev
+```
+
+Start discovery-api first so the proxy can reach it. Open http://127.0.0.1:5175.
+
+### 7. Shop (Web / iOS / Android)
 
 ```bash
 cd shop
@@ -92,6 +114,8 @@ npm run android     # Android emulator
 | customer-web | `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8000/v1` (or unset to use `/api` rewrites) |
 | customer-web | `NEXT_PUBLIC_ADMIN_URL` | `http://127.0.0.1:5173` |
 | admin-web | `VITE_API_URL` | `/api` (proxied to 8001/v1) |
+| discovery-api | `DATABASE_URL` | `sqlite+aiosqlite:///./discovery.db` |
+| discovery-web | `VITE_DISCOVERY_API_URL` or proxy | `/api` (proxied to 8004) |
 | shop | `EXPO_PUBLIC_API_URL` | `http://127.0.0.1:8000/v1` |
 
 ---
@@ -104,7 +128,7 @@ Run the full stack (APIs, customer-web, admin-web, bulk-import worker) in contai
 docker compose up --build
 ```
 
-Then open http://127.0.0.1:3002 (customer) and http://127.0.0.1:5174 (admin). The **Shop** app runs on the host: `cd shop && npm start` and should use `EXPO_PUBLIC_API_URL=http://127.0.0.1:8002/v1` to reach the Docker customer-api. See [docs/DOCKER.md](docs/DOCKER.md). For local vs Docker and macOS/Windows, see [ARCHITECTURE.md](ARCHITECTURE.md) (“Running: local vs Docker”).
+Then open http://127.0.0.1:3002 (customer), http://127.0.0.1:5174 (admin), and http://127.0.0.1:5176 (discovery). The **Shop** app runs on the host: `cd shop && npm start` and should use `EXPO_PUBLIC_API_URL=http://127.0.0.1:8002/v1` to reach the Docker customer-api. See [docs/DOCKER.md](docs/DOCKER.md). For local vs Docker and macOS/Windows, see [ARCHITECTURE.md](ARCHITECTURE.md) (“Running: local vs Docker”).
 
 ---
 
@@ -118,6 +142,8 @@ Then open http://127.0.0.1:3002 (customer) and http://127.0.0.1:5174 (admin). Th
 - [admin-api/README.md](admin-api/README.md) – Admin API
 - [customer-web/README.md](customer-web/README.md) – Customer Web
 - [admin-web/README.md](admin-web/README.md) – Admin Web
+- [discovery-api/README.md](discovery-api/README.md) – Discovery API
+- [discovery-web/README.md](discovery-web/README.md) – Discovery Web
 - [shop/README.md](shop/README.md) – Shop (React Native + Expo)
 - [design_template.html](design_template.html) – UI reference (tokens, PDP, filters, cart)
 - [FRONTEND_REDESIGN_PROMPTS.md](FRONTEND_REDESIGN_PROMPTS.md) – Customer-web & admin redesign prompts

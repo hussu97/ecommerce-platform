@@ -57,6 +57,8 @@ Use the existing [docker-compose.yml](docker-compose.yml) and [docs/DOCKER.md](d
 - **customer-web** – Next.js customer app (build from root for design-tokens)
 - **admin-web** – Vite admin dashboard (build from root for design-tokens)
 
+**Discovery API / Discovery Web** – Optional internal tools for product discovery (separate DB). Add `discovery-api` and `discovery-web` to Compose if needed; use their own volume for discovery DB. Auth can be added later (e.g. API key or admin JWT).
+
 **Shop** (Expo) is not in Docker; build and distribute via EAS (iOS/Android) or deploy the web build separately.
 
 ### Production steps (Docker)
