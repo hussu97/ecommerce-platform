@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
-from typing import Optional
+from typing import Optional, Union
 
 
 class Settings(BaseSettings):
@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     
     # CORS (allow localhost and 127.0.0.1 - http and https so dev with HTTPS works)
-    BACKEND_CORS_ORIGINS: list[str] = [
+    # Type Union so env is read as string (comma-separated); validator normalizes to list.
+    BACKEND_CORS_ORIGINS: Union[str, list[str]] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://localhost:3000",
@@ -43,9 +44,11 @@ class Settings(BaseSettings):
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v):  # noqa: ANN001
-        """Accept comma-separated string from env as well as list."""
+        """Accept comma-separated string from env (no JSON required) or list."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",") if origin.strip()]
+        if isinstance(v, list):
+            return v
         return v
     
     # Stripe
