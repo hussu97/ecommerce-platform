@@ -10,7 +10,14 @@ function getBaseURL(): string {
   const publicUrl = process.env.NEXT_PUBLIC_API_URL;
   let raw: string;
   if (publicUrl && isBrowser) {
-    const pageProto = typeof window !== "undefined" ? window.location?.protocol?.toLowerCase() : "";
+    let pageProto = "";
+    try {
+      if (typeof window !== "undefined" && typeof window.location !== "undefined") {
+        pageProto = window.location.protocol?.toLowerCase() ?? "";
+      }
+    } catch {
+      // Some environments (e.g. build) may have window but not location
+    }
     const apiIsHttp = publicUrl.toLowerCase().startsWith("http://");
     if (pageProto === "https:" && apiIsHttp) {
       raw = "/api";
