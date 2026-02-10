@@ -89,15 +89,19 @@ export function ProductListPage() {
             id="run-strategy"
             style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #ccc" }}
           >
-            <option value="mock_trending">Mock Trending</option>
             <option value="all">All</option>
+            {strategies.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
           </select>
           <button
             type="button"
             disabled={runLoading}
             onClick={() => {
               const sel = document.getElementById("run-strategy") as HTMLSelectElement;
-              onRun(sel?.value || "mock_trending");
+              onRun(sel?.value || "all");
             }}
             style={{
               padding: "8px 16px",
