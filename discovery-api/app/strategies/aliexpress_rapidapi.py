@@ -1,4 +1,4 @@
-"""AliExpress product discovery via RapidAPI."""
+"""AliExpress product discovery via Aliexpress True API (RapidAPI) – /hot-products."""
 import logging
 import time
 from typing import Any, Dict, List, Optional
@@ -7,29 +7,19 @@ import httpx
 
 from app.core.config import settings
 from app.services.discovery_filters import filter_by_max_asp, exclude_keywords_in_title
+from app.services.query_source import get_queries
 from app.strategies.base import BaseStrategy
 
 logger = logging.getLogger(__name__)
 
-# Default search terms (generic, low-ASP)
-DEFAULT_QUERIES = [
-    "wireless earbuds",
-    "phone stand",
-    "yoga mat",
-    "desk organizer",
-    "led lamp",
-]
+# AliExpress free tier is tight; cap queries per run
+ALIEXPRESS_MAX_QUERIES = 5
+HOT_PRODUCTS_PAGE_SIZE = 30
 
 
 def _get_queries() -> List[str]:
-    """Query list from config or default."""
-    raw = getattr(settings, "DISCOVERY_QUERY_LIST", None) or ""
-    raw = (raw or "").strip()
-    if raw:
-        if "," in raw:
-            return [q.strip() for q in raw.split(",") if q.strip()][:10]
-        return [raw]
-    return DEFAULT_QUERIES[:5]  # limit requests for free tier
+    """Query list from DISCOVERY_QUERY_SOURCE (static, trending, reddit, tokinsight), capped for free tier."""
+    return get_queries(max_queries=ALIEXPRESS_MAX_QUERIES)
 
 
 def _price_to_float(val: Any) -> Optional[float]:
@@ -43,125 +33,120 @@ def _price_to_float(val: Any) -> Optional[float]:
         return None
 
 
-def _normalize_item(item: dict, max_aed: float) -> Optional[dict]:
+def _normalize_hot_product(item: dict, max_aed: float) -> Optional[dict]:
     """
-    Map a generic AliExpress-style result to discovery dict.
-    Tries common RapidAPI AliExpress response keys.
+    Map one Aliexpress True API hot-product item to discovery dict.
+    Response shape: product_id, product_title, product_main_image_url, target_sale_price,
+    target_original_price, discount, commission_rate, evaluate_rate, lastest_volume, promotion_link.
     """
-    title = (
-        item.get("title")
-        or item.get("title_en")
-        or item.get("product_title")
-        or item.get("titleEn")
-        or ""
-    )
+    title = item.get("product_title") or ""
     if isinstance(title, str):
         title = title.strip()
     if not title or exclude_keywords_in_title(title):
         return None
-    url = (
-        item.get("product_detail_url")
-        or item.get("product_url")
-        or item.get("url")
-        or item.get("link")
-        or item.get("detail_url")
-        or ""
-    )
-    if isinstance(url, str):
-        url = url.strip()
+    product_id = item.get("product_id")
+    url = (item.get("promotion_link") or "").strip()
+    if not url and product_id is not None:
+        url = f"https://www.aliexpress.com/item/{product_id}.html"
     if not url:
         return None
-    image_url = (
-        item.get("product_main_image_url")
-        or item.get("image_url")
-        or item.get("thumbnail")
-        or item.get("image")
-        or item.get("product_image")
-    )
-    price = _price_to_float(
-        item.get("sale_price")
-        or item.get("price")
-        or item.get("target_sale_price")
-        or item.get("min_price")
-        or item.get("price_min")
-    )
-    currency = (item.get("currency") or "USD").strip().upper() or "USD"
+    image_url = item.get("product_main_image_url")
+    price = _price_to_float(item.get("target_sale_price"))
+    currency = "USD"
     if not filter_by_max_asp(price, currency, max_aed):
         return None
     raw_payload = {
-        "product_id": item.get("product_id") or item.get("productId"),
-        "original_price": item.get("original_price") or item.get("original_price_min"),
+        "product_id": product_id,
+        "target_original_price": item.get("target_original_price"),
+        "discount": item.get("discount"),
+        "commission_rate": item.get("commission_rate"),
+        "lastest_volume": item.get("lastest_volume"),
     }
     return {
         "title": title,
         "source_url": url,
-        "brand": None,  # AliExpress often generic
+        "brand": None,
         "image_url": image_url,
         "price": price,
         "currency": currency,
-        "delivers_to_uae": True,  # assume UAE for UAE-focused run
+        "delivers_to_uae": True,
         "raw_payload": raw_payload,
     }
 
 
 class AliExpressRapidAPIStrategy(BaseStrategy):
     strategy_id = "aliexpress_trending_uae"
-    name = "AliExpress (RapidAPI)"
-    description = "Product discovery via AliExpress search on RapidAPI; filtered by max ASP (AED)."
+    name = "AliExpress (True API – hot products)"
+    description = "Product discovery via Aliexpress True API /hot-products (trending, high-commission); UAE targeting."
 
     def run(self) -> List[dict]:
-        """Call RapidAPI AliExpress search; normalize and filter by MAX_ASP_AED."""
+        """Call Aliexpress True API GET /hot-products; normalize and filter by MAX_ASP_AED."""
         api_key = settings.RAPIDAPI_KEY
-        host = settings.RAPIDAPI_ALIEXPRESS_HOST
+        host = (settings.RAPIDAPI_ALIEXPRESS_HOST or "").strip()
         if not api_key or not host:
             logger.warning("RAPIDAPI_KEY or RAPIDAPI_ALIEXPRESS_HOST not set; returning empty list")
             return []
         max_aed = getattr(settings, "DISCOVERY_MAX_ASP_AED", 500.0)
+        ship_to_country = getattr(settings, "DISCOVERY_ALIEXPRESS_SHIP_COUNTRY", "AE")
+        target_language = getattr(settings, "DISCOVERY_ALIEXPRESS_LANGUAGE", "EN")
+        # Optional API-side max price (USD) from DISCOVERY_MAX_ASP_AED
+        usd_to_aed = getattr(settings, "USD_TO_AED", 3.67)
+        max_sale_price_usd = max_aed / usd_to_aed if usd_to_aed else None
+
+        host_clean = host.replace("https://", "").split("/")[0]
+        base_url = f"https://{host_clean}/api/v3"
+        path = "/hot-products"
+        headers = {
+            "X-RapidAPI-Key": api_key,
+            "X-RapidAPI-Host": host_clean,
+        }
+
         queries = _get_queries()
         results: List[dict] = []
         seen: set = set()
-        headers = {
-            "X-RapidAPI-Key": api_key,
-            "X-RapidAPI-Host": host.strip(),
-        }
-        host_clean = host.strip().replace("https://", "").split("/")[0]
-        base_url = f"https://{host_clean}"
-        # Common path for RapidAPI AliExpress search APIs
-        search_path = "/search"
+
         with httpx.Client(timeout=30.0) as client:
             for i, query in enumerate(queries):
                 if i > 0:
                     time.sleep(0.5)
-                params = {"keyword": query}
+                params: Dict[str, Any] = {
+                    "keywords": query,
+                    "page_no": 1,
+                    "page_size": HOT_PRODUCTS_PAGE_SIZE,
+                    "target_currency": "USD",
+                    "target_language": target_language,
+                    "ship_to_country": ship_to_country,
+                    "sort": "LAST_VOLUME_DESC",
+                }
+                if max_sale_price_usd is not None:
+                    params["max_sale_price"] = max_sale_price_usd
                 try:
                     r = client.get(
-                        f"{base_url}{search_path}",
+                        f"{base_url}{path}",
                         params=params,
                         headers=headers,
                     )
                     r.raise_for_status()
                     data = r.json()
                 except Exception as e:
-                    logger.warning("RapidAPI AliExpress request failed for q=%s: %s", query, e)
+                    logger.warning("Aliexpress True API /hot-products failed for q=%s: %s", query, e)
                     continue
                 if not isinstance(data, dict):
                     continue
-                # Unnest common response shapes
-                items = (
-                    data.get("results")
-                    or data.get("result")
-                    or data.get("products")
-                    or data.get("data")
-                    or data.get("items")
-                )
-                if isinstance(items, dict):
-                    items = items.get("products") or items.get("items") or items.get("result") or []
-                if not isinstance(items, list):
+                products_obj = data.get("products")
+                if not isinstance(products_obj, dict):
                     continue
+                items = products_obj.get("product")
+                if not isinstance(items, list):
+                    # API might return a single object in some cases
+                    if isinstance(items, dict):
+                        items = [items]
+                    else:
+                        continue
                 for it in items:
                     if not isinstance(it, dict):
                         continue
-                    norm = _normalize_item(it, max_aed)
+                    norm = _normalize_hot_product(it, max_aed)
                     if norm and norm["source_url"] not in seen:
                         seen.add(norm["source_url"])
                         results.append(norm)
