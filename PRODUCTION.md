@@ -369,5 +369,3 @@ docker compose up --build
 ```
 
 The full stack includes discovery-api, discovery-web, and optionally customer-bff; see [docs/DOCKER.md](docs/DOCKER.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for ports and details.
-
-
