@@ -4,6 +4,8 @@ FastAPI backend for admin: products CRUD, orders management, taxonomies. Uses th
 
 ## Setup
 
+**Python:** 3.11+ (3.14 recommended). See `.python-version` in this directory.
+
 ```bash
 cd admin-api
 python3 -m venv venv

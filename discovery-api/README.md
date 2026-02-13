@@ -4,6 +4,8 @@ FastAPI backend for the product discovery pipeline: pluggable strategies, runs, 
 
 ## Setup
 
+**Python:** 3.11+ (3.14 recommended). See `.python-version` in this directory.
+
 ```bash
 cd discovery-api
 python3 -m venv venv

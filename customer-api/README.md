@@ -4,6 +4,8 @@ FastAPI backend for the customer-facing e-commerce flow: auth, products (read), 
 
 ## Setup
 
+**Python:** 3.11+ (3.14 recommended). See `.python-version` in this directory.
+
 ```bash
 cd customer-api
 python3 -m venv venv
