@@ -11,6 +11,7 @@ import { Image } from "expo-image";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { useCartStore } from "@/stores/useCartStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@/constants/Colors";
@@ -20,9 +21,15 @@ import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export default function CartScreen() {
   const { items, isLoading, fetchCart, removeFromCart, updateQuantity } = useCartStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const router = useRouter();
   const total = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
   const t = useI18nStore((s) => s.t);
+
+  const goToCheckout = () => {
+    if (isAuthenticated) router.push("/checkout");
+    else router.push("/login?redirect=/checkout");
+  };
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
@@ -127,7 +134,7 @@ export default function CartScreen() {
         </Text>
         <TouchableOpacity
           style={[styles.checkoutBtn, { backgroundColor: colors.primary }]}
-          onPress={() => router.push("/checkout")}
+          onPress={goToCheckout}
           activeOpacity={0.85}
         >
           <Text style={styles.checkoutBtnText}>{t("proceed_to_checkout")}</Text>

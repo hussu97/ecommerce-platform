@@ -123,15 +123,6 @@ export default function CheckoutPage() {
   const [addressesLoading, setAddressesLoading] = useState(true);
   const [selectedAddressCode, setSelectedAddressCode] = useState<string | null>(null);
   const [step1Error, setStep1Error] = useState("");
-  const [inlineAddress, setInlineAddress] = useState({
-    contact_name: "",
-    phone: "",
-    street: "",
-    city: "",
-    state_province: "",
-    country: "United Arab Emirates",
-    postal_code: "",
-  });
   const shippingCost = 25;
 
   useEffect(() => {
@@ -154,41 +145,17 @@ export default function CheckoutPage() {
     })();
   }, [isAuthenticated, router]);
 
-  const handleAddressSubmit = async (e: React.FormEvent) => {
+  const handleContinueToPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep1Error("");
     if (items.length === 0) return;
-
-    let addressCodeToUse = selectedAddressCode;
-    if (!addressCodeToUse && addresses.length === 0) {
-      if (!inlineAddress.street.trim() || !inlineAddress.city.trim() || !inlineAddress.country.trim() || !inlineAddress.contact_name.trim() || !inlineAddress.phone.trim()) {
-        setStep1Error(t("please_fill_required"));
-        return;
-      }
-      try {
-        const created = await api.post<SavedAddress>("/addresses", {
-          contact_name: inlineAddress.contact_name,
-          phone: inlineAddress.phone,
-          address_type: "home",
-          street: inlineAddress.street,
-          city: inlineAddress.city,
-          country: inlineAddress.country,
-          state_province: inlineAddress.state_province || undefined,
-          postal_code: inlineAddress.postal_code || undefined,
-        });
-        addressCodeToUse = created.data.address_code;
-      } catch (err) {
-        console.error("Failed to create address", err);
-        alert(t("failed_to_create_order"));
-        return;
-      }
-    }
-    if (!addressCodeToUse) return;
+    if (!selectedAddressCode) return;
 
     try {
       const key = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "";
       setIdempotencyKey(key);
-      const totalAmount = getCartTotal() + (addresses.find((a) => a.address_code === addressCodeToUse)?.country === "United Arab Emirates" || inlineAddress.country === "United Arab Emirates" ? 0 : shippingCost);
+      const selectedAddr = addresses.find((a) => a.address_code === selectedAddressCode);
+      const totalAmount = getCartTotal() + (selectedAddr?.country === "United Arab Emirates" ? 0 : shippingCost);
       const response = await api.post(
         "/orders/create-payment-intent",
         { amount: totalAmount },
@@ -196,7 +163,6 @@ export default function CheckoutPage() {
       );
       const secret = response.data?.client_secret ?? "mock_secret_for_testing";
       setClientSecret(secret);
-      setSelectedAddressCode(addressCodeToUse);
       setStep(2);
     } catch (error) {
       console.error("Error creating payment intent:", error);
@@ -205,7 +171,8 @@ export default function CheckoutPage() {
   };
 
   const selectedAddress = addresses.find((a) => a.address_code === selectedAddressCode);
-  const total = getCartTotal() + (selectedAddress?.country === "United Arab Emirates" || (addresses.length === 0 && inlineAddress.country === "United Arab Emirates") ? 0 : shippingCost);
+  const total = getCartTotal() + (selectedAddress?.country === "United Arab Emirates" ? 0 : shippingCost);
+  const hasAddress = addresses.length > 0;
 
   if (items.length === 0) {
     return (
@@ -243,100 +210,44 @@ export default function CheckoutPage() {
             <section className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h3 className="serif-font text-lg font-bold text-[#181511]">{t("delivery_address")}</h3>
-                {addresses.length > 0 && (
-                  <Link href="/profile/addresses" className="text-[#ec9213] text-xs font-semibold">{t("change")}</Link>
+                {hasAddress && (
+                  <Link href="/profile/addresses?returnTo=/checkout" className="text-[#ec9213] text-xs font-semibold">{t("change")}</Link>
                 )}
               </div>
               {addressesLoading ? (
                 <PageLoader className="py-8 min-h-[120px]" />
-              ) : addresses.length > 0 ? (
-                <form onSubmit={handleAddressSubmit} className="space-y-3">
-                  <div className="space-y-2">
-                    {addresses.map((addr) => (
-                      <button
-                        key={addr.address_code}
-                        type="button"
-                        onClick={() => setSelectedAddressCode(addr.address_code)}
-                        className={`w-full text-left rounded-xl p-4 border-2 transition-all ${
-                          selectedAddressCode === addr.address_code
-                            ? "border-[#ec9213] bg-[#ec9213]/5"
-                            : "border-[#e5e1da] bg-white hover:border-[#d6cfc5]"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="size-10 rounded-lg bg-[#f2efe9] flex items-center justify-center text-[#897961]">
-                            {addr.address_type === "office" ? <Building2 className="size-5" /> : addr.address_type === "other" ? <MapPin className="size-5" /> : <Home className="size-5" />}
-                          </div>
-                          <div>
-                            <p className="font-bold text-[#181511]">{addr.contact_name}</p>
-                            <p className="text-sm text-[#897961]">{addr.street}, {addr.city}, {addr.country}</p>
-                            <p className="text-xs text-[#897961]">{addr.phone}</p>
-                          </div>
-                          {selectedAddressCode === addr.address_code && (
-                            <div className="ml-auto size-6 rounded-full bg-[#ec9213] flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">✓</span>
-                            </div>
-                          )}
+              ) : hasAddress ? (
+                <div className="space-y-3">
+                  {selectedAddress && (
+                    <div className="w-full text-left rounded-xl p-4 border-2 border-[#ec9213] bg-[#ec9213]/5">
+                      <div className="flex items-center gap-3">
+                        <div className="size-10 rounded-lg bg-[#f2efe9] flex items-center justify-center text-[#897961]">
+                          {selectedAddress.address_type === "office" ? <Building2 className="size-5" /> : selectedAddress.address_type === "other" ? <MapPin className="size-5" /> : <Home className="size-5" />}
                         </div>
-                      </button>
-                    ))}
-                  </div>
+                        <div>
+                          <p className="font-bold text-[#181511]">{selectedAddress.contact_name}</p>
+                          <p className="text-sm text-[#897961]">{selectedAddress.street}, {selectedAddress.city}, {selectedAddress.country}</p>
+                          <p className="text-xs text-[#897961]">{selectedAddress.phone}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <Link
                     href="/profile/addresses/new?from=checkout"
                     className="block text-center py-2 text-[#ec9213] text-sm font-semibold"
                   >
                     + {t("add_new_address")}
                   </Link>
-                </form>
+                </div>
               ) : (
-                <form onSubmit={handleAddressSubmit} className="space-y-3">
-                  {step1Error && <p className="text-sm text-red-600 mb-3">{step1Error}</p>}
-                  <p className="text-sm text-[#897961] mb-3">{t("add_delivery_address_hint")}</p>
-                  <input
-                    className="w-full bg-white border border-[#e5e1da] rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-[#ec9213] placeholder:text-[#897961]/60"
-                    placeholder={t("full_name")}
-                    value={inlineAddress.contact_name}
-                    onChange={(e) => setInlineAddress({ ...inlineAddress, contact_name: e.target.value })}
-                    required
-                  />
-                  <input
-                    className="w-full bg-white border border-[#e5e1da] rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-[#ec9213] placeholder:text-[#897961]/60"
-                    type="tel"
-                    placeholder={t("mobile_placeholder")}
-                    value={inlineAddress.phone}
-                    onChange={(e) => setInlineAddress({ ...inlineAddress, phone: e.target.value })}
-                    required
-                  />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      className="w-full bg-white border border-[#e5e1da] rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-[#ec9213] placeholder:text-[#897961]/60"
-                      placeholder={t("city_placeholder")}
-                      value={inlineAddress.city}
-                      onChange={(e) => setInlineAddress({ ...inlineAddress, city: e.target.value })}
-                      required
-                    />
-                    <input
-                      className="w-full bg-white border border-[#e5e1da] rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-[#ec9213] placeholder:text-[#897961]/60"
-                      placeholder={t("emirate_placeholder")}
-                      value={inlineAddress.state_province}
-                      onChange={(e) => setInlineAddress({ ...inlineAddress, state_province: e.target.value })}
-                    />
-                  </div>
-                  <input
-                    className="w-full bg-white border border-[#e5e1da] rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-[#ec9213] placeholder:text-[#897961]/60"
-                    placeholder={t("street_address_placeholder")}
-                    value={inlineAddress.street}
-                    onChange={(e) => setInlineAddress({ ...inlineAddress, street: e.target.value })}
-                    required
-                  />
-                  <input
-                    className="w-full bg-white border border-[#e5e1da] rounded-xl px-4 py-3.5 text-sm focus:ring-1 focus:ring-[#ec9213] placeholder:text-[#897961]/60"
-                    placeholder={t("country")}
-                    value={inlineAddress.country}
-                    onChange={(e) => setInlineAddress({ ...inlineAddress, country: e.target.value })}
-                    required
-                  />
-                </form>
+                <div className="rounded-xl p-6 border-2 border-dashed border-[#e5e1da] bg-white/50 text-center space-y-4">
+                  <p className="text-sm text-[#897961]">{t("no_address_yet")}</p>
+                  <Link href="/profile/addresses/new?from=checkout" className="block">
+                    <Button className="w-full bg-[#ec9213] text-white py-4 rounded-xl font-bold text-base shadow-lg shadow-[#ec9213]/30">
+                      {t("set_address")}
+                    </Button>
+                  </Link>
+                </div>
               )}
             </section>
 
@@ -354,22 +265,33 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <p className="text-sm font-bold text-[#ec9213]">
-                  {(selectedAddress?.country ?? inlineAddress.country) === "United Arab Emirates" ? t("free") : `AED ${shippingCost}`}
+                  {selectedAddress?.country === "United Arab Emirates" ? t("free") : `AED ${shippingCost}`}
                 </p>
               </div>
             </section>
           </>
         ) : null}
-        {/* Desktop: Continue to payment inside left column */}
+        {/* Desktop: Continue to payment or Set Address inside left column */}
         {step === 1 && (
           <div className="hidden md:block">
-            <Button
-              onClick={handleAddressSubmit}
-              className="w-full max-w-md bg-[#ec9213] text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-[#ec9213]/30 flex items-center justify-center gap-2"
-            >
-              {t("continue_to_payment")}
-              <ChevronRight className="size-5" />
-            </Button>
+            {hasAddress ? (
+              <Button
+                onClick={handleContinueToPayment}
+                className="w-full max-w-md bg-[#ec9213] text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-[#ec9213]/30 flex items-center justify-center gap-2"
+              >
+                {t("continue_to_payment")}
+                <ChevronRight className="size-5" />
+              </Button>
+            ) : (
+              <Link href="/profile/addresses/new?from=checkout" className="block w-full max-w-md">
+                <Button
+                  type="button"
+                  className="w-full bg-[#ec9213] text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-[#ec9213]/30 flex items-center justify-center gap-2"
+                >
+                  {t("set_address")}
+                </Button>
+              </Link>
+            )}
           </div>
         )}
         </div>
@@ -415,7 +337,7 @@ export default function CheckoutPage() {
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#897961]">{t("shipping")}</span>
               <span className="font-medium">
-                {(selectedAddress?.country ?? inlineAddress.country) === "United Arab Emirates" ? t("free") : `AED ${shippingCost}`}
+                {selectedAddress?.country === "United Arab Emirates" ? t("free") : `AED ${shippingCost}`}
               </span>
             </div>
             <div className="flex justify-between items-center pt-3 mt-1 border-t border-dashed border-[#e5e1da]">
@@ -494,19 +416,28 @@ export default function CheckoutPage() {
         )}
       </div>
 
-      {/* Fixed bottom CTA - step 1, mobile only; desktop show inline above or in left column */}
+      {/* Fixed bottom CTA - step 1, mobile only */}
       {step === 1 && (
-        <>
-          <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] md:hidden bg-white/90 backdrop-blur-xl border-t border-[#e5e1da] px-6 pt-4 pb-8 z-50">
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] md:hidden bg-white/90 backdrop-blur-xl border-t border-[#e5e1da] px-6 pt-4 pb-8 z-50">
+          {hasAddress ? (
             <Button
-              onClick={handleAddressSubmit}
+              onClick={handleContinueToPayment}
               className="w-full bg-[#ec9213] text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-[#ec9213]/30 flex items-center justify-center gap-2"
             >
               {t("continue_to_payment")}
               <ChevronRight className="size-5" />
             </Button>
-          </div>
-        </>
+          ) : (
+            <Link href="/profile/addresses/new?from=checkout" className="block w-full">
+              <Button
+                type="button"
+                className="w-full bg-[#ec9213] text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-[#ec9213]/30 flex items-center justify-center gap-2"
+              >
+                {t("set_address")}
+              </Button>
+            </Link>
+          )}
+        </div>
       )}
     </div>
   );

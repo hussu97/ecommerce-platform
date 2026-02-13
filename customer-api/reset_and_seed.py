@@ -310,6 +310,10 @@ UI_STRINGS = {
         "label_optional": "Label (e.g. Apartment 104)", "confirm_location": "Confirm Location",
         "pin_location": "Pin Location on Map", "country": "Country",
         "add_delivery_address_hint": "Add your delivery address to continue.",
+        "set_address": "Set Address",
+        "no_address_yet": "No delivery address – add one to continue.",
+        "back_to_checkout": "Back to checkout",
+        "sign_in_to_checkout": "Sign in to checkout",
         "please_fill_required": "Please fill required fields.",
         "please_fill_address_fields": "Please fill all address fields.",
         "please_select_or_add_address": "Please select or add an address.",
@@ -428,6 +432,10 @@ UI_STRINGS = {
         "label_optional": "التسمية (مثال: شقة 104)", "confirm_location": "تأكيد الموقع",
         "pin_location": "تحديد الموقع على الخريطة", "country": "الدولة",
         "add_delivery_address_hint": "أضف عنوان التوصيل للمتابعة.",
+        "set_address": "تعيين العنوان",
+        "no_address_yet": "لا يوجد عنوان توصيل – أضف واحداً للمتابعة.",
+        "back_to_checkout": "العودة للدفع",
+        "sign_in_to_checkout": "تسجيل الدخول للدفع",
         "please_fill_required": "يرجى ملء الحقول المطلوبة.",
         "please_fill_address_fields": "يرجى ملء جميع حقول العنوان.",
         "please_select_or_add_address": "يرجى اختيار أو إضافة عنوان.",
@@ -462,7 +470,7 @@ async def reset_and_seed():
     print("Dropping all tables...")
     async with engine.begin() as conn:
         # Drop admin-api tables that reference shared tables (e.g. users) so drop_all can succeed.
-        await conn.execute(text("DROP TABLE IF EXISTS product_bulk_uploads CASCADE"))
+        await conn.execute(text("DROP TABLE IF EXISTS product_bulk_uploads"))
         await conn.run_sync(Base.metadata.drop_all)
 
     print("Creating all tables...")
@@ -671,12 +679,14 @@ async def reset_and_seed():
             if pid in product_id_to_first_child_id
         ]
 
-        # Orders: 3-5 per customer
+        # Orders: 3-5 per customer (each customer has at least one address in seed)
         order_counter = 0
         all_order_items: list[tuple[OrderItem, int, str]] = []  # (item, user_id, product_id) for reviews
         for u in sample_users:
             addrs = addr_by_user.get(u.id, [])
-            ship_str = addrs[0].to_shipping_string() if addrs else "Dubai, UAE"
+            if not addrs:
+                continue
+            default_addr = addrs[0]
             n_orders = random.randint(3, 5)
             for _ in range(n_orders):
                 order_counter += 1
@@ -694,7 +704,8 @@ async def reset_and_seed():
                     user_id=u.id,
                     status="paid",
                     total_amount=round(total, 2),
-                    shipping_address=ship_str,
+                    address_code=default_addr.address_code,
+                    shipping_address=default_addr.to_shipping_string(),
                 )
                 session.add(ord_obj)
                 await session.flush()

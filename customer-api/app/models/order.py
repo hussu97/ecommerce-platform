@@ -12,7 +12,8 @@ class Order(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     status = Column(String, default="pending")  # pending, paid (payment status)
     total_amount = Column(Float, nullable=False)
-    shipping_address = Column(String)
+    address_code = Column(String(36), nullable=False)  # references customer_addresses.address_code
+    shipping_address = Column(String)  # denormalized display string from address at order creation
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

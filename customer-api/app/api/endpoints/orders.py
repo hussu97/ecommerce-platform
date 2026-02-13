@@ -142,34 +142,23 @@ async def create_order(
                 detail=f"Insufficient stock for {product.name} ({child.size_value}). Available: {child.stock_net}",
             )
 
-    # 2. Resolve shipping address string (saved address by address_code or inline)
-    shipping_str: str
-    if order_in.address_code:
-        addr_result = await db.execute(
-            select(CustomerAddress).where(
-                CustomerAddress.address_code == order_in.address_code,
-                CustomerAddress.user_id == current_user.id,
-            )
+    # 2. Resolve saved address by address_code (required)
+    addr_result = await db.execute(
+        select(CustomerAddress).where(
+            CustomerAddress.address_code == order_in.address_code,
+            CustomerAddress.user_id == current_user.id,
         )
-        saved_addr = addr_result.scalar_one_or_none()
-        if not saved_addr:
-            raise HTTPException(status_code=404, detail="Address not found")
-        shipping_str = saved_addr.to_shipping_string()
-    elif order_in.shipping_address:
-        address_in = order_in.shipping_address
-        parts = [address_in.street, address_in.city]
-        if address_in.state_province:
-            parts.append(address_in.state_province)
-        parts.extend([address_in.postal_code or "", address_in.country])
-        shipping_str = ", ".join(p for p in parts if p)
-    else:
-        raise HTTPException(status_code=400, detail="Provide address_code or shipping_address")
+    )
+    saved_addr = addr_result.scalar_one_or_none()
+    if not saved_addr:
+        raise HTTPException(status_code=404, detail="Address not found")
 
     new_order = Order(
         user_id=current_user.id,
         status="paid",
         total_amount=order_in.total_amount,
-        shipping_address=shipping_str
+        address_code=order_in.address_code,
+        shipping_address=saved_addr.to_shipping_string(),
     )
     db.add(new_order)
     await db.flush()
@@ -257,6 +246,7 @@ def _build_order_response(order, items_with_product, review_map):
         user_id=order.user_id,
         status=order.status,
         total_amount=order.total_amount,
+        address_code=order.address_code,
         shipping_address=order.shipping_address,
         created_at=order.created_at,
         items=sorted(item_responses, key=lambda x: x.order_item_number),

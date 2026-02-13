@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, ScrollView, View } from "react-native";
 import { Text } from "@/components/Themed";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
@@ -16,6 +16,8 @@ export default function NewAddressScreen() {
   const { isAuthenticated } = useAuthStore();
   const t = useI18nStore((s) => s.t);
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  const fromCheckout = returnTo === "/checkout";
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const [saving, setSaving] = useState(false);
@@ -62,9 +64,9 @@ export default function NewAddressScreen() {
         company_name: form.address_type === "office" ? form.company_name.trim() || undefined : undefined,
         building_name: form.building_name.trim() || undefined,
         floor_office: form.floor_office.trim() || undefined,
-        is_default: form.is_default,
+        is_default: fromCheckout || form.is_default,
       });
-      router.replace("/addresses");
+      router.replace(fromCheckout ? "/checkout" : "/addresses");
     } catch (err: unknown) {
       setError((err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t("failed_to_save_address"));
     } finally {

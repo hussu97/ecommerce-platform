@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/useCartStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import { Button } from "@/components/ui/Button";
 import { PageLoader } from "@/components/PageLoader";
@@ -19,8 +20,11 @@ export default function CartPage() {
     fetchCart,
     isLoading,
   } = useCartStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const t = useI18nStore((s) => s.t);
   const router = useRouter();
+
+  const checkoutHref = isAuthenticated ? "/checkout" : "/login?redirect=/checkout";
 
   useEffect(() => {
     fetchCart();
@@ -160,7 +164,7 @@ export default function CartPage() {
           </div>
           {/* Desktop: CTA inside summary column */}
           <div className="hidden md:block mt-4">
-            <Link href="/checkout" className="block w-full">
+            <Link href={checkoutHref} className="block w-full">
               <button className="w-full bg-[#ec9213] text-white py-4 rounded-xl text-sm font-bold uppercase tracking-widest shadow-lg shadow-[#ec9213]/30">
                 {t("proceed_to_checkout")}
               </button>
@@ -174,7 +178,7 @@ export default function CartPage() {
 
       {/* Fixed bottom CTA on mobile only */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] md:hidden bg-white/90 backdrop-blur-xl border-t border-[#e5e1da] px-6 py-8 z-50">
-        <Link href="/checkout" className="block w-full">
+        <Link href={checkoutHref} className="block w-full">
           <button className="w-full bg-[#ec9213] text-white py-4 rounded-full text-sm font-bold uppercase tracking-widest shadow-lg shadow-[#ec9213]/30 flex items-center justify-center gap-3 active:scale-[0.98] transition-transform">
             <span>{t("proceed_to_checkout")}</span>
             <span>→</span>

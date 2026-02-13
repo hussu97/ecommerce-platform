@@ -45,7 +45,7 @@ Set in `.env`; restart Expo after changes.
 - Product detail
 - Cart (guest + logged-in)
 - Login / Sign up
-- Checkout
+- **Checkout:** Requires login (cart sends unauthenticated users to login with return to checkout). Delivery address must be set from saved addresses: add or select an address on the addresses screen; no inline address form on checkout. If the user has no address, the primary CTA is “Set Address” to add one, then return to checkout.
 - Orders and order detail
 - Saved addresses (CRUD)
 - Product reviews (rate after purchase)

@@ -10,19 +10,10 @@ class OrderItemSchema(BaseModel):
     price_at_purchase: float = Field(..., ge=0)
 
 
-class AddressSchema(BaseModel):
-    street: str = Field(..., max_length=500)
-    city: str = Field(..., max_length=100)
-    country: str = Field(..., max_length=100)
-    postal_code: Optional[str] = Field(None, max_length=20)
-    state_province: Optional[str] = Field(None, max_length=100)
-
-
 class OrderCreate(BaseModel):
     items: List[OrderItemSchema]
     total_amount: float = Field(..., ge=0)
-    address_code: Optional[str] = Field(None, max_length=36)  # use saved address (preferred)
-    shipping_address: Optional[AddressSchema] = None  # inline address when no saved address
+    address_code: str = Field(..., max_length=36)  # required; must be a saved address for current user
 
 
 class PaymentIntentCreate(BaseModel):
@@ -70,6 +61,7 @@ class OrderResponse(BaseModel):
     user_id: int
     status: str
     total_amount: float
+    address_code: Optional[str] = None
     shipping_address: Optional[str] = None
     created_at: datetime
     items: List[OrderItemResponse] = []

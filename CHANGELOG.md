@@ -6,8 +6,6 @@ All notable changes are recorded here only. Use format: `## YYYY-MM-DD` for the 
 
 ## [Unreleased]
 
-- **Vertical PLP display ads JIRA tasks:** Added docs/jira_vertical_plp_display_ads.csv and docs/jira_vertical_plp_display_ads_reference.md for bulk upload to JIRA. Tasks split by Backend (9) and Frontend (3), plus optional Epic. Converted from admon standup meeting minutes (admon_summary.txt). (docs)
-
 - **Checkout address flow refactor:** Orders use only `address_code` (required); removed inline `shipping_address` from order create API. Order model has non-nullable `address_code`; seed creates orders with address_code from customer addresses. customer-web and shop: cart auth guard (redirect to login with return to checkout); checkout shows address selector or empty state with “Set Address” linking to addresses screen; no inline address form. Addresses flow supports return to checkout. i18n keys: set_address, no_address_yet, back_to_checkout, sign_in_to_checkout (EN/AR). README checkout flow description updated. (customer-api, customer-web, shop)
 
 - **Design tokens: local theme.css in customer-web and admin-web; remove packages/design-tokens:** Both apps now use a local theme file (customer-web/app/theme.css, admin-web/src/theme.css) with identical token values; shop uses the same values in constants/Colors.ts. Added .cursor/rules/design-tokens-sync.mdc to keep both theme files (and shop) in sync. Removed packages/design-tokens; root workspaces no longer include packages/*; Dockerfiles and PRODUCTION, ARCHITECTURE, README, design_template, NEXT_TODO updated. (customer-web, admin-web, shop, .cursor/rules, PRODUCTION, ARCHITECTURE, README, docs)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
 import { Text } from "@/components/Themed";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
@@ -39,6 +39,8 @@ export default function AddressesScreen() {
   const { isAuthenticated } = useAuthStore();
   const t = useI18nStore((s) => s.t);
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  const returnToCheckout = returnTo === "/checkout";
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
   const [loading, setLoading] = useState(true);
   const colorScheme = useColorScheme();
@@ -91,6 +93,12 @@ export default function AddressesScreen() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          {returnToCheckout && (
+            <TouchableOpacity onPress={() => router.push("/checkout")} style={styles.backToCheckout}>
+              <Ionicons name="chevron-back" size={18} color={colors.primary} />
+              <Text style={[styles.backToCheckoutText, { color: colors.primary }]}>{t("back_to_checkout")}</Text>
+            </TouchableOpacity>
+          )}
           <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>{t("saved_locations")}</Text>
           <Text style={[styles.sectionHint, { color: colors.textMuted }]}>{t("saved_locations_hint")}</Text>
           {addresses.map((addr) => (
@@ -142,7 +150,7 @@ export default function AddressesScreen() {
       <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.sandDivider }]}>
         <TouchableOpacity
           style={[styles.addBtn, { backgroundColor: colors.primary }]}
-          onPress={() => router.push("/addresses/new")}
+          onPress={() => router.push(returnToCheckout ? "/addresses/new?returnTo=/checkout" : "/addresses/new")}
         >
           <Ionicons name="add-circle-outline" size={22} color="#fff" />
           <Text style={styles.addBtnText}>{t("add_new_address")}</Text>
@@ -167,6 +175,8 @@ const styles = StyleSheet.create({
   loader: { flex: 1, marginTop: 24 },
   scroll: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 100 },
+  backToCheckout: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 16 },
+  backToCheckoutText: { fontSize: 14, fontWeight: "600" },
   sectionLabel: { fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 },
   sectionHint: { fontSize: 12, marginBottom: 16 },
   card: {

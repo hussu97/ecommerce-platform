@@ -41,7 +41,7 @@ Both `customer-api` and `admin-api` use the same SQLite database. Set `admin-api
 - **User** – Auth, profile, role (customer/admin)
 - **Product** – Catalog (code, slug, content, price). Stock lives on **ProductChild** only.
 - **ProductChild** – Variants/sizes per product: code, barcode, size_value (e.g. "S", "M", "L", or "single_size"), stock_quantity, stock_reserved. Every product has at least one child.
-- **Order** / **OrderItem** – OrderItem has required product_child_id. Orders always reference a child.
+- **Order** / **OrderItem** – Order has required `address_code` (saved CustomerAddress) and denormalized `shipping_address` for display. OrderItem has required product_child_id. Orders always reference a child.
 - **CustomerAddress** – Saved delivery addresses (address_code, user_id)
 - **ProductReview** – Reviews linked to order items
 - **CartItem** – Guest (X-Visitor-ID) or logged-in; required product_child_id (cart always references a child)

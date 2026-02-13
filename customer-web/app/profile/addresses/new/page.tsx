@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
@@ -14,6 +14,8 @@ export default function NewAddressPage() {
   const { isAuthenticated } = useAuthStore();
   const t = useI18nStore((s) => s.t);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromCheckout = searchParams.get("from") === "checkout";
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -58,9 +60,9 @@ export default function NewAddressPage() {
         company_name: form.address_type === "office" ? form.company_name.trim() || undefined : undefined,
         building_name: form.building_name.trim() || undefined,
         floor_office: form.floor_office.trim() || undefined,
-        is_default: form.is_default,
+        is_default: fromCheckout || form.is_default,
       });
-      router.push("/profile/addresses");
+      router.push(fromCheckout ? "/checkout" : "/profile/addresses");
     } catch (err: unknown) {
       setError(getApiErrorDetail(err, t("failed_to_save_address")));
     } finally {

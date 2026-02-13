@@ -43,7 +43,7 @@ Set in `.env.local`; restart the dev server after changes.
 - Product listing, filters, and detail
 - Cart (guest + logged-in)
 - Login / Sign up
-- Checkout (address selection, mock payment)
+- **Checkout:** Requires login (cart sends unauthenticated users to login with return to checkout). Delivery address must be set from saved addresses: add or select an address on the profile addresses screen; no inline address form on checkout. Address selector shows default address with a link to manage addresses; if the user has no address, the primary CTA is “Set Address” to add one, then return to checkout.
 - Orders history and order detail
 - Profile and saved addresses (CRUD)
 - Multi-language (EN/AR)

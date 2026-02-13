@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, View, ActivityIndicator } from "react-native";
+import { StyleSheet, TouchableOpacity, ScrollView, Alert, View, ActivityIndicator } from "react-native";
 import { Text } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import api from "@/lib/api";
@@ -32,14 +32,10 @@ export default function CheckoutScreen() {
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
   const [addressesLoading, setAddressesLoading] = useState(true);
   const [selectedAddressCode, setSelectedAddressCode] = useState<string | null>(null);
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [country, setCountry] = useState("United Arab Emirates");
-  const [postalCode, setPostalCode] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const idempotencyKeyRef = useRef<string | null>(null);
+
+  const hasAddress = addresses.length > 0;
 
   const total = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
 
@@ -65,37 +61,12 @@ export default function CheckoutScreen() {
   }, [isAuthenticated]);
 
   if (!isAuthenticated) {
-    router.replace("/login");
+    router.replace("/login?redirect=/checkout");
     return null;
   }
 
   const handlePlaceOrder = async () => {
-    let addressCodeToUse = selectedAddressCode;
-    if (!addressCodeToUse && addresses.length === 0) {
-      if (!street.trim() || !city.trim() || !country.trim() || !contactName.trim() || !phone.trim()) {
-        Alert.alert(t("checkout"), t("please_fill_address_fields"));
-        return;
-      }
-      try {
-        const created = await api.post<SavedAddress>("/addresses", {
-          contact_name: contactName.trim(),
-          phone: phone.trim(),
-          address_type: "home",
-          street: street.trim(),
-          city: city.trim(),
-          country: country.trim(),
-          postal_code: postalCode.trim() || undefined,
-        });
-        addressCodeToUse = created.data.address_code;
-      } catch (err) {
-        Alert.alert(t("checkout"), (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? t("failed_to_create_order"));
-        return;
-      }
-    }
-    if (!addressCodeToUse) {
-      Alert.alert(t("checkout"), t("please_select_or_add_address"));
-      return;
-    }
+    if (!selectedAddressCode) return;
     setLoading(true);
     try {
       if (!idempotencyKeyRef.current) idempotencyKeyRef.current = generateIdempotencyKey();
@@ -110,7 +81,7 @@ export default function CheckoutScreen() {
             price_at_purchase: i.product.price,
           })),
           total_amount: total,
-          address_code: addressCodeToUse,
+          address_code: selectedAddressCode,
         },
         { headers: { "Idempotency-Key": key } }
       );
@@ -143,7 +114,7 @@ export default function CheckoutScreen() {
         <Text style={[styles.section, { fontFamily: FontFamily.serif, color: colors.text }]}>{t("delivery_address")}</Text>
         {addressesLoading ? (
           <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />
-        ) : addresses.length > 0 ? (
+        ) : hasAddress ? (
           <>
             {addresses.map((addr) => (
               <TouchableOpacity
@@ -172,71 +143,40 @@ export default function CheckoutScreen() {
                 </View>
               </TouchableOpacity>
             ))}
-            <TouchableOpacity onPress={() => router.push("/addresses/new")}>
+            <TouchableOpacity onPress={() => router.push("/addresses?returnTo=/checkout")}>
+              <Text style={[styles.addAddressLink, { color: colors.primary }]}>{t("change")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/addresses/new?returnTo=/checkout")}>
               <Text style={[styles.addAddressLink, { color: colors.primary }]}>+ {t("add_new_address")}</Text>
             </TouchableOpacity>
           </>
         ) : (
-          <>
-            <Text style={[styles.hint, { color: colors.textMuted }]}>{t("add_delivery_address_hint")}</Text>
-            <TextInput
-              style={[styles.input, { borderColor: colors.sandDivider, color: colors.text }]}
-              placeholder={t("contact_name")}
-              placeholderTextColor={colors.textMuted}
-              value={contactName}
-              onChangeText={setContactName}
-            />
-            <TextInput
-              style={[styles.input, { borderColor: colors.sandDivider, color: colors.text }]}
-              placeholder={t("mobile_placeholder")}
-              placeholderTextColor={colors.textMuted}
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
-            <TextInput
-              style={[styles.input, { borderColor: colors.sandDivider, color: colors.text }]}
-              placeholder={t("street_address_placeholder")}
-              placeholderTextColor={colors.textMuted}
-              value={street}
-              onChangeText={setStreet}
-            />
-            <TextInput
-              style={[styles.input, { borderColor: colors.sandDivider, color: colors.text }]}
-              placeholder={t("city_placeholder")}
-              placeholderTextColor={colors.textMuted}
-              value={city}
-              onChangeText={setCity}
-            />
-            <TextInput
-              style={[styles.input, { borderColor: colors.sandDivider, color: colors.text }]}
-              placeholder={t("country")}
-              placeholderTextColor={colors.textMuted}
-              value={country}
-              onChangeText={setCountry}
-            />
-            <TextInput
-              style={[styles.input, { borderColor: colors.sandDivider, color: colors.text }]}
-              placeholder={t("postal_code")}
-              placeholderTextColor={colors.textMuted}
-              value={postalCode}
-              onChangeText={setPostalCode}
-            />
-          </>
+          <View style={styles.emptyAddressBox}>
+            <Text style={[styles.hint, { color: colors.textMuted }]}>{t("no_address_yet")}</Text>
+            <TouchableOpacity
+              style={[styles.btn, { backgroundColor: colors.primary }]}
+              onPress={() => router.push("/addresses/new?returnTo=/checkout")}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.btnText}>{t("set_address")}</Text>
+            </TouchableOpacity>
+          </View>
         )}
-        <TouchableOpacity
-          style={[
-            styles.btn,
-            { backgroundColor: colors.primary },
-            loading && styles.btnDisabled,
-          ]}
-          onPress={handlePlaceOrder}
-          disabled={loading || (addresses.length > 0 && !selectedAddressCode)}
-        >
-          <Text style={styles.btnText}>
-            {loading ? t("processing") : `${t("place_order")} (AED ${total.toFixed(2)})`}
-          </Text>
-        </TouchableOpacity>
+        {hasAddress && (
+          <TouchableOpacity
+            style={[
+              styles.btn,
+              { backgroundColor: colors.primary },
+              loading && styles.btnDisabled,
+            ]}
+            onPress={handlePlaceOrder}
+            disabled={loading || !selectedAddressCode}
+          >
+            <Text style={styles.btnText}>
+              {loading ? t("processing") : `${t("place_order")} (AED ${total.toFixed(2)})`}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
@@ -259,6 +199,7 @@ const styles = StyleSheet.create({
   addressLine: { fontSize: 13, marginBottom: 2 },
   addressPhone: { fontSize: 12 },
   addAddressLink: { fontSize: 14, fontWeight: "600", marginTop: 8, marginBottom: 16 },
+  emptyAddressBox: { marginTop: 8 },
   hint: { fontSize: 14, marginBottom: 12 },
   input: {
     borderWidth: 1,
