@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useI18nStore } from "@/stores/useI18nStore";
 import api from "@/lib/api";
 import { PageLoader } from "@/components/PageLoader";
-import { Home, Building2, MapPin, ChevronLeft, Pencil, MoreHorizontal } from "lucide-react";
+import { Home, Building2, MapPin, ChevronLeft, Pencil } from "lucide-react";
 
 export interface SavedAddress {
   address_code: string;
@@ -52,6 +52,8 @@ export default function AddressesPage() {
   const { isAuthenticated } = useAuthStore();
   const t = useI18nStore((s) => s.t);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnToCheckout = searchParams.get("returnTo") === "/checkout";
   const [addresses, setAddresses] = useState<SavedAddress[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -101,6 +103,15 @@ export default function AddressesPage() {
       </nav>
 
       <main className="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full pb-32">
+        {returnToCheckout && (
+          <Link
+            href="/checkout"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#ec9213] mb-2"
+          >
+            <ChevronLeft className="size-4" />
+            {t("back_to_checkout")}
+          </Link>
+        )}
         <div className="py-2">
           <p className="text-sm font-medium text-[#897961] uppercase tracking-widest mb-1">
             {t("saved_locations")}
@@ -179,7 +190,7 @@ export default function AddressesPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#f8f7f6] via-[#f8f7f6]/95 to-transparent pt-8 pb-6 px-4">
         <div className="max-w-lg mx-auto">
           <Link
-            href="/profile/addresses/new"
+            href={returnToCheckout ? "/profile/addresses/new?from=checkout" : "/profile/addresses/new"}
             className="w-full bg-[#ec9213] hover:bg-[#d48311] text-white h-14 rounded-xl font-bold text-base shadow-lg shadow-[#ec9213]/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
           >
             <MapPin className="size-5" />
