@@ -162,7 +162,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 2. Connect **GitHub** (authorize if needed) and select your ecommerce repo.
 3. **Name:** e.g. `customer-api`. **Region:** same as the database.
 4. **Root Directory:** `customer-api`.
-5. **Runtime:** Python 3.14 (or 3.11+). The repo’s `.python-version` is set to 3.14.
+5. **Runtime:** Python 3.13 (or 3.11+). The repo’s `.python-version` is set to 3.13.
 6. **Build Command:** `pip install -r requirements.txt` (default).
 7. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT` (Render sets `$PORT`; do not use a fixed port).
 8. **Instance type:** Free.
@@ -170,7 +170,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
    - `DATABASE_URL` = (Neon connection string with `postgresql+asyncpg://` as the scheme).
    - `SECRET_KEY` = (generate a strong key, e.g. `openssl rand -hex 32`).
    - `BACKEND_CORS_ORIGINS` = leave empty for now; set after Vercel deploys (see Phase 7).
-10. **Python version:** The stack uses `asyncpg>=0.31` and `greenlet>=3.0.3,<4`, which provide pre-built wheels for Python 3.14, 3.13, and 3.11. Use Python 3.14 when available (see `customer-api/.python-version`). If Render or your environment lacks 3.14, set **Environment** → `PYTHON_VERSION` = `3.13` or `3.11.9`, or ensure `.python-version` contains `3.13` or `3.11`.
+10. **Python version:** The stack uses `asyncpg>=0.31` and `greenlet>=3.0.3,<4`, which provide pre-built wheels for Python 3.13 and 3.11. Use Python 3.13 (see `customer-api/.python-version`). If Render lacks 3.13, set **Environment** → `PYTHON_VERSION` = `3.11.9`.
 11. **Create Web Service**. Wait for the first deploy to succeed.
 12. Note the service URL (e.g. `https://customer-api-xxxx.onrender.com`). Frontends will use this base URL and append `/v1` (e.g. `https://customer-api-xxxx.onrender.com/v1`).
 
@@ -185,7 +185,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 5. **Environment:**
    - `DATABASE_URL` = (same Neon connection string as customer-api; `postgresql+asyncpg://...`).
    - `STORAGE_PATH` = `/tmp/uploads` (Render’s disk is ephemeral; for beta this is acceptable; for persistent uploads you’d need a volume or external storage).
-6. **Python version:** As with customer-api, use Python 3.14 when available (see `admin-api/.python-version`). Otherwise set **Environment** → `PYTHON_VERSION` = `3.13` or `3.11.9` so asyncpg/greenlet use pre-built wheels.
+6. **Python version:** As with customer-api, use Python 3.13 (see `admin-api/.python-version`). If Render lacks 3.13, set **Environment** → `PYTHON_VERSION` = `3.11.9`.
 7. **Create Web Service**. Note the admin-api URL (e.g. `https://admin-api-xxxx.onrender.com`).
 
 ---

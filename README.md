@@ -24,7 +24,7 @@ Monorepo for the e-commerce platform: customer-facing and admin apps, with share
 
 ## Quick start
 
-**Python:** Customer API, Admin API, Discovery API, and Customer BFF require **Python 3.11 or newer** (3.14 recommended). Each Python app has a `.python-version` file (3.14); use that version locally if available, or 3.11/3.13.
+**Python:** Customer API, Admin API, Discovery API, and Customer BFF require **Python 3.11 or newer** (3.13 recommended). Each Python app has a `.python-version` file (3.13); use that version locally if available, or 3.11.
 
 Run **Customer API** first (required for customer-web and shop). Run **Admin API** first if you use admin-web. Each app can be run from its folder as below.
 
