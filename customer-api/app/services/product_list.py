@@ -11,11 +11,11 @@ from app.models.brand import Brand
 from app.models.taxonomy_attribute import TaxonomyAttribute, TaxonomyAttributeOption
 from app.models.product_attribute_value import ProductAttributeValue
 from app.services.i18n import (
-    build_product_response,
-    get_taxonomy_translated,
-    get_brand_translated,
-    get_attribute_translated,
-    get_option_translated,
+    build_product_responses_batch,
+    batch_taxonomy_translations,
+    batch_brand_translations,
+    batch_attribute_translations,
+    batch_option_translations,
 )
 
 
@@ -115,9 +115,7 @@ async def list_products_with_filters(
     )
     result = await db.execute(query)
     products_raw = result.scalars().all()
-    products = [
-        await build_product_response(db, p, language_id) for p in products_raw
-    ]
+    products = await build_product_responses_batch(db, products_raw, language_id)
 
     # Filters: categories (excluding category filter - show all categories with products matching brand/search/options)
     cat_cond = _base_product_query(search, None, brand_slug, option_ids, min_price, max_price)
@@ -138,11 +136,11 @@ async def list_products_with_filters(
             select(Taxonomy).where(Taxonomy.id.in_(category_ids)).order_by(Taxonomy.sort_order, Taxonomy.name)
         )
         taxonomies = tax_result.scalars().all()
+        cat_trans = await batch_taxonomy_translations(db, category_ids, language_id)
         for t in taxonomies:
-            name = await get_taxonomy_translated(db, t.id, language_id) or t.name
             categories_data.append({
                 "id": t.id,
-                "name": name,
+                "name": cat_trans.get(t.id, t.name),
                 "slug": t.slug,
                 "count": cat_counts.get(t.id, 0),
             })
@@ -166,17 +164,17 @@ async def list_products_with_filters(
             select(Brand).where(Brand.id.in_(brand_ids)).order_by(Brand.name)
         )
         brands = b_result.scalars().all()
+        br_trans = await batch_brand_translations(db, brand_ids, language_id)
         for b in brands:
-            name = await get_brand_translated(db, b.id, language_id) or b.name
             brands_data.append({
                 "id": b.id,
-                "name": name,
+                "name": br_trans.get(b.id, b.name),
                 "slug": b.slug,
                 "count": brand_counts.get(b.id, 0),
             })
 
     # Filters: attributes (only when category selected - attributes are taxonomy-scoped)
-    # For each option: count = products matching (base) + (other selected options) + this option
+    # Single query counts all option combinations instead of one query per option
     attributes_data = []
     if category_slug:
         tax_res = await db.execute(
@@ -191,28 +189,43 @@ async def list_products_with_filters(
                 .options(selectinload(TaxonomyAttribute.options))
             )
             attrs = attr_res.scalars().all()
+
+            # Collect all attr/option IDs, fetch translations in batch
+            all_attr_ids = [a.id for a in attrs]
+            all_opt_ids = [o.id for a in attrs for o in (a.options or []) if getattr(o, "is_active", True)]
+            at_trans = await batch_attribute_translations(db, all_attr_ids, language_id)
+            ot_trans = await batch_option_translations(db, all_opt_ids, language_id)
+
+            # Base condition excluding attribute options for cross-attribute counting
+            base_no_opts = _base_product_query(search, category_slug, brand_slug, None, min_price, max_price)
+
+            # Count products per option in ONE query (products matching base + having that option)
+            if all_opt_ids:
+                opt_count_q = (
+                    select(ProductAttributeValue.option_id, func.count(func.distinct(Product.id)))
+                    .select_from(Product)
+                    .join(ProductAttributeValue, ProductAttributeValue.product_id == Product.id)
+                    .where(base_no_opts)
+                    .where(ProductAttributeValue.option_id.in_(all_opt_ids))
+                    .group_by(ProductAttributeValue.option_id)
+                )
+                opt_count_res = await db.execute(opt_count_q)
+                opt_counts = {row[0]: row[1] for row in opt_count_res.all()}
+            else:
+                opt_counts = {}
+
             for attr in attrs:
-                attr_name = await get_attribute_translated(db, attr.id, language_id) or attr.name
-                # Options selected from OTHER attributes (not this one)
-                other_opt_ids = [oid for oid in (option_ids or []) if oid not in {o.id for o in (attr.options or [])}]
+                attr_name = at_trans.get(attr.id, attr.name)
                 opts_with_count = []
                 for opt in sorted(
                     [o for o in (attr.options or []) if getattr(o, "is_active", True)],
                     key=lambda o: (o.sort_order or 0, o.value),
                 ):
-                    opt_val = await get_option_translated(db, opt.id, language_id) or opt.value
-                    combined_opts = other_opt_ids + [opt.id]
-                    opt_cond = _base_product_query(
-                        search, category_slug, brand_slug, combined_opts, min_price, max_price
-                    )
-                    cnt_res = await db.execute(
-                        select(func.count(Product.id)).select_from(Product).where(opt_cond)
-                    )
-                    cnt = cnt_res.scalar() or 0
+                    cnt = opt_counts.get(opt.id, 0)
                     if cnt > 0:
                         opts_with_count.append({
                             "id": opt.id,
-                            "value": opt_val,
+                            "value": ot_trans.get(opt.id, opt.value),
                             "count": cnt,
                         })
                 if opts_with_count:
