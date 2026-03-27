@@ -469,10 +469,9 @@ UI_STRINGS = {
 async def reset_and_seed():
     print("Dropping all tables...")
     async with engine.begin() as conn:
-        # Drop tables with FK deps that aren't in this app's metadata so drop_all can succeed.
-        await conn.execute(text("DROP TABLE IF EXISTS product_bulk_uploads CASCADE"))
-        await conn.execute(text("DROP TABLE IF EXISTS idempotency_keys CASCADE"))
-        await conn.run_sync(Base.metadata.drop_all)
+        # Drop all tables with CASCADE to handle cross-service FK dependencies
+        await conn.execute(text("DROP SCHEMA public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
 
     print("Creating all tables...")
     async with engine.begin() as conn:
