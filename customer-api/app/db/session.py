@@ -1,16 +1,20 @@
+import ssl as _ssl
+
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from app.core.config import settings
 
-# SQLite: busy timeout; PostgreSQL: set connection_timeout/command_timeout in connect_args when using asyncpg
-_connect_args = {}
+_connect_args: dict = {}
 if "sqlite" in settings.DATABASE_URL:
     _connect_args["timeout"] = settings.DB_CONNECT_TIMEOUT
+elif "postgresql" in settings.DATABASE_URL:
+    # Neon and most cloud PostgreSQL providers require SSL
+    _connect_args["ssl"] = _ssl.create_default_context()
 
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     future=True,
-    connect_args=_connect_args if _connect_args else {},
+    connect_args=_connect_args,
 )
 
 # Create async session factory

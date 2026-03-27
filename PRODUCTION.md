@@ -43,7 +43,7 @@ Steps to make the ecommerce platform production-ready and deploy to a server or 
 | Option | Best for | Summary |
 |--------|----------|---------|
 | **A. Docker Compose** | VPS, single host, full control | Run the full stack in containers; add PostgreSQL for production. Easiest if you already use Docker locally. |
-| **B. Cloud (free tiers)** | Beta, minimal cost | Vercel (frontends) + Render (APIs + PostgreSQL) + EAS (shop iOS/Android). Services may sleep when idle. |
+| **B. Cloud (free tiers)** | Beta, minimal cost | Vercel (frontends) + Render (APIs) + Neon (PostgreSQL) + EAS (shop iOS/Android). Services may sleep when idle. |
 | **C. Google Cloud (GCP)** | Production, single cloud | Cloud Run (APIs + frontends), Cloud SQL (PostgreSQL), Secret Manager. Billing enabled; free tier applies to many products. |
 
 ### Systems and apps (coverage by path)
@@ -90,7 +90,7 @@ All of these are defined in [docker-compose.yml](docker-compose.yml). To run wit
 ### Production steps (Docker)
 
 1. **PostgreSQL**  
-   - Add a `postgres` service to Compose with a named volume (or use a managed PostgreSQL e.g. Render, Supabase).  
+   - Add a `postgres` service to Compose with a named volume (or use a managed PostgreSQL e.g. Neon, Supabase).  
    - Set `DATABASE_URL=postgresql+asyncpg://user:password@postgres:5432/ecommerce` (or the managed URL) for **customer-api**, **admin-api**, **bulk-import-worker**, and **init**; all four share the same DB.  
    - **discovery-api** uses its own DB (SQLite on the `discoverydata` volume by default, or a separate PostgreSQL instance if you prefer). See [discovery-api/README](discovery-api/README.md) for its env vars (e.g. `RAPIDAPI_KEY`, `SERPAPI_API_KEY`).
 
@@ -130,7 +130,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 | admin-web | Vercel | Vite static; set `VITE_API_URL` to admin-api on Render |
 | customer-api | Render | Web service; same PostgreSQL as admin-api |
 | admin-api | Render | Web service; optional background worker or same process |
-| PostgreSQL | Render | Single DB for both APIs (free tier) |
+| PostgreSQL | Neon | Single DB for both APIs (free tier, serverless) |
 | shop (web) | Vercel | Optional: Expo web build as static site |
 | shop (iOS/Android) | EAS Build | Set `EXPO_PUBLIC_API_URL` to production customer-api URL |
 | discovery-api | Render (optional) | Web service; root `discovery-api`; own DB (SQLite on ephemeral disk or separate DB). See Phase 9. |
@@ -140,20 +140,19 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 
 - Code pushed to a **GitHub** repo (Render and Vercel deploy from Git).
 - Production checklist (Section 1) done or in progress: `SECRET_KEY`, PostgreSQL, CORS origins.
-- Free accounts: [Render](https://render.com), [Vercel](https://vercel.com), [Expo](https://expo.dev) (for EAS).
+- Free accounts: [Render](https://render.com), [Neon](https://neon.tech), [Vercel](https://vercel.com), [Expo](https://expo.dev) (for EAS).
 
 ---
 
-### Phase 1: Render – PostgreSQL
+### Phase 1: Neon – PostgreSQL (serverless)
 
-1. Sign in at [render.com](https://render.com).
-2. **Dashboard → New + → PostgreSQL**.
-3. **Name:** e.g. `ecommerce-db`. **Region:** choose the same region you will use for your API services (e.g. Oregon).
-4. **Plan:** Free. Create.
-5. After the database is created, open it and go to the **Info** tab.
-6. Copy **Internal Database URL** (use this for APIs in the same Render account; format `postgresql://...`).  
-   For our APIs you must use the **asyncpg** driver: when setting `DATABASE_URL`, change the scheme from `postgresql://` to `postgresql+asyncpg://` (e.g. `postgresql+asyncpg://user:pass@host/dbname`).
-7. Optionally note **External Database URL** (for running the seed from your machine).
+1. Sign in at [neon.tech](https://neon.tech).
+2. **Create a project**. Name it e.g. `ecommerce`. Choose a region close to your Render API services (e.g. `us-east-2` or `us-west-2`).
+3. **Plan:** Free (0.5 GiB storage, autoscaling compute). Create.
+4. After the project is created, go to **Dashboard → Connection Details**.
+5. Copy the **connection string** (format `postgresql://user:pass@ep-xxx.region.aws.neon.tech/dbname?sslmode=require`).
+   For our APIs you must use the **asyncpg** driver: change the scheme from `postgresql://` to `postgresql+asyncpg://` (e.g. `postgresql+asyncpg://user:pass@ep-xxx.us-east-2.aws.neon.tech/ecommerce?sslmode=require`).
+6. The same connection string works from both Render services and your local machine (Neon is accessible over the internet, unlike Render's internal URLs).
 
 ---
 
@@ -168,7 +167,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 7. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT` (Render sets `$PORT`; do not use a fixed port).
 8. **Instance type:** Free.
 9. **Environment** → Add environment variables (key / value):
-   - `DATABASE_URL` = (Internal Database URL with `postgresql+asyncpg://` as the scheme).
+   - `DATABASE_URL` = (Neon connection string with `postgresql+asyncpg://` as the scheme).
    - `SECRET_KEY` = (generate a strong key, e.g. `openssl rand -hex 32`).
    - `BACKEND_CORS_ORIGINS` = leave empty for now; set after Vercel deploys (see Phase 7).
 10. **Python version:** The stack uses `asyncpg>=0.31` and `greenlet>=3.0.3,<4`, which provide pre-built wheels for Python 3.14, 3.13, and 3.11. Use Python 3.14 when available (see `customer-api/.python-version`). If Render or your environment lacks 3.14, set **Environment** → `PYTHON_VERSION` = `3.13` or `3.11.9`, or ensure `.python-version` contains `3.13` or `3.11`.
@@ -184,7 +183,7 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 3. **Build Command:** `pip install -r requirements.txt`. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 4. **Instance type:** Free.
 5. **Environment:**
-   - `DATABASE_URL` = (same value as customer-api; `postgresql+asyncpg://...`).
+   - `DATABASE_URL` = (same Neon connection string as customer-api; `postgresql+asyncpg://...`).
    - `STORAGE_PATH` = `/tmp/uploads` (Render’s disk is ephemeral; for beta this is acceptable; for persistent uploads you’d need a volume or external storage).
 6. **Python version:** As with customer-api, use Python 3.14 when available (see `admin-api/.python-version`). Otherwise set **Environment** → `PYTHON_VERSION` = `3.13` or `3.11.9` so asyncpg/greenlet use pre-built wheels.
 7. **Create Web Service**. Note the admin-api URL (e.g. `https://admin-api-xxxx.onrender.com`).
@@ -195,14 +194,14 @@ Deploy frontends and APIs to separate platforms. Good for beta; some services sl
 
 Run the seed once so the database has an admin user, sample products, and UI strings.
 
-**Option A – From your machine (recommended)**  
-1. Copy Render’s **External Database URL** from the PostgreSQL service (Info tab).  
-2. Convert to asyncpg format: `postgresql+asyncpg://...` (replace `postgresql://` with `postgresql+asyncpg://`).  
-3. Locally: `cd customer-api`, set `DATABASE_URL` to that value, then run `python3 reset_and_seed.py`.  
+**Option A – From your machine (recommended)**
+1. Copy the Neon connection string from **Dashboard → Connection Details**.
+2. Convert to asyncpg format: `postgresql+asyncpg://...` (replace `postgresql://` with `postgresql+asyncpg://`). Keep `?sslmode=require`.
+3. Locally: `cd customer-api`, set `DATABASE_URL` to that value, then run `python3 reset_and_seed.py`.
 4. Ensure `asyncpg` is installed: `pip install asyncpg`.
 
-**Option B – Render Shell**  
-If your Render plan includes Shell access: open the **customer-api** service → **Shell** tab → run `python3 reset_and_seed.py` (with `DATABASE_URL` already set in the service env). This uses the Internal Database URL.
+**Option B – Render Shell**
+If your Render plan includes Shell access: open the **customer-api** service → **Shell** tab → run `python3 reset_and_seed.py` (with `DATABASE_URL` already set in the service env).
 
 ---
 
@@ -346,7 +345,7 @@ GCP’s free tier includes monthly free egress and a generous number of Cloud Ru
 ## 6. Beta Caveats
 
 - **Render free web services** sleep after ~15 min idle; first request can be slow.
-- **PostgreSQL free tier** has connection and storage limits.
+- **Neon free tier** has 0.5 GiB storage limit and auto-suspends compute after 5 min idle (reconnects transparently).
 - **TestFlight / Play internal** have rate limits but are sufficient for beta.
 - **Docker on a VPS** avoids cold starts but you manage the host and updates.
 - **Discovery APIs** (e.g. AliExpress, SerpApi) may have rate limits from third-party providers; check each strategy’s API tier.

@@ -6,6 +6,8 @@ All notable changes are recorded here only. Use format: `## YYYY-MM-DD` for the 
 
 ## [Unreleased]
 
+- **Switch from Render PostgreSQL to Neon (free serverless PostgreSQL):** All three API session.py files now auto-configure SSL (`ssl.create_default_context()`) for PostgreSQL connections, required by Neon and most cloud providers. .env.example files updated with Neon connection string format. PRODUCTION.md Path B Phase 1 rewritten for Neon setup; Phase 2/3/4 references updated. .env.docker.example includes Neon example. (customer-api, admin-api, discovery-api, PRODUCTION.md, docs)
+
 - **Python 3.14 as default for Python apps:** Updated `.python-version` to 3.14 in customer-api, admin-api, discovery-api, and customer-bff. asyncpg 0.31 and greenlet >=3.0.3 support 3.14; requirements unchanged. README (root and Python app READMEs) and PRODUCTION.md now state Python 3.11+ (3.14 recommended) and document fallback to 3.13/3.11 on Render if needed. (customer-api, admin-api, discovery-api, customer-bff, README, PRODUCTION.md)
 
 - **Checkout address flow refactor:** Orders use only `address_code` (required); removed inline `shipping_address` from order create API. Order model has non-nullable `address_code`; seed creates orders with address_code from customer addresses. customer-web and shop: cart auth guard (redirect to login with return to checkout); checkout shows address selector or empty state with “Set Address” linking to addresses screen; no inline address form. Addresses flow supports return to checkout. i18n keys: set_address, no_address_yet, back_to_checkout, sign_in_to_checkout (EN/AR). README checkout flow description updated. (customer-api, customer-web, shop)
