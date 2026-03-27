@@ -469,8 +469,9 @@ UI_STRINGS = {
 async def reset_and_seed():
     print("Dropping all tables...")
     async with engine.begin() as conn:
-        # Drop admin-api tables that reference shared tables (e.g. users) so drop_all can succeed.
-        await conn.execute(text("DROP TABLE IF EXISTS product_bulk_uploads"))
+        # Drop tables with FK deps that aren't in this app's metadata so drop_all can succeed.
+        await conn.execute(text("DROP TABLE IF EXISTS product_bulk_uploads CASCADE"))
+        await conn.execute(text("DROP TABLE IF EXISTS idempotency_keys CASCADE"))
         await conn.run_sync(Base.metadata.drop_all)
 
     print("Creating all tables...")
