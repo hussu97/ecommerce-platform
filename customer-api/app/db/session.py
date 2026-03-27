@@ -1,5 +1,5 @@
 import ssl as _ssl
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+from urllib.parse import urlparse, urlunparse
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from app.core.config import settings
@@ -11,11 +11,9 @@ if "sqlite" in _db_url:
 elif "postgresql" in _db_url:
     # Neon and most cloud PostgreSQL providers require SSL
     _connect_args["ssl"] = _ssl.create_default_context()
-    # asyncpg does not accept sslmode as a query param — strip it
+    # Strip libpq query params (sslmode, channel_binding, etc.) that asyncpg rejects
     _parsed = urlparse(_db_url)
-    _qs = parse_qs(_parsed.query)
-    _qs.pop("sslmode", None)
-    _db_url = urlunparse(_parsed._replace(query=urlencode(_qs, doseq=True)))
+    _db_url = urlunparse(_parsed._replace(query=""))
 
 engine = create_async_engine(
     _db_url,
